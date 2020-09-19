@@ -9,6 +9,23 @@ repositories {
     mavenCentral()
 }
 
+// These arguments are required because of the JVM 11's module system -
+// we grant this module access to the packages from the Truffle API JAR
+test {
+    jvmArgs '-ea',
+            '--add-exports',
+                'org.graalvm.truffle/com.oracle.truffle.api.nodes=ALL-UNNAMED',
+            '--add-exports',
+                'org.graalvm.truffle/com.oracle.truffle.api=ALL-UNNAMED'
+}
+
+ext {
+    graal_version = '20.2.0'
+}
+
 dependencies {
+    compile "org.graalvm.truffle:truffle-api:$graal_version"
+    compileOnly "org.graalvm.truffle:truffle-dsl-processor:$graal_version"
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
