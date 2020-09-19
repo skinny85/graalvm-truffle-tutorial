@@ -3,7 +3,9 @@ package com.endoflineblog.truffle;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 public class AdditionNode extends EasyScriptExprNode {
-    private final EasyScriptExprNode leftNode, rightNode;
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    private EasyScriptExprNode leftNode, rightNode;
 
     public AdditionNode(EasyScriptExprNode leftNode, EasyScriptExprNode rightNode) {
         this.leftNode = leftNode;
