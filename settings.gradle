@@ -1,2 +1,3 @@
 rootProject.name = 'truffle-tutorial'
 
+include 'part-01'

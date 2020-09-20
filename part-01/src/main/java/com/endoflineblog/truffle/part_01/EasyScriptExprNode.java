@@ -1,4 +1,4 @@
-package com.endoflineblog.truffle;
+package com.endoflineblog.truffle.part_01;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
