@@ -6,9 +6,9 @@ import com.oracle.truffle.api.nodes.RootNode;
 public class EasyScriptRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private EasyScriptExprNode exprNode;
+    private EasyScriptNode exprNode;
 
-    public EasyScriptRootNode(EasyScriptExprNode exprNode) {
+    public EasyScriptRootNode(EasyScriptNode exprNode) {
         super(null);
 
         this.exprNode = exprNode;

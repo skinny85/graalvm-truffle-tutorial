@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 public class ExecuteNodesTest {
     @Test
     public void adds_12_and_34_correctly() {
-        EasyScriptExprNode exprNode = new AdditionNode(new IntLiteralNode(12), new IntLiteralNode(34));
+        EasyScriptNode exprNode = new AdditionNode(new IntLiteralNode(12), new IntLiteralNode(34));
         var rootNode = new EasyScriptRootNode(exprNode);
         CallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
 

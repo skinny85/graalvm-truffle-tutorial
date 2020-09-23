@@ -16,7 +16,7 @@ and so gets built when you build the top-level project.
 
 ## Setup
 
-First of all, you need a GraalVM installation on your local machine.
+To build and execute this project, you need a GraalVM installation on your local machine.
 The free Community Edition works fine if you don't have the paid Enterprise Edition.
 You can download it from here: https://github.com/graalvm/graalvm-ce-builds/releases.
 This repository uses Java 11 features,

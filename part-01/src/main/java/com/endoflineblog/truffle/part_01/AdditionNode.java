@@ -2,12 +2,12 @@ package com.endoflineblog.truffle.part_01;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-public class AdditionNode extends EasyScriptExprNode {
+public class AdditionNode extends EasyScriptNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private EasyScriptExprNode leftNode, rightNode;
+    private EasyScriptNode leftNode, rightNode;
 
-    public AdditionNode(EasyScriptExprNode leftNode, EasyScriptExprNode rightNode) {
+    public AdditionNode(EasyScriptNode leftNode, EasyScriptNode rightNode) {
         this.leftNode = leftNode;
         this.rightNode = rightNode;
     }
