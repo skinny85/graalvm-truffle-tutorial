@@ -2,6 +2,9 @@ package com.endoflineblog.truffle.part_01;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+/**
+ * The AST node that represents the plus operator in EasyScript.
+ */
 public final class AdditionNode extends EasyScriptNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
