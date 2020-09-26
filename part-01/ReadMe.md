@@ -1,4 +1,4 @@
-# Part 1 - Nodes and CallTarget
+# Part 1 - `Node`, `RootNode`, `CallTarget`
 
 In this first part,
 EasyScript will be extremely simple:

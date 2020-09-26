@@ -54,4 +54,4 @@ $ ./gradlew build
 
 ## Table of contents
 
-* [Part 1 - Nodes and CallTarget](part-01/ReadMe.md)
+* [Part 1 - `Node`, `RootNode`, `CallTarget`](part-01/ReadMe.md)
