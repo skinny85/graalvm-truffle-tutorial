@@ -1,3 +1,4 @@
 rootProject.name = 'truffle-tutorial'
 
-include 'part-01'
+include 'part-01',
+        'part-02'

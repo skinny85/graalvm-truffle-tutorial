@@ -55,3 +55,4 @@ $ ./gradlew build
 ## Table of contents
 
 * [Part 1 - `Node`, `RootNode`, `CallTarget`](part-01/ReadMe.md)
+* [Part 2 - introduction to specializations](part-02/ReadMe.md)
