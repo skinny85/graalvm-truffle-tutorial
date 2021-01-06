@@ -17,7 +17,9 @@ subprojects {
                 '--add-exports',
                     'org.graalvm.truffle/com.oracle.truffle.api=ALL-UNNAMED',
                 '--add-exports',
-                    'org.graalvm.truffle/com.oracle.truffle.api.nodes=ALL-UNNAMED'
+                    'org.graalvm.truffle/com.oracle.truffle.api.nodes=ALL-UNNAMED',
+                '--add-exports',
+                    'org.graalvm.truffle/com.oracle.truffle.api.dsl=ALL-UNNAMED'
     }
 
     ext {
@@ -26,7 +28,7 @@ subprojects {
 
     dependencies {
         implementation "org.graalvm.truffle:truffle-api:$graal_version"
-        compileOnly "org.graalvm.truffle:truffle-dsl-processor:$graal_version"
+        annotationProcessor "org.graalvm.truffle:truffle-dsl-processor:$graal_version"
 
         testImplementation "junit:junit:4.12"
     }
