@@ -10,9 +10,19 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.io.IOException;
+import java.io.Reader;
+
 public final class EasyScriptTruffleParser {
     public static EasyScriptNode parse(String program) {
-        var inputStream = new ANTLRInputStream(program);
+        return parse(new ANTLRInputStream(program));
+    }
+
+    public static EasyScriptNode parse(Reader program) throws IOException {
+        return parse(new ANTLRInputStream(program));
+    }
+
+    private static EasyScriptNode parse(ANTLRInputStream inputStream) {
         var lexer = new EasyScriptLexer(inputStream);
         // remove the default console error listener
         lexer.removeErrorListeners();

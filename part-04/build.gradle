@@ -1,6 +1,11 @@
 apply plugin: 'antlr'
 
 dependencies {
-    compile project(':part-03')
-    antlr "org.antlr:antlr4:4.5.1"
+    implementation project(':part-03')
+    antlr 'org.antlr:antlr4:4.5.1'
+}
+
+// required to allow GraalVM to discover our EasyScript language class
+test {
+    jvmArgs '-Dgraalvm.locatorDisabled=true'
 }
