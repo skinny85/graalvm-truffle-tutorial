@@ -7,6 +7,7 @@ import com.endoflineblog.truffle.part_03.EasyScriptNode;
 import com.endoflineblog.truffle.part_03.IntLiteralNode;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -22,7 +23,7 @@ public final class EasyScriptTruffleParser {
         return parse(new ANTLRInputStream(program));
     }
 
-    private static EasyScriptNode parse(ANTLRInputStream inputStream) {
+    private static EasyScriptNode parse(CharStream inputStream) {
         var lexer = new EasyScriptLexer(inputStream);
         // remove the default console error listener
         lexer.removeErrorListeners();

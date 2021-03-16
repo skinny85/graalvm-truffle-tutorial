@@ -9,20 +9,16 @@ import com.oracle.truffle.api.TruffleLanguage;
 import java.io.IOException;
 
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
-public final class EasyScriptTruffleLanguage extends
-        TruffleLanguage<EasyScriptTruffleContext> {
-    @Override
-    protected EasyScriptTruffleContext createContext(Env env) {
-        return new EasyScriptTruffleContext();
-    }
-
+public final class EasyScriptTruffleLanguage extends TruffleLanguage<Void> {
     @Override
     protected CallTarget parse(ParsingRequest request) throws IOException {
         EasyScriptNode exprNode = EasyScriptTruffleParser.parse(request.getSource().getReader());
         var rootNode = new EasyScriptRootNode(exprNode);
         return Truffle.getRuntime().createCallTarget(rootNode);
     }
-}
 
-final class EasyScriptTruffleContext {
+    @Override
+    protected Void createContext(Env env) {
+        return null;
+    }
 }
