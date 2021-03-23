@@ -57,3 +57,4 @@ $ ./gradlew build
 * [Part 1 - `Node`, `RootNode`, `CallTarget`](part-01/ReadMe.md)
 * [Part 2 - introduction to specializations](part-02/ReadMe.md)
 * [Part 3 - specializations using Truffle DSL, `@TypeSystem`](part-03/ReadMe.md)
+* [Part 4 - parsing, and the `TruffleLanguage` class](part-04/ReadMe.md)
