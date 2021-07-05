@@ -17,7 +17,6 @@ public final class EasyScriptRootNode extends RootNode {
      * Fields annotated with {@code @Children}
      * need to have the array type.
      */
-    @SuppressWarnings("FieldMayBeFinal")
     @Children
     private final EasyScriptStmtNode[] stmtNodes;
 

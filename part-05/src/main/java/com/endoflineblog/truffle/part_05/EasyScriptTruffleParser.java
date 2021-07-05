@@ -94,10 +94,9 @@ public final class EasyScriptTruffleParser {
 
     private AssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
         EasyScriptParser.BindingContext binding = assignmentExpr.binding();
-        // create a new frame slot for this variable
         String variableId = binding.ID().getText();
-        FrameSlot frameSlot;
-        frameSlot = this.frameDescriptor.findFrameSlot(variableId);
+        // retrieve the frame slot for this variable
+        FrameSlot frameSlot = this.frameDescriptor.findFrameSlot(variableId);
         if (frameSlot == null) {
             throw new EasyScriptException("'" + variableId + "' is not defined");
         }
