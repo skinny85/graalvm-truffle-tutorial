@@ -58,3 +58,4 @@ $ ./gradlew build
 * [Part 2 - introduction to specializations](part-02/ReadMe.md)
 * [Part 3 - specializations using Truffle DSL, `@TypeSystem`](part-03/ReadMe.md)
 * [Part 4 - parsing, and the `TruffleLanguage` class](part-04/ReadMe.md)
+* [Part 5 - global variables](part-05/ReadMe.md)
