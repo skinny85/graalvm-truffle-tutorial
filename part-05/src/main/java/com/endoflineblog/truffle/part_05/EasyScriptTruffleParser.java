@@ -71,6 +71,10 @@ public final class EasyScriptTruffleParser {
         return declStmt.binding()
                 .stream()
                 .map(binding -> {
+                    // we parse the initializer expression before creating a slot for the variable -
+                    // this handles the edge case of using a variable in its own initializer
+                    EasyScriptExprNode initializerExpr = this.parseExpr1(binding.expr1());
+
                     // create a new frame slot for this variable
                     String variableId = binding.ID().getText();
                     FrameSlot frameSlot;
@@ -79,17 +83,14 @@ public final class EasyScriptTruffleParser {
                     } catch (IllegalArgumentException e) {
                         throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                     }
-                    return new DeclStmtNode(AssignmentExprNodeGen.create(
-                            this.parseExpr1(binding.expr1()), frameSlot));
+                    return new DeclStmtNode(AssignmentExprNodeGen.create(initializerExpr, frameSlot));
                 });
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
-        if (expr1 instanceof EasyScriptParser.AssignmentExpr1Context) {
-            return parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1);
-        } else {
-            return this.parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
-        }
+        return expr1 instanceof EasyScriptParser.AssignmentExpr1Context
+                ? parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1)
+                : this.parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
     }
 
     private AssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {

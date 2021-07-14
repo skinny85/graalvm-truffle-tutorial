@@ -90,4 +90,15 @@ public class ExecutingTest {
             assertEquals("'a' is not defined", e.getMessage());
         }
     }
+
+    @Test
+    public void using_a_variable_in_its_own_definition_causes_an_error() {
+        try {
+            this.context.eval("ezs", "let x = x");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'x' is not defined", e.getMessage());
+        }
+    }
 }
