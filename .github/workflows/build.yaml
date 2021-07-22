@@ -15,7 +15,7 @@ jobs:
       - name: Set up GraalVM with Java 11
         uses: DeLaGuardo/setup-graalvm@master
         with:
-          graalvm-version: '20.2.0.java11'
+          graalvm-version: '21.2.0.java11'
 
       - name: Cache Gradle packages
         uses: actions/cache@v2
