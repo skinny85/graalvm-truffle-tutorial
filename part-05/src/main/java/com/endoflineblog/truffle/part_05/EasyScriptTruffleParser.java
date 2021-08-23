@@ -2,19 +2,16 @@ package com.endoflineblog.truffle.part_05;
 
 import com.endoflineblog.truffle.part_05.nodes.exprs.AdditionExprNode;
 import com.endoflineblog.truffle.part_05.nodes.exprs.AdditionExprNodeGen;
-import com.endoflineblog.truffle.part_05.nodes.exprs.AssignmentExprNode;
-import com.endoflineblog.truffle.part_05.nodes.exprs.AssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_05.nodes.exprs.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_05.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarAssignmentExprNode;
+import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarAssignmentExprNodeGen;
+import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarReferenceExprNode;
+import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_05.nodes.exprs.IntLiteralExprNode;
-import com.endoflineblog.truffle.part_05.nodes.exprs.ReferenceExprNode;
-import com.endoflineblog.truffle.part_05.nodes.exprs.ReferenceExprNodeGen;
-import com.endoflineblog.truffle.part_05.nodes.stmts.DeclStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.ExprStmtNode;
-import com.oracle.truffle.api.frame.FrameDescriptor;
-import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
+import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNodeGen;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,7 +19,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,11 +31,7 @@ import java.util.stream.Stream;
  * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_05/EasyScript.g4 file.
  */
 public final class EasyScriptTruffleParser {
-    private final FrameDescriptor frameDescriptor;
-
-    public EasyScriptTruffleParser(FrameDescriptor frameDescriptor) {
-        this.frameDescriptor = frameDescriptor;
-    }
+    private final Set<String> constants = new HashSet<>();
 
     public List<EasyScriptStmtNode> parse(Reader program) throws IOException {
         var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
@@ -62,28 +57,19 @@ public final class EasyScriptTruffleParser {
         return new ExprStmtNode(this.parseExpr1(exprStmt.expr1()));
     }
 
-    enum VariableMutability { MUTABLE, IMMUTABLE }
-
     private Stream<EasyScriptStmtNode> parseDeclStmt(EasyScriptParser.DeclStmtContext declStmt) {
-        var variableMutability = declStmt.getText().startsWith("const")
-                ? VariableMutability.IMMUTABLE
-                : VariableMutability.MUTABLE;
+        boolean isConstantDecl = declStmt.getText().startsWith("const");
         return declStmt.binding()
                 .stream()
                 .map(binding -> {
                     // we parse the initializer expression before creating a slot for the variable -
                     // this handles the edge case of using a variable in its own initializer
                     EasyScriptExprNode initializerExpr = this.parseExpr1(binding.expr1());
-
-                    // create a new frame slot for this variable
                     String variableId = binding.ID().getText();
-                    FrameSlot frameSlot;
-                    try {
-                        frameSlot = this.frameDescriptor.addFrameSlot(variableId, variableMutability, FrameSlotKind.Illegal);
-                    } catch (IllegalArgumentException e) {
-                        throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
+                    if (isConstantDecl) {
+                        this.constants.add(variableId);
                     }
-                    return new DeclStmtNode(AssignmentExprNodeGen.create(initializerExpr, frameSlot));
+                    return GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId);
                 });
     }
 
@@ -93,18 +79,13 @@ public final class EasyScriptTruffleParser {
                 : this.parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
     }
 
-    private AssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
+    private GlobalVarAssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
         EasyScriptParser.BindingContext binding = assignmentExpr.binding();
         String variableId = binding.ID().getText();
-        // retrieve the frame slot for this variable
-        FrameSlot frameSlot = this.frameDescriptor.findFrameSlot(variableId);
-        if (frameSlot == null) {
-            throw new EasyScriptException("'" + variableId + "' is not defined");
-        }
-        if (frameSlot.getInfo() == VariableMutability.IMMUTABLE) {
+        if (this.constants.contains(variableId)) {
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
         }
-        return AssignmentExprNodeGen.create(this.parseExpr1(binding.expr1()), frameSlot);
+        return GlobalVarAssignmentExprNodeGen.create(this.parseExpr1(binding.expr1()), variableId);
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
@@ -136,13 +117,8 @@ public final class EasyScriptTruffleParser {
                 : new DoubleLiteralExprNode(Double.parseDouble(literalExpr.getText()));
     }
 
-    private ReferenceExprNode parseReferenceExpr(EasyScriptParser.ReferenceExpr3Context refExpr) {
+    private GlobalVarReferenceExprNode parseReferenceExpr(EasyScriptParser.ReferenceExpr3Context refExpr) {
         String variableId = refExpr.ID().getText();
-        // retrieve the frame slot for this variable
-        FrameSlot frameSlot = this.frameDescriptor.findFrameSlot(variableId);
-        if (frameSlot == null) {
-            throw new EasyScriptException("'" + variableId + "' is not defined");
-        }
-        return ReferenceExprNodeGen.create(frameSlot);
+        return GlobalVarReferenceExprNodeGen.create(variableId);
     }
 }

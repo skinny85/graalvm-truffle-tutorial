@@ -5,7 +5,6 @@ import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
-import com.oracle.truffle.api.frame.FrameDescriptor;
 
 import java.util.List;
 
@@ -14,13 +13,12 @@ import java.util.List;
  * Very similar to EasyScriptTruffleLanguage in part 4.
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
-public final class EasyScriptTruffleLanguage extends TruffleLanguage<Void> {
+public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
-        var frameDescriptor = new FrameDescriptor();
-        var easyScriptTruffleParser = new EasyScriptTruffleParser(frameDescriptor);
+        var easyScriptTruffleParser = new EasyScriptTruffleParser();
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parse(request.getSource().getReader());
-        var rootNode = new EasyScriptRootNode(this, frameDescriptor, stmts);
+        var rootNode = new EasyScriptRootNode(this, stmts);
         return Truffle.getRuntime().createCallTarget(rootNode);
     }
 
@@ -29,7 +27,12 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<Void> {
      * so we still return {@code null} here.
      */
     @Override
-    protected Void createContext(Env env) {
-        return null;
+    protected EasyScriptLanguageContext createContext(Env env) {
+        return new EasyScriptLanguageContext();
+    }
+
+    @Override
+    protected Object getScope(EasyScriptLanguageContext context) {
+        return context.globalScopeObject;
     }
 }

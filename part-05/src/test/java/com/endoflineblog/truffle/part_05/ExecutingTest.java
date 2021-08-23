@@ -7,6 +7,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +37,26 @@ public class ExecutingTest {
         );
 
         assertEquals(14, result.asInt());
+
+        Value globalBindings = this.context.getBindings("ezs");
+        assertFalse(globalBindings.isNull());
+        assertTrue(globalBindings.hasMembers());
+        assertTrue(globalBindings.hasMember("a"));
+        Value a = globalBindings.getMember("a");
+        assertEquals(7, a.asInt());
+        assertEquals(Set.of("a", "b", "c"), globalBindings.getMemberKeys());
+    }
+
+    @Test
+    public void global_variables_are_saved_between_executions() {
+        this.context.eval("ezs",
+                "var a = 1; " +
+                "let b = 2; " +
+                "const c = 3.0; "
+        );
+        Value result = this.context.eval("ezs", "a + b + c;");
+
+        assertEquals(6.0, result.asDouble(), 0.0);
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_05.nodes;
 
 import com.endoflineblog.truffle.part_05.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
-import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
@@ -21,8 +20,8 @@ public final class EasyScriptRootNode extends RootNode {
     private final EasyScriptStmtNode[] stmtNodes;
 
     public EasyScriptRootNode(EasyScriptTruffleLanguage truffleLanguage,
-            FrameDescriptor frameDescriptor, List<EasyScriptStmtNode> stmtNodes) {
-        super(truffleLanguage, frameDescriptor);
+            List<EasyScriptStmtNode> stmtNodes) {
+        super(truffleLanguage);
 
         this.stmtNodes = stmtNodes.toArray(new EasyScriptStmtNode[]{});
     }
