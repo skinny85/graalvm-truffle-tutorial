@@ -48,6 +48,16 @@ public class ExecutingTest {
     }
 
     @Test
+    public void variable_declaration_statement_returns_undefined() {
+        Value result = this.context.eval("ezs",
+                "const a = 1;"
+        );
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
     public void global_variables_are_saved_between_executions() {
         this.context.eval("ezs",
                 "var a = 1; " +

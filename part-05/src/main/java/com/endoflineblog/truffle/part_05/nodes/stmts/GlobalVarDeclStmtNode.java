@@ -4,6 +4,7 @@ import com.endoflineblog.truffle.part_05.EasyScriptException;
 import com.endoflineblog.truffle.part_05.EasyScriptLanguageContext;
 import com.endoflineblog.truffle.part_05.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_05.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_05.runtime.Undefined;
 import com.oracle.truffle.api.dsl.CachedContext;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
@@ -18,11 +19,6 @@ import com.oracle.truffle.api.dsl.Specialization;
 public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     protected abstract String getName();
 
-    /**
-     * The sensible thing here would probably to return `undefined`,
-     * but since we don't have it in the language yet,
-     * simply return the value of the variable instead.
-     */
     @Specialization
     protected Object assignVariable(
             Object value,
@@ -31,6 +27,7 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
         if (!context.globalScopeObject.newValue(variableId, value)) {
             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
         }
-        return value;
+        // we return 'undefined' for statements that declare variables
+        return Undefined.INSTANCE;
     }
 }
