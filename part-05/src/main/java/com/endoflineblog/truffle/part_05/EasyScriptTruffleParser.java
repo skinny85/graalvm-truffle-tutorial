@@ -80,12 +80,11 @@ public final class EasyScriptTruffleParser {
     }
 
     private GlobalVarAssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
-        EasyScriptParser.BindingContext binding = assignmentExpr.binding();
-        String variableId = binding.ID().getText();
+        String variableId = assignmentExpr.ID().getText();
         if (this.constants.contains(variableId)) {
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
         }
-        return GlobalVarAssignmentExprNodeGen.create(this.parseExpr1(binding.expr1()), variableId);
+        return GlobalVarAssignmentExprNodeGen.create(this.parseExpr1(assignmentExpr.expr1()), variableId);
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {

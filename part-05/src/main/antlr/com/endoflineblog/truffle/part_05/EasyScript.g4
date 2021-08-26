@@ -12,7 +12,7 @@ stmt : ('var' | 'let' | 'const') binding (',' binding)* ';'?     #DeclStmt
 
 binding : ID '=' expr1 ;
 
-expr1 : binding                    #AssignmentExpr1
+expr1 : ID '=' expr1               #AssignmentExpr1
       | expr2                      #PrecedenceTwoExpr1
       ;
 expr2 : left=expr2 '+' right=expr3 #AddExpr2
