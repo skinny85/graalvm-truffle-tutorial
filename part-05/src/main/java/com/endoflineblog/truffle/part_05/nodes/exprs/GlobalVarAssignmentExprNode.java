@@ -22,7 +22,7 @@ public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
             @CachedContext(EasyScriptTruffleLanguage.class) EasyScriptLanguageContext context) {
         String variableId = this.getName();
         if (!context.globalScopeObject.updateVariable(variableId, value)) {
-            throw new EasyScriptException("'" + variableId + "' is not defined");
+            throw new EasyScriptException(this, "'" + variableId + "' is not defined");
         }
         return value;
     }
