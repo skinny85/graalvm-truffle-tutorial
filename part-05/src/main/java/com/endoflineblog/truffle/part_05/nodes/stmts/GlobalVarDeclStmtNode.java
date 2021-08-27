@@ -24,7 +24,7 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
             Object value,
             @CachedContext(EasyScriptTruffleLanguage.class) EasyScriptLanguageContext context) {
         String variableId = this.getName();
-        if (!context.globalScopeObject.newValue(variableId, value)) {
+        if (!context.globalScopeObject.newVariable(variableId, value)) {
             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
         }
         // we return 'undefined' for statements that declare variables

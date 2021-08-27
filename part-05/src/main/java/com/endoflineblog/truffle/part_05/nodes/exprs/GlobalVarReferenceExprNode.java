@@ -15,7 +15,7 @@ public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
     protected Object readVariable(
             @CachedContext(EasyScriptTruffleLanguage.class) EasyScriptLanguageContext context) {
         String variableId = this.getName();
-        var value = context.globalScopeObject.getValue(variableId);
+        var value = context.globalScopeObject.getVariable(variableId);
         if (value == null) {
             throw new EasyScriptException("'" + variableId + "' is not defined");
         }

@@ -13,22 +13,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This is the Truffle interop object that represents the global-level scope
+ * that contains all of the global variables.
+ */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject implements TruffleObject {
-    private final Map<String, Object> values = new HashMap<>();
+    private final Map<String, Object> variables = new HashMap<>();
 
-    public boolean newValue(String name, Object value) {
-        Object existingValue = values.putIfAbsent(name, value);
+    public boolean newVariable(String name, Object value) {
+        Object existingValue = variables.putIfAbsent(name, value);
         return existingValue == null;
     }
 
-    public boolean updateValue(String name, Object value) {
-        Object existingValue = values.computeIfPresent(name, (k, v) -> value);
+    public boolean updateVariable(String name, Object value) {
+        Object existingValue = variables.computeIfPresent(name, (k, v) -> value);
         return existingValue != null;
     }
 
-    public Object getValue(String name) {
-        return this.values.get(name);
+    public Object getVariable(String name) {
+        return this.variables.get(name);
     }
 
     @ExportMessage
@@ -38,12 +42,12 @@ public final class GlobalScopeObject implements TruffleObject {
 
     @ExportMessage
     boolean isMemberReadable(String member) {
-        return this.values.containsKey(member);
+        return this.variables.containsKey(member);
     }
 
     @ExportMessage
     Object readMember(String member) throws UnknownIdentifierException {
-        Object value = this.values.get(member);
+        Object value = this.variables.get(member);
         if (null == value) {
             throw UnknownIdentifierException.create(member);
         }
@@ -57,7 +61,7 @@ public final class GlobalScopeObject implements TruffleObject {
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
-        return new GlobalVariableNamesObject(this.values.keySet());
+        return new GlobalVariableNamesObject(this.variables.keySet());
     }
 
     @ExportMessage
