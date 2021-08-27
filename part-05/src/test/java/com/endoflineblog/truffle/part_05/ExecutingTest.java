@@ -70,6 +70,17 @@ public class ExecutingTest {
     }
 
     @Test
+    public void variables_without_initializers_have_undefined_value() {
+        Value result = this.context.eval("ezs",
+                "let a; " +
+                "a"
+        );
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
     public void reassigning_a_const_causes_an_error() {
         try {
             this.context.eval("ezs",

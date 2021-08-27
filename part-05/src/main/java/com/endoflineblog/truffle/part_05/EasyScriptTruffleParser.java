@@ -9,6 +9,7 @@ import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarAssignmentExprNode
 import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_05.nodes.exprs.IntLiteralExprNode;
+import com.endoflineblog.truffle.part_05.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNodeGen;
@@ -62,9 +63,10 @@ public final class EasyScriptTruffleParser {
         return declStmt.binding()
                 .stream()
                 .map(binding -> {
-                    // we parse the initializer expression before creating a slot for the variable -
-                    // this handles the edge case of using a variable in its own initializer
-                    EasyScriptExprNode initializerExpr = this.parseExpr1(binding.expr1());
+                    var bindingExpr = binding.expr1();
+                    EasyScriptExprNode initializerExpr = bindingExpr == null
+                        ? new UndefinedLiteralExprNode()
+                        : this.parseExpr1(bindingExpr);
                     String variableId = binding.ID().getText();
                     if (isConstantDecl) {
                         this.constants.add(variableId);
