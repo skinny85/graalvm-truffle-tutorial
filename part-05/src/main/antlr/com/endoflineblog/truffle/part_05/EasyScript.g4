@@ -23,7 +23,7 @@ expr3 : literal                    #LiteralExpr3
       | '(' expr1 ')'              #PrecedenceOneExpr3
       ;
 
-literal : INT | DOUBLE ;
+literal : INT | DOUBLE | 'undefined' ;
 
 fragment DIGIT : [0-9] ;
 INT : DIGIT+ ;

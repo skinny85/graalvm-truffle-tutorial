@@ -84,7 +84,7 @@ public class ExecutingTest {
     public void reassigning_a_const_causes_an_error() {
         try {
             this.context.eval("ezs",
-                    "const a = 1, b = a; " +
+                    "const a = undefined, b = a; " +
                     "a = b"
             );
             fail("expected PolyglotException to be thrown");

@@ -113,9 +113,13 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parseLiteralExpr(EasyScriptParser.LiteralExpr3Context literalExpr) {
         TerminalNode intTerminal = literalExpr.literal().INT();
-        return intTerminal != null
-                ? new IntLiteralExprNode(Integer.parseInt(intTerminal.getText()))
-                : new DoubleLiteralExprNode(Double.parseDouble(literalExpr.getText()));
+        if (intTerminal != null) {
+            return new IntLiteralExprNode(Integer.parseInt(intTerminal.getText()));
+        }
+        TerminalNode doubleTerminal = literalExpr.literal().DOUBLE();
+        return doubleTerminal != null
+                ? new DoubleLiteralExprNode(Double.parseDouble(doubleTerminal.getText()))
+                : new UndefinedLiteralExprNode();
     }
 
     private GlobalVarReferenceExprNode parseReferenceExpr(EasyScriptParser.ReferenceExpr3Context refExpr) {
