@@ -29,8 +29,8 @@ fragment DIGIT : [0-9] ;
 INT : DIGIT+ ;
 DOUBLE : DIGIT+ '.' DIGIT+ ;
 
-fragment LETTER : [a-zA-Z$] ;
-ID : (LETTER | '_') (LETTER | '_' | DIGIT)* ;
+fragment LETTER : [a-zA-Z$_] ;
+ID : LETTER (LETTER | DIGIT)* ;
 
 // skip all whitespace
 WS : (' ' | '\r' | '\t' | '\n' | '\f')+ -> skip ;

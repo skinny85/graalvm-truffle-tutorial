@@ -50,7 +50,7 @@ public class ExecutingTest {
     @Test
     public void variable_declaration_statement_returns_undefined() {
         Value result = this.context.eval("ezs",
-                "const a = 1;"
+                "const $_ = 1;"
         );
 
         assertTrue(result.isNull());
