@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_05.runtime;
 
+import com.endoflineblog.truffle.part_05.EasyScriptException;
 import com.endoflineblog.truffle.part_05.EasyScriptTruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -10,6 +11,7 @@ import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,14 +22,21 @@ import java.util.Set;
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject implements TruffleObject {
     private final Map<String, Object> variables = new HashMap<>();
+    private final Set<String> constants = new HashSet<>();
 
-    public boolean newVariable(String name, Object value) {
-        Object existingValue = variables.putIfAbsent(name, value);
+    public boolean newVariable(String name, Object value, boolean constant) {
+        Object existingValue = this.variables.putIfAbsent(name, value);
+        if (constant) {
+            this.constants.add(name);
+        }
         return existingValue == null;
     }
 
     public boolean updateVariable(String name, Object value) {
-        Object existingValue = variables.computeIfPresent(name, (k, v) -> value);
+        if (this.constants.contains(name)) {
+            throw new EasyScriptException("Assignment to constant variable '" + name + "'");
+        }
+        Object existingValue = this.variables.computeIfPresent(name, (k, v) -> value);
         return existingValue != null;
     }
 

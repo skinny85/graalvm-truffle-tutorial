@@ -16,15 +16,17 @@ import com.oracle.truffle.api.dsl.Specialization;
  */
 @NodeChild(value = "initializerExpr", type = EasyScriptExprNode.class)
 @NodeField(name = "name", type = String.class)
+@NodeField(name = "constant", type = boolean.class)
 public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     protected abstract String getName();
+    protected abstract boolean isConstant();
 
     @Specialization
     protected Object assignVariable(
             Object value,
             @CachedContext(EasyScriptTruffleLanguage.class) EasyScriptLanguageContext context) {
         String variableId = this.getName();
-        if (!context.globalScopeObject.newVariable(variableId, value)) {
+        if (!context.globalScopeObject.newVariable(variableId, value, this.isConstant())) {
             throw new EasyScriptException(this, "Identifier '" + variableId + "' has already been declared");
         }
         // we return 'undefined' for statements that declare variables

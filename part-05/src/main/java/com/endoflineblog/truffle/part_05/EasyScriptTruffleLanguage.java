@@ -16,8 +16,7 @@ import java.util.List;
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
-        var easyScriptTruffleParser = new EasyScriptTruffleParser();
-        List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parse(request.getSource().getReader());
+        List<EasyScriptStmtNode> stmts = EasyScriptTruffleParser.parse(request.getSource().getReader());
         var rootNode = new EasyScriptRootNode(this, stmts);
         return Truffle.getRuntime().createCallTarget(rootNode);
     }

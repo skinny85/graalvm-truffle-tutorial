@@ -20,9 +20,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,9 +30,7 @@ import java.util.stream.Stream;
  * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_05/EasyScript.g4 file.
  */
 public final class EasyScriptTruffleParser {
-    private final Set<String> constants = new HashSet<>();
-
-    public List<EasyScriptStmtNode> parse(Reader program) throws IOException {
+    public static List<EasyScriptStmtNode> parse(Reader program) throws IOException {
         var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
         // remove the default console error listener
         lexer.removeErrorListeners();
@@ -46,19 +42,19 @@ public final class EasyScriptTruffleParser {
         return parseStmtList(parser.start().stmt());
     }
 
-    private List<EasyScriptStmtNode> parseStmtList(List<EasyScriptParser.StmtContext> stmts) {
+    private static List<EasyScriptStmtNode> parseStmtList(List<EasyScriptParser.StmtContext> stmts) {
         return stmts.stream()
                 .flatMap(stmt -> stmt instanceof EasyScriptParser.ExprStmtContext
-                        ? Stream.of(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt))
-                        : this.parseDeclStmt((EasyScriptParser.DeclStmtContext) stmt))
+                        ? Stream.of(parseExprStmt((EasyScriptParser.ExprStmtContext) stmt))
+                        : parseDeclStmt((EasyScriptParser.DeclStmtContext) stmt))
                 .collect(Collectors.toList());
     }
 
-    private ExprStmtNode parseExprStmt(EasyScriptParser.ExprStmtContext exprStmt) {
-        return new ExprStmtNode(this.parseExpr1(exprStmt.expr1()));
+    private static ExprStmtNode parseExprStmt(EasyScriptParser.ExprStmtContext exprStmt) {
+        return new ExprStmtNode(parseExpr1(exprStmt.expr1()));
     }
 
-    private Stream<EasyScriptStmtNode> parseDeclStmt(EasyScriptParser.DeclStmtContext declStmt) {
+    private static Stream<EasyScriptStmtNode> parseDeclStmt(EasyScriptParser.DeclStmtContext declStmt) {
         boolean isConstantDecl = declStmt.getText().startsWith("const");
         return declStmt.binding()
                 .stream()
@@ -72,52 +68,46 @@ public final class EasyScriptTruffleParser {
                         }
                         initializerExpr = new UndefinedLiteralExprNode();
                     } else {
-                        initializerExpr = this.parseExpr1(bindingExpr);
+                        initializerExpr = parseExpr1(bindingExpr);
                     }
-                    if (isConstantDecl) {
-                        this.constants.add(variableId);
-                    }
-                    return GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId);
+                    return GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, isConstantDecl);
                 });
     }
 
-    private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
+    private static EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
         return expr1 instanceof EasyScriptParser.AssignmentExpr1Context
                 ? parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1)
-                : this.parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
+                : parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
     }
 
-    private GlobalVarAssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
+    private static GlobalVarAssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
         String variableId = assignmentExpr.ID().getText();
-        if (this.constants.contains(variableId)) {
-            throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
-        }
-        return GlobalVarAssignmentExprNodeGen.create(this.parseExpr1(assignmentExpr.expr1()), variableId);
+        return GlobalVarAssignmentExprNodeGen.create(parseExpr1(assignmentExpr.expr1()), variableId);
     }
 
-    private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
+    private static EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
         return expr2 instanceof EasyScriptParser.AddExpr2Context
-                ? this.parseAdditionExpr((EasyScriptParser.AddExpr2Context) expr2)
-                : this.parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
+                ? parseAdditionExpr((EasyScriptParser.AddExpr2Context) expr2)
+                : parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
     }
 
-    private AdditionExprNode parseAdditionExpr(EasyScriptParser.AddExpr2Context addExpr) {
+    private static AdditionExprNode parseAdditionExpr(EasyScriptParser.AddExpr2Context addExpr) {
         return AdditionExprNodeGen.create(
-                this.parseExpr2(addExpr.left),
-                this.parseExpr3(addExpr.right));
+                parseExpr2(addExpr.left),
+                parseExpr3(addExpr.right));
     }
 
-    private EasyScriptExprNode parseExpr3(EasyScriptParser.Expr3Context expr3) {
+    private static EasyScriptExprNode parseExpr3(EasyScriptParser.Expr3Context expr3) {
         if (expr3 instanceof EasyScriptParser.LiteralExpr3Context) {
-            return this.parseLiteralExpr((EasyScriptParser.LiteralExpr3Context) expr3);
+            return parseLiteralExpr((EasyScriptParser.LiteralExpr3Context) expr3);
         } else if (expr3 instanceof EasyScriptParser.ReferenceExpr3Context) {
-            return this.parseReferenceExpr((EasyScriptParser.ReferenceExpr3Context) expr3);
+            return parseReferenceExpr((EasyScriptParser.ReferenceExpr3Context) expr3);
         } else {
-            return this.parseExpr1(((EasyScriptParser.PrecedenceOneExpr3Context) expr3).expr1());
+            return parseExpr1(((EasyScriptParser.PrecedenceOneExpr3Context) expr3).expr1());
         }
     }
 
-    private EasyScriptExprNode parseLiteralExpr(EasyScriptParser.LiteralExpr3Context literalExpr) {
+    private static EasyScriptExprNode parseLiteralExpr(EasyScriptParser.LiteralExpr3Context literalExpr) {
         TerminalNode intTerminal = literalExpr.literal().INT();
         if (intTerminal != null) {
             return new IntLiteralExprNode(Integer.parseInt(intTerminal.getText()));
@@ -128,7 +118,7 @@ public final class EasyScriptTruffleParser {
                 : new UndefinedLiteralExprNode();
     }
 
-    private GlobalVarReferenceExprNode parseReferenceExpr(EasyScriptParser.ReferenceExpr3Context refExpr) {
+    private static GlobalVarReferenceExprNode parseReferenceExpr(EasyScriptParser.ReferenceExpr3Context refExpr) {
         String variableId = refExpr.ID().getText();
         return GlobalVarReferenceExprNodeGen.create(variableId);
     }
