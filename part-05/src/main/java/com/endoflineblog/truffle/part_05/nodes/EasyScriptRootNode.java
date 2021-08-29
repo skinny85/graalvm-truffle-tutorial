@@ -1,11 +1,19 @@
 package com.endoflineblog.truffle.part_05.nodes;
 
+import com.endoflineblog.truffle.part_05.DeclarationKind;
 import com.endoflineblog.truffle.part_05.EasyScriptTruffleLanguage;
+import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarAssignmentExprNodeGen;
+import com.endoflineblog.truffle.part_05.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
+import com.endoflineblog.truffle.part_05.nodes.stmts.ExprStmtNode;
+import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNodeGen;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * The {@link RootNode} for EasyScript code.
@@ -23,7 +31,34 @@ public final class EasyScriptRootNode extends RootNode {
             List<EasyScriptStmtNode> stmtNodes) {
         super(truffleLanguage);
 
-        this.stmtNodes = stmtNodes.toArray(new EasyScriptStmtNode[]{});
+        // implement hoisting of 'var' declarations,
+        // see: https://developer.mozilla.org/en-US/docs/Glossary/Hoisting
+        List<GlobalVarDeclStmtNode> varDeclarations = new ArrayList<>();
+        List<EasyScriptStmtNode> remainingStmts = new ArrayList<>();
+        for (EasyScriptStmtNode stmtNode : stmtNodes) {
+            if (stmtNode instanceof GlobalVarDeclStmtNode) {
+                var varDeclaration = (GlobalVarDeclStmtNode) stmtNode;
+                if (varDeclaration.getDeclarationKind() == DeclarationKind.VAR) {
+                    // any 'var' declarations are replaced by two statements:
+                    // the first is a declaration with the initializer as 'undefined',
+                    // the second is an assignment expression for that variable,
+                    // with the right-hand side of the assignment being the original initializer
+                    varDeclarations.add(GlobalVarDeclStmtNodeGen.create(
+                            new UndefinedLiteralExprNode(), varDeclaration.getName(), DeclarationKind.VAR));
+
+                    remainingStmts.add(new ExprStmtNode(GlobalVarAssignmentExprNodeGen.create(
+                            varDeclaration.getInitializerExpr(), varDeclaration.getName())));
+
+                    continue;
+                }
+            }
+            remainingStmts.add(stmtNode);
+        }
+
+        this.stmtNodes = Stream.concat(
+                varDeclarations.stream(),
+                remainingStmts.stream()
+        ).toArray(EasyScriptStmtNode[]::new);
     }
 
     /**

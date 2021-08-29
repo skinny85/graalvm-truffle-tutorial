@@ -6,8 +6,8 @@ package com.endoflineblog.truffle.part_05;
 
 start : stmt+ EOF ;
 
-stmt : ('var' | 'let' | 'const') binding (',' binding)* ';'?     #DeclStmt
-     |                                            expr1 ';'?     #ExprStmt
+stmt : kind=('var' | 'let' | 'const') binding (',' binding)* ';'?     #DeclStmt
+     |                                                 expr1 ';'?     #ExprStmt
      ;
 
 binding : ID ('=' expr1)? ;

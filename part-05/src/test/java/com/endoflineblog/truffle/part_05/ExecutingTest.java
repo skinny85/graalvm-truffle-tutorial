@@ -92,6 +92,18 @@ public class ExecutingTest {
     }
 
     @Test
+    public void var_declarations_are_hoisted_to_the_top() {
+        Value result = this.context.eval("ezs",
+                "let b = a; " +
+                "var a = 3; " +
+                "b"
+        );
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
     public void reassigning_a_const_causes_an_error() {
         try {
             this.context.eval("ezs",

@@ -55,7 +55,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private static Stream<EasyScriptStmtNode> parseDeclStmt(EasyScriptParser.DeclStmtContext declStmt) {
-        boolean isConstantDecl = declStmt.getText().startsWith("const");
+        DeclarationKind declarationKind = DeclarationKind.fromToken(declStmt.kind.getText());
         return declStmt.binding()
                 .stream()
                 .map(binding -> {
@@ -63,14 +63,14 @@ public final class EasyScriptTruffleParser {
                     var bindingExpr = binding.expr1();
                     EasyScriptExprNode initializerExpr;
                     if (bindingExpr == null) {
-                        if (isConstantDecl) {
+                        if (declarationKind == DeclarationKind.CONST) {
                             throw new EasyScriptException("Missing initializer in const declaration '" + variableId + "'");
                         }
                         initializerExpr = new UndefinedLiteralExprNode();
                     } else {
                         initializerExpr = parseExpr1(bindingExpr);
                     }
-                    return GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, isConstantDecl);
+                    return GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, declarationKind);
                 });
     }
 
