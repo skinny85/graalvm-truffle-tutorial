@@ -104,6 +104,17 @@ public class ExecutingTest {
     }
 
     @Test
+    public void hoisted_statement_still_returns_undefined() {
+        Value result = this.context.eval("ezs",
+                "let a = 1; " +
+                "var b = 2"
+        );
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
     public void reassigning_a_const_causes_an_error() {
         try {
             this.context.eval("ezs",

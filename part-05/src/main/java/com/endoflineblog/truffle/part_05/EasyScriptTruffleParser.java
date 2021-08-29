@@ -51,7 +51,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private static ExprStmtNode parseExprStmt(EasyScriptParser.ExprStmtContext exprStmt) {
-        return new ExprStmtNode(parseExpr1(exprStmt.expr1()));
+        return new ExprStmtNode(parseExpr1(exprStmt.expr1()), false);
     }
 
     private static Stream<EasyScriptStmtNode> parseDeclStmt(EasyScriptParser.DeclStmtContext declStmt) {

@@ -46,8 +46,10 @@ public final class EasyScriptRootNode extends RootNode {
                     varDeclarations.add(GlobalVarDeclStmtNodeGen.create(
                             new UndefinedLiteralExprNode(), varDeclaration.getName(), DeclarationKind.VAR));
 
-                    remainingStmts.add(new ExprStmtNode(GlobalVarAssignmentExprNodeGen.create(
-                            varDeclaration.getInitializerExpr(), varDeclaration.getName())));
+                    remainingStmts.add(new ExprStmtNode(
+                            GlobalVarAssignmentExprNodeGen.create(
+                                    varDeclaration.getInitializerExpr(), varDeclaration.getName()),
+                            true));
 
                     continue;
                 }
