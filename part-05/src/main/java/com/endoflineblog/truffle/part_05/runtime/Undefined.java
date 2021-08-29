@@ -18,6 +18,11 @@ public final class Undefined implements TruffleObject {
     private Undefined() {
     }
 
+    @Override
+    public String toString() {
+        return "Undefined";
+    }
+
     @ExportMessage
     boolean isNull() {
         return true;

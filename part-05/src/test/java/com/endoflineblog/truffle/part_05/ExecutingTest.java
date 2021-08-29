@@ -81,6 +81,17 @@ public class ExecutingTest {
     }
 
     @Test
+    public void addition_with_undefined_returns_nan() {
+        Value result = this.context.eval("ezs",
+                "let a, b = 3; " +
+                "a + b"
+        );
+
+        assertTrue(result.fitsInDouble());
+        assertTrue(Double.isNaN(result.asDouble()));
+    }
+
+    @Test
     public void reassigning_a_const_causes_an_error() {
         try {
             this.context.eval("ezs",
