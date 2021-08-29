@@ -63,11 +63,17 @@ public final class EasyScriptTruffleParser {
         return declStmt.binding()
                 .stream()
                 .map(binding -> {
-                    var bindingExpr = binding.expr1();
-                    EasyScriptExprNode initializerExpr = bindingExpr == null
-                        ? new UndefinedLiteralExprNode()
-                        : this.parseExpr1(bindingExpr);
                     String variableId = binding.ID().getText();
+                    var bindingExpr = binding.expr1();
+                    EasyScriptExprNode initializerExpr;
+                    if (bindingExpr == null) {
+                        if (isConstantDecl) {
+                            throw new EasyScriptException("Missing initializer in const declaration '" + variableId + "'");
+                        }
+                        initializerExpr = new UndefinedLiteralExprNode();
+                    } else {
+                        initializerExpr = this.parseExpr1(bindingExpr);
+                    }
                     if (isConstantDecl) {
                         this.constants.add(variableId);
                     }

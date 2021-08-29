@@ -83,7 +83,7 @@ public class ExecutingTest {
     @Test
     public void addition_with_undefined_returns_nan() {
         Value result = this.context.eval("ezs",
-                "let a, b = 3; " +
+                "var a, b = 3; " +
                 "a + b"
         );
 
@@ -103,6 +103,20 @@ public class ExecutingTest {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
             assertEquals("Assignment to constant variable 'a'", e.getMessage());
+        }
+    }
+
+    @Test
+    public void const_variables_must_have_an_initializer() {
+        try {
+            this.context.eval("ezs",
+                    "const a;"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Missing initializer in const declaration 'a'", e.getMessage());
         }
     }
 
