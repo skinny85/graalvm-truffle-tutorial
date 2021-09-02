@@ -1,7 +1,5 @@
 package com.endoflineblog.truffle.part_05.runtime;
 
-import com.endoflineblog.truffle.part_05.EasyScriptTruffleLanguage;
-import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
@@ -31,15 +29,5 @@ public final class Undefined implements TruffleObject {
     @ExportMessage
     Object toDisplayString(@SuppressWarnings("unused") boolean allowSideEffects) {
         return "undefined";
-    }
-
-    @ExportMessage
-    boolean hasLanguage() {
-        return true;
-    }
-
-    @ExportMessage
-    Class<? extends TruffleLanguage<?>> getLanguage() {
-        return EasyScriptTruffleLanguage.class;
     }
 }

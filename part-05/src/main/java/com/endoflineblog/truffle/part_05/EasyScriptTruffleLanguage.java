@@ -21,10 +21,6 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return Truffle.getRuntime().createCallTarget(rootNode);
     }
 
-    /**
-     * We still don't need a Context,
-     * so we still return {@code null} here.
-     */
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
         return new EasyScriptLanguageContext();

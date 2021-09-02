@@ -9,18 +9,28 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode expr;
-    private final boolean isHoistedDeclExpression;
+    private final boolean discardExpressionValue;
 
     /**
      * Creates a new instance of the expression statement.
      *
      * @param expr the expression node
-     * @param isHoistedDeclExpression whether this statement was created because of splitting
-     *   a 'var' declaration into variable creation and assignment
      */
-    public ExprStmtNode(EasyScriptExprNode expr, boolean isHoistedDeclExpression) {
+    public ExprStmtNode(EasyScriptExprNode expr) {
+        this(expr, false);
+    }
+
+    /**
+     * Creates a new instance of the expression statement.
+     *
+     * @param expr the expression node
+     * @param discardExpressionValue whether evaluating this statement should discard
+     *   the value of the expression it wraps,
+     *   and always return {@code Undefined.INSTANCE}
+     */
+    public ExprStmtNode(EasyScriptExprNode expr, boolean discardExpressionValue) {
         this.expr = expr;
-        this.isHoistedDeclExpression = isHoistedDeclExpression;
+        this.discardExpressionValue = discardExpressionValue;
     }
 
     /** Evaluating the statement returns the result of executing its expression. */
@@ -29,6 +39,6 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
         Object exprResult = this.expr.executeGeneric(frame);
         // if this statement was created because of hoisting a 'var' declaration to the top,
         // return 'undefined', to be consistent with how 'let' and 'const' declarations work
-        return this.isHoistedDeclExpression ? Undefined.INSTANCE : exprResult;
+        return this.discardExpressionValue ? Undefined.INSTANCE : exprResult;
     }
 }

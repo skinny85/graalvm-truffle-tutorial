@@ -8,6 +8,7 @@ import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNodeGen;
+import com.endoflineblog.truffle.part_05.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
@@ -49,6 +50,8 @@ public final class EasyScriptRootNode extends RootNode {
                     remainingStmts.add(new ExprStmtNode(
                             GlobalVarAssignmentExprNodeGen.create(
                                     varDeclaration.getInitializerExpr(), varDeclaration.getName()),
+                            // we pass 'true' here to make sure this expression statement returns 'undefined',
+                            // instead of the right-hand expression value, when executed
                             true));
 
                     continue;
@@ -69,7 +72,7 @@ public final class EasyScriptRootNode extends RootNode {
      */
     @Override
     public Object execute(VirtualFrame frame) {
-        Object ret = null;
+        Object ret = Undefined.INSTANCE;
         for (EasyScriptStmtNode stmtNode : this.stmtNodes) {
             ret = stmtNode.executeStatement(frame);
         }

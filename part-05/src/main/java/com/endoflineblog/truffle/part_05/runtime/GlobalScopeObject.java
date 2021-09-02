@@ -10,8 +10,10 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +52,16 @@ public final class GlobalScopeObject implements TruffleObject {
     }
 
     @ExportMessage
+    boolean hasMembers() {
+        return true;
+    }
+
+    @ExportMessage
+    Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
+        return new GlobalVariableNamesObject(this.variables.keySet());
+    }
+
+    @ExportMessage
     boolean isMemberReadable(String member) {
         return this.variables.containsKey(member);
     }
@@ -61,16 +73,6 @@ public final class GlobalScopeObject implements TruffleObject {
             throw UnknownIdentifierException.create(member);
         }
         return value;
-    }
-
-    @ExportMessage
-    boolean hasMembers() {
-        return true;
-    }
-
-    @ExportMessage
-    Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
-        return new GlobalVariableNamesObject(this.variables.keySet());
     }
 
     @ExportMessage
@@ -90,11 +92,11 @@ public final class GlobalScopeObject implements TruffleObject {
 }
 
 @ExportLibrary(InteropLibrary.class)
-class GlobalVariableNamesObject implements TruffleObject {
-    private final String[] names;
+final class GlobalVariableNamesObject implements TruffleObject {
+    private final List<String> names;
 
     GlobalVariableNamesObject(Set<String> names) {
-        this.names = names.toArray(new String[]{});
+        this.names = new ArrayList<>(names);
     }
 
     @ExportMessage
@@ -104,19 +106,19 @@ class GlobalVariableNamesObject implements TruffleObject {
 
     @ExportMessage
     long getArraySize() {
-        return names.length;
+        return this.names.size();
     }
 
     @ExportMessage
     boolean isArrayElementReadable(long index) {
-        return index >= 0 && index < names.length;
+        return index >= 0 && index < this.names.size();
     }
 
     @ExportMessage
     Object readArrayElement(long index) throws InvalidArrayIndexException {
-        if (!isArrayElementReadable(index)) {
+        if (!this.isArrayElementReadable(index)) {
             throw InvalidArrayIndexException.create(index);
         }
-        return names[(int) index];
+        return this.names.get((int) index);
     }
 }

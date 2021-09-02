@@ -9,12 +9,12 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
  */
 public final class UndefinedLiteralExprNode extends EasyScriptExprNode {
     @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
+    public int executeInt(VirtualFrame frame) throws UnexpectedResultException {
         throw new UnexpectedResultException(Undefined.INSTANCE);
     }
 
     @Override
-    public int executeInt(VirtualFrame frame) throws UnexpectedResultException {
+    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
         throw new UnexpectedResultException(Undefined.INSTANCE);
     }
 

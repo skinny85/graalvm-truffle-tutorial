@@ -17,7 +17,8 @@ public enum DeclarationKind {
         switch (token) {
             case "var": return DeclarationKind.VAR;
             case "let": return DeclarationKind.LET;
-            default: return DeclarationKind.CONST;
+            case "const": return DeclarationKind.CONST;
+            default: throw new EasyScriptException("Unrecognized variable kind: '" + token + "'");
         }
     }
 }
