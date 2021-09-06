@@ -14,6 +14,11 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 public abstract class EasyScriptExprNode extends Node {
     public abstract int executeInt(VirtualFrame frame) throws UnexpectedResultException;
 
+    /**
+     * Since we have the `undefined` value now,
+     * we need to allow throwing UnexpectedResultException
+     * from {@code executeDouble()} too.
+     */
     public abstract double executeDouble(VirtualFrame frame) throws UnexpectedResultException;
 
     public abstract Object executeGeneric(VirtualFrame frame);

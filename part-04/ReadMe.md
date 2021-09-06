@@ -9,8 +9,8 @@ Truffle does not have a built-in way to perform parsing,
 and instead allows you to use any library you want for this task.
 
 This article series uses [ANTLR](https://www.antlr.org).
-The way it's set up is that we have a grammar file,
-[EasyScript.g4](src/main/antlr/com/endoflineblog/truffle/part_04/EasyScript.g4),
+The way it's set up is that we have a
+[grammar file, `EasyScript.g4`](src/main/antlr/com/endoflineblog/truffle/part_04/EasyScript.g4),
 that represents a language for adding integer and `double` literals from [part 3](../part-03).
 That grammar file is read by the ANTLR Gradle plugin,
 enabled in the [`build.gradle` file of the module](build.gradle),
