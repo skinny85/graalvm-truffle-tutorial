@@ -142,7 +142,7 @@ and always return `Undefined.INSTANCE`.
 
 ---
 
-There is a [unit test](src/test/java/com/endoflineblog/truffle/part_05/StatementsEvaluationTest.java)
+There is a [unit test](src/test/java/com/endoflineblog/truffle/part_05/GlobalVariablesTest.java)
 exercising the positive test cases,
 and the possible errors, like duplicate variable declarations,
 or referencing an undeclared variable.
