@@ -10,6 +10,7 @@ import com.endoflineblog.truffle.part_05.nodes.exprs.IntLiteralExprNode;
 import com.endoflineblog.truffle.part_05.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.ExprStmtNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.FunctionCallExprNode;
 import com.endoflineblog.truffle.part_06.nodes.exprs.GlobalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_06.nodes.exprs.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_06.nodes.exprs.GlobalVarReferenceExprNode;
@@ -102,8 +103,15 @@ public final class EasyScriptTruffleParser {
     private static EasyScriptExprNode parseExpr3(EasyScriptParser.Expr3Context expr3) {
         if (expr3 instanceof EasyScriptParser.LiteralExpr3Context) {
             return parseLiteralExpr((EasyScriptParser.LiteralExpr3Context) expr3);
-        } else if (expr3 instanceof EasyScriptParser.ReferenceExpr3Context) {
-            return parseReferenceExpr((EasyScriptParser.ReferenceExpr3Context) expr3);
+        } else if (expr3 instanceof EasyScriptParser.SimpleReferenceExpr3Context) {
+            return parseReference(((EasyScriptParser.SimpleReferenceExpr3Context) expr3).ID().getText());
+        } else if (expr3 instanceof EasyScriptParser.ComplexReferenceExpr3Context) {
+            var complexRef = (EasyScriptParser.ComplexReferenceExpr3Context) expr3;
+            return parseReference(complexRef.ID().stream()
+                    .map(id -> id.getText())
+                    .collect(Collectors.joining(".")));
+        } else if (expr3 instanceof EasyScriptParser.CallExpr3Context) {
+            return parseCallExpr((EasyScriptParser.CallExpr3Context) expr3);
         } else {
             return parseExpr1(((EasyScriptParser.PrecedenceOneExpr3Context) expr3).expr1());
         }
@@ -120,8 +128,15 @@ public final class EasyScriptTruffleParser {
                 : new UndefinedLiteralExprNode();
     }
 
-    private static GlobalVarReferenceExprNode parseReferenceExpr(EasyScriptParser.ReferenceExpr3Context refExpr) {
-        String variableId = refExpr.ID().getText();
+    private static GlobalVarReferenceExprNode parseReference(String variableId) {
         return GlobalVarReferenceExprNodeGen.create(variableId);
+    }
+
+    private static FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr3Context callExpr) {
+        return new FunctionCallExprNode(
+                parseExpr3(callExpr.expr3()),
+                callExpr.expr1().stream()
+                        .map(EasyScriptTruffleParser::parseExpr1)
+                        .collect(Collectors.toList()));
     }
 }
