@@ -1,18 +1,14 @@
 package com.endoflineblog.truffle.part_06;
 
-import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_06.nodes.EasyScriptRootNode;
+import com.endoflineblog.truffle.part_06.nodes.stmts.EasyScriptStmtNode;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 
 import java.util.List;
 
-/**
- * The EasyScript Graal polyglot language implementation.
- * Very similar to EasyScriptTruffleLanguage in part 4.
- */
-@TruffleLanguage.Registration(id = "ezs2", name = "EasyScript")
+@TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {

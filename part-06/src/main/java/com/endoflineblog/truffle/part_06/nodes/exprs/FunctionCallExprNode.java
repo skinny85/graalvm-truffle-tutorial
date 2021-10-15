@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_06.nodes.exprs;
 
-import com.endoflineblog.truffle.part_05.EasyScriptException;
-import com.endoflineblog.truffle.part_05.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_06.EasyScriptException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 

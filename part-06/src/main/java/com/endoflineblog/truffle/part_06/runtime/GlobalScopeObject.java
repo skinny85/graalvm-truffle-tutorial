@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_06.runtime;
 
-import com.endoflineblog.truffle.part_05.EasyScriptException;
+import com.endoflineblog.truffle.part_06.EasyScriptException;
 import com.endoflineblog.truffle.part_06.EasyScriptTruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;

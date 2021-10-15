@@ -27,7 +27,7 @@ public class StaticFunctionCallsTest {
 
     @Test
     public void executing_list_of_statements_returns_the_last_ones_value() {
-        Value result = this.context.eval("ezs2",
+        Value result = this.context.eval("ezs",
                 "var a = 1; " +
                 "let b = 2 + 3; " +
                 "const c = 4 + 5.0; " +
@@ -36,7 +36,7 @@ public class StaticFunctionCallsTest {
 
         assertEquals(14, result.asInt());
 
-        Value globalBindings = this.context.getBindings("ezs2");
+        Value globalBindings = this.context.getBindings("ezs");
         assertFalse(globalBindings.isNull());
         assertTrue(globalBindings.hasMembers());
         assertTrue(globalBindings.hasMember("a"));

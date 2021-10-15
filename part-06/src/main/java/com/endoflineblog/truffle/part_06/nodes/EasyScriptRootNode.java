@@ -1,14 +1,14 @@
 package com.endoflineblog.truffle.part_06.nodes;
 
-import com.endoflineblog.truffle.part_05.DeclarationKind;
-import com.endoflineblog.truffle.part_05.nodes.exprs.GlobalVarAssignmentExprNodeGen;
-import com.endoflineblog.truffle.part_05.nodes.exprs.UndefinedLiteralExprNode;
-import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
-import com.endoflineblog.truffle.part_05.nodes.stmts.ExprStmtNode;
-import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNode;
-import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNodeGen;
-import com.endoflineblog.truffle.part_05.runtime.Undefined;
+import com.endoflineblog.truffle.part_06.DeclarationKind;
 import com.endoflineblog.truffle.part_06.EasyScriptTruffleLanguage;
+import com.endoflineblog.truffle.part_06.nodes.exprs.GlobalVarAssignmentExprNodeGen;
+import com.endoflineblog.truffle.part_06.nodes.exprs.UndefinedLiteralExprNode;
+import com.endoflineblog.truffle.part_06.nodes.stmts.EasyScriptStmtNode;
+import com.endoflineblog.truffle.part_06.nodes.stmts.ExprStmtNode;
+import com.endoflineblog.truffle.part_06.nodes.stmts.GlobalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_06.nodes.stmts.GlobalVarDeclStmtNodeGen;
+import com.endoflineblog.truffle.part_06.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
