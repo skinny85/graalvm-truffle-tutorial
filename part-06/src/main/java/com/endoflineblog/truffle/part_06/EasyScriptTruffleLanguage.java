@@ -25,7 +25,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     protected EasyScriptLanguageContext createContext(Env env) {
         var context = new EasyScriptLanguageContext();
 
-        context.globalScopeObject.newVariable("Math.abs",
+        context.globalScopeObject.newConstant("Math.abs",
                 new FunctionObject(Truffle.getRuntime().createCallTarget(new FunctionRootNode(this,
                         AbsFunctionBodyExprNodeGen.create(new ReadFunctionArgExprNode(0))))));
 

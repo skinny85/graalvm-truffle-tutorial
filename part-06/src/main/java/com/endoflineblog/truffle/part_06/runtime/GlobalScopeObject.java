@@ -26,7 +26,7 @@ public final class GlobalScopeObject implements TruffleObject {
     private final Map<String, Object> variables = new HashMap<>();
     private final Set<String> constants = new HashSet<>();
 
-    public boolean newVariable(String name, Object value) {
+    public boolean newConstant(String name, Object value) {
         return newVariable(name, value, false);
     }
 
