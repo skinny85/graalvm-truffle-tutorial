@@ -1,7 +1,11 @@
 package com.endoflineblog.truffle.part_06;
 
-import com.endoflineblog.truffle.part_06.nodes.EasyScriptRootNode;
+import com.endoflineblog.truffle.part_06.nodes.FunctionRootNode;
+import com.endoflineblog.truffle.part_06.nodes.ProgramRootNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.ReadFunctionArgExprNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.functions.AbsFunctionBodyExprNodeGen;
 import com.endoflineblog.truffle.part_06.nodes.stmts.EasyScriptStmtNode;
+import com.endoflineblog.truffle.part_06.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -13,13 +17,19 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         List<EasyScriptStmtNode> stmts = EasyScriptTruffleParser.parse(request.getSource().getReader());
-        var rootNode = new EasyScriptRootNode(this, stmts);
+        var rootNode = new ProgramRootNode(this, stmts);
         return Truffle.getRuntime().createCallTarget(rootNode);
     }
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        return new EasyScriptLanguageContext();
+        var context = new EasyScriptLanguageContext();
+
+        context.globalScopeObject.newVariable("Math.abs",
+                new FunctionObject(Truffle.getRuntime().createCallTarget(new FunctionRootNode(this,
+                        AbsFunctionBodyExprNodeGen.create(new ReadFunctionArgExprNode(0))))));
+
+        return context;
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public final class EasyScriptRootNode extends RootNode {
+public final class ProgramRootNode extends RootNode {
     /**
      * Fields annotated with {@code @Children}
      * need to have the array type.
@@ -24,7 +24,7 @@ public final class EasyScriptRootNode extends RootNode {
     @Children
     private final EasyScriptStmtNode[] stmtNodes;
 
-    public EasyScriptRootNode(EasyScriptTruffleLanguage truffleLanguage,
+    public ProgramRootNode(EasyScriptTruffleLanguage truffleLanguage,
             List<EasyScriptStmtNode> stmtNodes) {
         super(truffleLanguage);
 

@@ -26,22 +26,11 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void executing_list_of_statements_returns_the_last_ones_value() {
+    public void calling_Math_abs_works() {
         Value result = this.context.eval("ezs",
-                "var a = 1; " +
-                "let b = 2 + 3; " +
-                "const c = 4 + 5.0; " +
-                "(a = a + b + a) + a"
+                "Math.abs(2)"
         );
 
-        assertEquals(14, result.asInt());
-
-        Value globalBindings = this.context.getBindings("ezs");
-        assertFalse(globalBindings.isNull());
-        assertTrue(globalBindings.hasMembers());
-        assertTrue(globalBindings.hasMember("a"));
-        Value a = globalBindings.getMember("a");
-        assertEquals(7, a.asInt());
-        assertEquals(Set.of("a", "b", "c"), globalBindings.getMemberKeys());
+        assertEquals(2, result.asInt());
     }
 }

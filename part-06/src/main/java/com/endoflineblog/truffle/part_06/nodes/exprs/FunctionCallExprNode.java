@@ -1,36 +1,39 @@
 package com.endoflineblog.truffle.part_06.nodes.exprs;
 
-import com.endoflineblog.truffle.part_06.EasyScriptException;
+import com.endoflineblog.truffle.part_06.nodes.FunctionDispatchNode;
+import com.endoflineblog.truffle.part_06.nodes.FunctionDispatchNodeGen;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import java.util.List;
 
 public final class FunctionCallExprNode extends EasyScriptExprNode {
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode callTarget;
 
     @Children
     private final EasyScriptExprNode[] callArguments;
 
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    private FunctionDispatchNode dispatchNode;
+
     public FunctionCallExprNode(EasyScriptExprNode callTarget, List<EasyScriptExprNode> callArguments) {
         super();
         this.callTarget = callTarget;
         this.callArguments = callArguments.toArray(new EasyScriptExprNode[]{});
+        this.dispatchNode = FunctionDispatchNodeGen.create();
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        throw new EasyScriptException("Function call expression not implemented yet");
-    }
+        Object function = this.callTarget.executeGeneric(frame);
 
-    @Override
-    public int executeInt(VirtualFrame frame) throws UnexpectedResultException {
-        throw new EasyScriptException("Function call expression not implemented yet");
-    }
+        Object[] argumentValues = new Object[this.callArguments.length];
+        for (int i = 0; i < this.callArguments.length; i++) {
+            argumentValues[i] = this.callArguments[i].executeGeneric(frame);
+        }
 
-    @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        throw new EasyScriptException("Function call expression not implemented yet");
+        return this.dispatchNode.executeDispatch(function, argumentValues);
     }
 }
