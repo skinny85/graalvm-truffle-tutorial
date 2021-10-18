@@ -186,6 +186,7 @@ public class GlobalVariablesTest {
     public void using_a_variable_in_its_own_definition_causes_an_error() {
         try {
             this.context.eval("ezs", "let x = x");
+            fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
