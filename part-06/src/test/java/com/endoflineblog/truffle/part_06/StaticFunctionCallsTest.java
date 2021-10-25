@@ -6,10 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Set;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class StaticFunctionCallsTest {
@@ -28,7 +25,7 @@ public class StaticFunctionCallsTest {
     @Test
     public void calling_Math_abs_works() {
         Value result = this.context.eval("ezs",
-                "Math.abs(2)"
+                "Math.abs(-2)"
         );
 
         assertEquals(2, result.asInt());

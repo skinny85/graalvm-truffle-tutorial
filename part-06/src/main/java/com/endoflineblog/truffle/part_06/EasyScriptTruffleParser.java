@@ -10,6 +10,8 @@ import com.endoflineblog.truffle.part_06.nodes.exprs.GlobalVarAssignmentExprNode
 import com.endoflineblog.truffle.part_06.nodes.exprs.GlobalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_06.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_06.nodes.exprs.IntLiteralExprNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.NegationExprNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_06.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_06.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_06.nodes.stmts.ExprStmtNode;
@@ -87,15 +89,23 @@ public final class EasyScriptTruffleParser {
     }
 
     private static EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
-        return expr2 instanceof EasyScriptParser.AddExpr2Context
-                ? parseAdditionExpr((EasyScriptParser.AddExpr2Context) expr2)
-                : parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
+        if (expr2 instanceof EasyScriptParser.AddExpr2Context) {
+            return parseAdditionExpr((EasyScriptParser.AddExpr2Context) expr2);
+        } else if (expr2 instanceof EasyScriptParser.UnaryMinusExpr2Context) {
+            return parseUnaryMinusExpr((EasyScriptParser.UnaryMinusExpr2Context) expr2);
+        } else {
+            return parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
+        }
     }
 
     private static AdditionExprNode parseAdditionExpr(EasyScriptParser.AddExpr2Context addExpr) {
         return AdditionExprNodeGen.create(
                 parseExpr2(addExpr.left),
                 parseExpr3(addExpr.right));
+    }
+
+    private static NegationExprNode parseUnaryMinusExpr(EasyScriptParser.UnaryMinusExpr2Context unaryMinusExpr) {
+        return NegationExprNodeGen.create(parseExpr3(unaryMinusExpr.expr3()));
     }
 
     private static EasyScriptExprNode parseExpr3(EasyScriptParser.Expr3Context expr3) {

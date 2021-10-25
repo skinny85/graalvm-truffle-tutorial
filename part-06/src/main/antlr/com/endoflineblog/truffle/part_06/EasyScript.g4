@@ -15,6 +15,7 @@ expr1 : ID '=' expr1                        #AssignmentExpr1
       | expr2                               #PrecedenceTwoExpr1
       ;
 expr2 : left=expr2 '+' right=expr3          #AddExpr2
+      | '-' expr3                           #UnaryMinusExpr2
       | expr3                               #PrecedenceThreeExpr2
       ;
 expr3 : literal                             #LiteralExpr3
