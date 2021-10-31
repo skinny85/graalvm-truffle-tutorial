@@ -30,4 +30,24 @@ public class StaticFunctionCallsTest {
 
         assertEquals(2, result.asInt());
     }
+
+    @Test
+    public void calling_a_function_with_extra_arguments_ignores_the_extra_ones() {
+        Value result = this.context.eval("ezs",
+                "Math.abs(3, 4);"
+        );
+
+        assertEquals(3, result.asInt());
+    }
+
+    @Test
+    public void extra_function_arguments_expressions_are_still_evaluated() {
+        Value result = this.context.eval("ezs",
+                "var a = -1; " +
+                "Math.abs(4, a = 5);" +
+                "a"
+        );
+
+        assertEquals(5, result.asInt());
+    }
 }
