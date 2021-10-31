@@ -50,4 +50,22 @@ public class StaticFunctionCallsTest {
 
         assertEquals(5, result.asInt());
     }
+
+    @Test
+    public void calling_a_function_with_less_arguments_assigns_them_undefined() {
+        Value result = this.context.eval("ezs",
+                "Math.abs()"
+        );
+
+        assertTrue(Double.isNaN(result.asDouble()));
+    }
+
+    @Test
+    public void abs_of_a_function_is_nan() {
+        Value result = this.context.eval("ezs",
+                "Math.abs(Math.abs)"
+        );
+
+        assertTrue(Double.isNaN(result.asDouble()));
+    }
 }

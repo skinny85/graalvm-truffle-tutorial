@@ -1,10 +1,8 @@
 package com.endoflineblog.truffle.part_06.nodes.exprs;
 
-import com.endoflineblog.truffle.part_06.EasyScriptTypeSystem;
-import com.oracle.truffle.api.dsl.TypeSystemReference;
+import com.endoflineblog.truffle.part_06.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-@TypeSystemReference(EasyScriptTypeSystem.class)
 public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
     private final int index;
 
@@ -14,6 +12,9 @@ public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        return frame.getArguments()[index];
+        Object[] arguments = frame.getArguments();
+        // In JavaScript, it's legal to call a function with fewer arguments than it declares;
+        // in that case, the arguments not provided are assigned 'undefined'
+        return arguments.length > index ? arguments[index] : Undefined.INSTANCE;
     }
 }

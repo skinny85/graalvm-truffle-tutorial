@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_06.nodes.exprs.functions;
 
 import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
+import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 
@@ -12,7 +13,17 @@ public abstract class AbsFunctionBodyExprNode extends EasyScriptExprNode {
     }
 
     @Specialization
-    protected double intDouble(double argument) {
+    protected double doubleAbs(double argument) {
         return argument >= 0 ? argument : -argument;
+    }
+
+    /**
+     * It's always possible to get called with 'undefined' passed as an argument,
+     * or even another function.
+     * Simply return NaN in all those cases.
+     */
+    @Fallback
+    protected double notANumberAbs(@SuppressWarnings("unused") Object argument) {
+        return Double.NaN;
     }
 }
