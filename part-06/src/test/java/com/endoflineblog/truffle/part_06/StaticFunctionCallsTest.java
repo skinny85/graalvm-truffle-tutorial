@@ -106,4 +106,16 @@ public class StaticFunctionCallsTest {
             assertEquals("'1' is not a function", e.getMessage());
         }
     }
+
+    @Test
+    public void an_EasyScript_function_can_be_called_from_Java() {
+        Value mathAbs = this.context.eval("ezs",
+                "Math.abs;"
+        );
+
+        assertTrue(mathAbs.canExecute());
+
+        Value result = mathAbs.execute(-3);
+        assertEquals(3, result.asInt());
+    }
 }
