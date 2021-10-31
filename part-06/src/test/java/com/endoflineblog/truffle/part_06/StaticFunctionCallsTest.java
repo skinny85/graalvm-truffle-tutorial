@@ -1,13 +1,16 @@
 package com.endoflineblog.truffle.part_06;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class StaticFunctionCallsTest {
     private Context context;
@@ -88,5 +91,19 @@ public class StaticFunctionCallsTest {
         );
 
         assertTrue(Double.isNaN(result.asDouble()));
+    }
+
+    @Test
+    public void calling_a_non_function_throws_a_guest_polyglot_exception() {
+        try {
+            this.context.eval("ezs",
+                    "1(2)"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'1' is not a function", e.getMessage());
+        }
     }
 }

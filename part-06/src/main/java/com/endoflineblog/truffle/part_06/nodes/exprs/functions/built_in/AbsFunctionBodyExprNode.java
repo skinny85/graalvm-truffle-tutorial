@@ -23,7 +23,7 @@ public abstract class AbsFunctionBodyExprNode extends EasyScriptExprNode {
      * Simply return NaN in all those cases.
      */
     @Fallback
-    protected double notANumberAbs(@SuppressWarnings("unused") Object argument) {
+    protected double nonNumberAbs(@SuppressWarnings("unused") Object argument) {
         return Double.NaN;
     }
 }
