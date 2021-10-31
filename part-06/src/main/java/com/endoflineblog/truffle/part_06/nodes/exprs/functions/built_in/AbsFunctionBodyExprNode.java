@@ -1,4 +1,4 @@
-package com.endoflineblog.truffle.part_06.nodes.exprs.functions;
+package com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in;
 
 import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
 import com.oracle.truffle.api.dsl.Fallback;

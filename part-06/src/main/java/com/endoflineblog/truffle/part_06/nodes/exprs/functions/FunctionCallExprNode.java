@@ -1,7 +1,6 @@
-package com.endoflineblog.truffle.part_06.nodes.exprs;
+package com.endoflineblog.truffle.part_06.nodes.exprs.functions;
 
-import com.endoflineblog.truffle.part_06.nodes.FunctionDispatchNode;
-import com.endoflineblog.truffle.part_06.nodes.FunctionDispatchNodeGen;
+import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.endoflineblog.truffle.part_06.nodes;
+package com.endoflineblog.truffle.part_06.nodes.exprs.functions;
 
 import com.endoflineblog.truffle.part_06.runtime.FunctionObject;
 import com.oracle.truffle.api.dsl.Cached;

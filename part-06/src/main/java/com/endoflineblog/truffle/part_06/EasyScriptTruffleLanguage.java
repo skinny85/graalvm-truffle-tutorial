@@ -2,8 +2,8 @@ package com.endoflineblog.truffle.part_06;
 
 import com.endoflineblog.truffle.part_06.nodes.FunctionRootNode;
 import com.endoflineblog.truffle.part_06.nodes.ProgramRootNode;
-import com.endoflineblog.truffle.part_06.nodes.exprs.ReadFunctionArgExprNode;
-import com.endoflineblog.truffle.part_06.nodes.exprs.functions.AbsFunctionBodyExprNodeGen;
+import com.endoflineblog.truffle.part_06.nodes.exprs.functions.ReadFunctionArgExprNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeGen;
 import com.endoflineblog.truffle.part_06.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_06.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;

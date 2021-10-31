@@ -1,5 +1,6 @@
-package com.endoflineblog.truffle.part_06.nodes.exprs;
+package com.endoflineblog.truffle.part_06.nodes.exprs.functions;
 
+import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_06.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
