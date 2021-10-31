@@ -68,4 +68,25 @@ public class StaticFunctionCallsTest {
 
         assertTrue(Double.isNaN(result.asDouble()));
     }
+
+    @Test
+    public void negating_a_function_or_undefined_returns_NaN() {
+        this.context.eval("ezs",
+                "var uNeg = -undefined;" +
+                "var fNeg = -Math.abs;"
+        );
+
+        Value easyScriptBindings = this.context.getBindings("ezs");
+        assertTrue(Double.isNaN(easyScriptBindings.getMember("uNeg").asDouble()));
+        assertTrue(Double.isNaN(easyScriptBindings.getMember("fNeg").asDouble()));
+    }
+
+    @Test
+    public void adding_a_function_returns_NaN() {
+        Value result = this.context.eval("ezs",
+                "Math.abs + 3"
+        );
+
+        assertTrue(Double.isNaN(result.asDouble()));
+    }
 }
