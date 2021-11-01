@@ -135,4 +135,31 @@ public class StaticFunctionCallsTest {
             assertEquals("'-1' is not an EasyScript value", e.getMessage());
         }
     }
+
+    @Test
+    public void calling_Math_pow_works() {
+        Value result = this.context.eval("ezs",
+                "Math.pow(2, 3)"
+        );
+
+        assertEquals(8, result.asInt());
+    }
+
+    @Test
+    public void Math_pow_with_negative_exponent_works_correctly() {
+        Value result = this.context.eval("ezs",
+                "Math.pow(2, -1)"
+        );
+
+        assertEquals(0.5, result.asDouble(), 0.0);
+    }
+
+    @Test
+    public void Math_pow_correctly_switches_to_double_on_overflow() {
+        Value result = this.context.eval("ezs",
+                "Math.pow(2, 35)"
+        );
+
+        assertEquals(34_359_738_368D, result.asDouble(), 0.0);
+    }
 }
