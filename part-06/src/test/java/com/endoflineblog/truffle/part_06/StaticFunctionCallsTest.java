@@ -118,4 +118,21 @@ public class StaticFunctionCallsTest {
         Value result = mathAbs.execute(-3);
         assertEquals(3, result.asInt());
     }
+
+    @Test
+    public void calling_an_EasyScript_function_with_a_byte_throws_an_exception() {
+        Value mathAbs = this.context.eval("ezs",
+                "Math.abs;"
+        );
+
+        try {
+            byte b = -1;
+            mathAbs.execute(b);
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'-1' is not an EasyScript value", e.getMessage());
+        }
+    }
 }
