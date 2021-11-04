@@ -10,7 +10,6 @@ import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_05.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import java.util.ArrayList;
@@ -72,7 +71,6 @@ public final class EasyScriptRootNode extends RootNode {
      * is simply the result of executing the last statement in the list.
      */
     @Override
-    @ExplodeLoop
     public Object execute(VirtualFrame frame) {
         Object ret = Undefined.INSTANCE;
         for (EasyScriptStmtNode stmtNode : this.stmtNodes) {
