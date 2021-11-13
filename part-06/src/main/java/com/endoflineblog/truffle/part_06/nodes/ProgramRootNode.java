@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * The {@link RootNode} used for the EasyScript program itself.
+ * Identical to the EasyScriptRootNode from part 5.
+ */
 public final class ProgramRootNode extends RootNode {
-    /**
-     * Fields annotated with {@code @Children}
-     * need to have the array type.
-     */
     @Children
     private final EasyScriptStmtNode[] stmtNodes;
 
@@ -29,26 +29,18 @@ public final class ProgramRootNode extends RootNode {
             List<EasyScriptStmtNode> stmtNodes) {
         super(truffleLanguage);
 
-        // implement hoisting of 'var' declarations,
-        // see: https://developer.mozilla.org/en-US/docs/Glossary/Hoisting
         List<GlobalVarDeclStmtNode> varDeclarations = new ArrayList<>();
         List<EasyScriptStmtNode> remainingStmts = new ArrayList<>();
         for (EasyScriptStmtNode stmtNode : stmtNodes) {
             if (stmtNode instanceof GlobalVarDeclStmtNode) {
                 var varDeclaration = (GlobalVarDeclStmtNode) stmtNode;
                 if (varDeclaration.getDeclarationKind() == DeclarationKind.VAR) {
-                    // any 'var' declarations are replaced by two statements:
-                    // the first is a declaration with the initializer as 'undefined',
-                    // the second is an assignment expression for that variable,
-                    // with the right-hand side of the assignment being the original initializer
                     varDeclarations.add(GlobalVarDeclStmtNodeGen.create(
                             new UndefinedLiteralExprNode(), varDeclaration.getName(), DeclarationKind.VAR));
 
                     remainingStmts.add(new ExprStmtNode(
                             GlobalVarAssignmentExprNodeGen.create(
                                     varDeclaration.getInitializerExpr(), varDeclaration.getName()),
-                            // we pass 'true' here to make sure this expression statement returns 'undefined',
-                            // instead of the right-hand expression value, when executed
                             true));
 
                     continue;
@@ -63,10 +55,6 @@ public final class ProgramRootNode extends RootNode {
         ).toArray(EasyScriptStmtNode[]::new);
     }
 
-    /**
-     * The result of executing an EasyScript program in this chapter of the tutorial
-     * is simply the result of executing the last statement in the list.
-     */
     @Override
     @ExplodeLoop
     public Object execute(VirtualFrame frame) {

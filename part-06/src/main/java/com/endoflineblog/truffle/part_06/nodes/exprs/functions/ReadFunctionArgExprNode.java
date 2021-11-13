@@ -16,6 +16,6 @@ public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
         Object[] arguments = frame.getArguments();
         // In JavaScript, it's legal to call a function with fewer arguments than it declares;
         // in that case, the arguments not provided are assigned 'undefined'
-        return arguments.length > index ? arguments[index] : Undefined.INSTANCE;
+        return index < arguments.length ? arguments[index] : Undefined.INSTANCE;
     }
 }

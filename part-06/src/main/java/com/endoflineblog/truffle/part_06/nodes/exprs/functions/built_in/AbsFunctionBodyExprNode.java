@@ -7,14 +7,14 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 @NodeChild("argument")
 public abstract class AbsFunctionBodyExprNode extends EasyScriptExprNode {
-    @Specialization
+    @Specialization(rewriteOn = ArithmeticException.class)
     protected int intAbs(int argument) {
-        return argument >= 0 ? argument : -argument;
+        return argument < 0 ? Math.subtractExact(0, argument) : argument;
     }
 
-    @Specialization
+    @Specialization(replaces = "intAbs")
     protected double doubleAbs(double argument) {
-        return argument >= 0 ? argument : -argument;
+        return Math.abs(argument);
     }
 
     /**

@@ -7,7 +7,7 @@ public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExpr {
     @Specialization(guards = "exponent >= 0", rewriteOn = ArithmeticException.class)
     protected int intPow(int base, int exponent) {
         int ret = 1;
-        for (int i = 1; i <= exponent; i++) {
+        for (int i = 0; i < exponent; i++) {
             ret = Math.multiplyExact(ret, base);
         }
         return ret;
@@ -24,7 +24,7 @@ public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExpr {
      * Simply return NaN in all those cases.
      */
     @Fallback
-    protected double nonNumberAbs(@SuppressWarnings("unused") Object base, @SuppressWarnings("unused") Object exponent) {
+    protected double nonNumberPow(@SuppressWarnings("unused") Object base, @SuppressWarnings("unused") Object exponent) {
         return Double.NaN;
     }
 }

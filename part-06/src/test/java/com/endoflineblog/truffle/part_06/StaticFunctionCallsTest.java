@@ -35,6 +35,18 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
+    public void Math_abs_correctly_handles_min_int() {
+        Value result = this.context.eval("ezs",
+                // if we just use Integer.MIN_VALUE, that will overflow int,
+                // as EasyScript parses it as two expressions,
+                // negation and an int literal
+                "Math.abs(" + (Integer.MIN_VALUE + 1) + " + (-1))"
+        );
+
+        assertEquals(Integer.MAX_VALUE + 1D, result.asDouble(), 0.0);
+    }
+
+    @Test
     public void calling_a_function_with_extra_arguments_ignores_the_extra_ones() {
         Value result = this.context.eval("ezs",
                 "Math.abs(3, 4);"

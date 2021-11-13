@@ -15,7 +15,7 @@ public abstract class FunctionDispatchNode extends Node {
     /**
      * A specialization that calls the given target directly.
      */
-    @Specialization(limit = "2", guards = "function.callTarget == directCallNode.getCallTarget()")
+    @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()", limit = "2")
     protected static Object dispatchDirectly(
             @SuppressWarnings("unused") FunctionObject function,
             Object[] arguments,
