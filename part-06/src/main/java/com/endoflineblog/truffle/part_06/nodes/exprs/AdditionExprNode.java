@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * The Node representing number addition.
- * Same as AdditionNode in part 3.
+ * Identical to the class with the same name from part 5.
  */
 @NodeChild("leftNode")
 @NodeChild("rightNode")
@@ -21,10 +21,13 @@ public abstract class AdditionExprNode extends EasyScriptExprNode {
         return leftValue + rightValue;
     }
 
-    // ToDo: now that we have function objects,
-    // the assumption here that one of these is undefined is no longer true
+    /**
+     * Strictly speaking, adding functions results in turning them to strings in JavaScript.
+     * However, since we don't have strings in EasyScript yet,
+     * let's just keep returning NaN for additions involving any non-numbers.
+     */
     @Fallback
-    protected double addWithUndefined(Object leftValue, Object rightValue) {
+    protected double addNonNumber(Object leftValue, Object rightValue) {
         return Double.NaN;
     }
 }

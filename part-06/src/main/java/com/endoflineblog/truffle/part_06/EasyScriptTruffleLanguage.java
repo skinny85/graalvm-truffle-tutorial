@@ -16,6 +16,15 @@ import com.oracle.truffle.api.dsl.NodeFactory;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * The {@link TruffleLanguage} implementation for this part of the article series.
+ * Very similar to the class with the same name from part 5,
+ * the only difference is that this adds the supported built-in functions
+ * ({@code Math.abs} and {@code Math.pow})
+ * to the global scope in the {@link #createContext} method.
+ *
+ * @see #createContext
+ */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
     @Override
@@ -25,13 +34,20 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return Truffle.getRuntime().createCallTarget(programRootNode);
     }
 
+    /**
+     * We create a new instance of {@link EasyScriptLanguageContext},
+     * and return it, but not before adding the built-in functions to
+     * the global scope the context object holds.
+     */
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
         var context = new EasyScriptLanguageContext();
 
+        // an example of defining a function directly, without @GenerateNodeFactory
         context.globalScopeObject.newConstant("Math.abs",
                 new FunctionObject(Truffle.getRuntime().createCallTarget(new FunctionRootNode(this,
                         AbsFunctionBodyExprNodeGen.create(new ReadFunctionArgExprNode(0))))));
+        // an example of using our utility method, possible by annotating the Node class with @GenerateNodeFactory
         this.defineBuiltInFunction(context, "Math.pow", PowFunctionBodyExprNodeFactory.getInstance());
 
         return context;

@@ -30,7 +30,10 @@ import java.util.stream.Stream;
 /**
  * This is the class that parses the program and turns it into a Truffle AST.
  * It uses ANTLR to perform the actual parsing,
- * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_05/EasyScript.g4 file.
+ * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_06/EasyScript.g4 file.
+ * This class is invoked by the {@link EasyScriptTruffleLanguage TruffleLanguage implementation for this part}.
+ *
+ * @see #parse
  */
 public final class EasyScriptTruffleParser {
     public static List<EasyScriptStmtNode> parse(Reader program) throws IOException {

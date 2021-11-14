@@ -5,6 +5,10 @@ import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * The {@link RootNode} for our built-in functions.
+ * Simply wraps the Node representing the body of the function.
+ */
 public final class FunctionRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child

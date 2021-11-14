@@ -5,11 +5,23 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 
+/**
+ * An expression Node that represents the implementation of the
+ * {@code Math.abs()} JavaScript function.
+ *
+ * Note that we don't make it inherit from {@link BuiltInFunctionBodyExpr}
+ * on purpose, to illustrate the difference in adding this,
+ * and {@link PowFunctionBodyExprNode}, to the global scope in
+ * {@link com.endoflineblog.truffle.part_06.EasyScriptTruffleLanguage}.
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/abs">Math.abs()</a>
+ */
 @NodeChild("argument")
 public abstract class AbsFunctionBodyExprNode extends EasyScriptExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
     protected int intAbs(int argument) {
-        return argument < 0 ? Math.subtractExact(0, argument) : argument;
+        // Integer.MIN_VALUE is too big to fit negated into an int
+        return argument < 0 ? Math.negateExact(argument) : argument;
     }
 
     @Specialization(replaces = "intAbs")

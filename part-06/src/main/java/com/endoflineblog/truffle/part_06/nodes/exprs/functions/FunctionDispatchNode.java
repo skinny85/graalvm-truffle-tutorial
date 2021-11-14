@@ -9,11 +9,19 @@ import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 
+/**
+ * A helper Node that contains specialization for functions calls.
+ * Used by {@link FunctionCallExprNode},
+ * and by {@link FunctionObject}.
+ */
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 
     /**
      * A specialization that calls the given target directly.
+     * This is the fastest case,
+     * used when the target of a call stays the same during the execution of the program,
+     * like in {@code Math.abs(-3)}.
      */
     @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()", limit = "2")
     protected static Object dispatchDirectly(

@@ -9,7 +9,13 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 /**
  * The abstract common ancestor of all expression Nodes in EasyScript.
- * Very similar to EasyScriptNode from part 3.
+ * Very similar to the class with the same name from part 5,
+ * the only difference is that we provide a default implementation of
+ * {@link #executeInt} and {@link #executeDouble}
+ * by using the helper methods from the class generated from {@link EasyScriptTypeSystem}.
+ *
+ * @see #executeInt
+ * @see #executeDouble
  */
 @TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends Node {

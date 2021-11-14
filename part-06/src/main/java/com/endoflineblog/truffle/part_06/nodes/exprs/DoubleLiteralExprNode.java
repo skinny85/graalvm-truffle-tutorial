@@ -5,7 +5,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 /**
  * The AST node that represents an decimal number literal expression in EasyScript.
- * The same as the DoubleLiteralNode in part 3.
+ * Identical to the class with the same name from part 5.
  */
 public final class DoubleLiteralExprNode extends EasyScriptExprNode {
     private final double value;

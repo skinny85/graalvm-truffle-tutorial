@@ -10,6 +10,9 @@ import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
+/**
+ * The object that represents a function in EasyScript.
+ */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject implements TruffleObject {
     public final CallTarget callTarget;

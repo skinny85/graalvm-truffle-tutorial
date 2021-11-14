@@ -3,6 +3,12 @@ package com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+/**
+ * An expression Node that represents the implementation of the
+ * {@code Math.pow()} JavaScript function.
+ *
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/pow">Math.pow()</a>
+ */
 public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExpr {
     @Specialization(guards = "exponent >= 0", rewriteOn = ArithmeticException.class)
     protected int intPow(int base, int exponent) {

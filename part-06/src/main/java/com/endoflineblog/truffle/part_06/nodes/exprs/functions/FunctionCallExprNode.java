@@ -6,6 +6,10 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 import java.util.List;
 
+/**
+ * The Node representing the expression of calling a function in EasyScript,
+ * for example {@code Math.pow(2, 3)}.
+ */
 public final class FunctionCallExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child

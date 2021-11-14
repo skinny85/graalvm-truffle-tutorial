@@ -4,7 +4,10 @@ import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_06.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-/** A Node that represents an expression statement. */
+/**
+ * A Node that represents an expression statement.
+ * Identical to the class with the same name from part 5.
+ */
 public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child

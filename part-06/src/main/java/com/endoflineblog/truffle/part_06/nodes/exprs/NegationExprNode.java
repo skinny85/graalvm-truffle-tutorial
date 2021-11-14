@@ -6,13 +6,14 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * The Node that represents the negation expression in JavaScript
- * ("unary minus"), like `-3`.
+ * ("unary minus"), like {@code -3}.
  */
 @NodeChild("expr")
 public abstract class NegationExprNode extends EasyScriptExprNode {
-    @Specialization
+    @Specialization(rewriteOn = ArithmeticException.class)
     protected int negateInt(int value) {
-        return -value;
+        // Integer.MIN_VALUE is too big to fit negated into an int
+        return Math.negateExact(value);
     }
 
     @Specialization(replaces = "negateInt")
@@ -20,8 +21,12 @@ public abstract class NegationExprNode extends EasyScriptExprNode {
         return -value;
     }
 
+    /**
+     * Same as with {@link AdditionExprNode},
+     * we return NaN when attempting to negate something that's not a number.
+     */
     @Fallback
-    protected double negateUndefined(@SuppressWarnings("unused") Object value) {
+    protected double negateNonNumber(@SuppressWarnings("unused") Object value) {
         return Double.NaN;
     }
 }

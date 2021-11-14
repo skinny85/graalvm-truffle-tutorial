@@ -20,12 +20,21 @@ import java.util.Set;
 /**
  * This is the Truffle interop object that represents the global-level scope
  * that contains all of the global variables.
+ * Basically identical to the class with the same name from part 5,
+ * the only difference is the {@link #newConstant} utility method.
+ *
+ * @see #newConstant
  */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject implements TruffleObject {
     private final Map<String, Object> variables = new HashMap<>();
     private final Set<String> constants = new HashSet<>();
 
+    /**
+     * A convenient alias for {@code newVariable(name, value, true)},
+     * used when defining built-in functions,
+     * which we treat as constants in this part of the series.
+     */
     public boolean newConstant(String name, Object value) {
         return newVariable(name, value, false);
     }
