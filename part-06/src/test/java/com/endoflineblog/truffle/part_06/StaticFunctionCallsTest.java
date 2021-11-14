@@ -174,4 +174,28 @@ public class StaticFunctionCallsTest {
 
         assertEquals(34_359_738_368D, result.asDouble(), 0.0);
     }
+
+    @Test
+    public void Math_cannot_be_referenced_by_itself() {
+        try {
+            this.context.eval("ezs",
+                    "Math"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'Math' is not defined", e.getMessage());
+        }
+    }
+
+    @Test
+    public void Math_is_a_legal_variable_name() {
+        Value result = this.context.eval("ezs",
+                "let Math = -5; " +
+                "Math.abs(Math)"
+        );
+
+        assertEquals(5, result.asInt());
+    }
 }
