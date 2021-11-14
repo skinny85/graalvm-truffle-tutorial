@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in;
 
 import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -16,7 +17,7 @@ import com.oracle.truffle.api.dsl.Specialization;
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/abs">Math.abs()</a>
  */
-@NodeChild("argument")
+@NodeChild(value = "argument", type = ReadFunctionArgExprNode.class)
 public abstract class AbsFunctionBodyExprNode extends EasyScriptExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
     protected int intAbs(int argument) {

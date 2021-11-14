@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in;
 
 import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_06.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.oracle.truffle.api.dsl.GenerateNodeFactory;
 import com.oracle.truffle.api.dsl.NodeChild;
 
@@ -13,7 +14,7 @@ import com.oracle.truffle.api.dsl.NodeChild;
  * in its private {@code defineBuiltInFunction()}
  * utility method to add the given built-in function to the global scope.
  */
-@NodeChild(value = "arguments", type = EasyScriptExprNode[].class)
+@NodeChild(value = "arguments", type = ReadFunctionArgExprNode[].class)
 @GenerateNodeFactory
 public abstract class BuiltInFunctionBodyExprNode extends EasyScriptExprNode {
 }
