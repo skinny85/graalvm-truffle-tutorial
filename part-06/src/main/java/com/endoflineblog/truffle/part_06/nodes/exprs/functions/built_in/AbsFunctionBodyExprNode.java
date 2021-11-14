@@ -9,7 +9,7 @@ import com.oracle.truffle.api.dsl.Specialization;
  * An expression Node that represents the implementation of the
  * {@code Math.abs()} JavaScript function.
  *
- * Note that we don't make it inherit from {@link BuiltInFunctionBodyExpr}
+ * Note that we don't make it inherit from {@link BuiltInFunctionBodyExprNode}
  * on purpose, to illustrate the difference in adding this,
  * and {@link PowFunctionBodyExprNode}, to the global scope in
  * {@link com.endoflineblog.truffle.part_06.EasyScriptTruffleLanguage}.

@@ -4,7 +4,7 @@ import com.endoflineblog.truffle.part_06.nodes.FunctionRootNode;
 import com.endoflineblog.truffle.part_06.nodes.ProgramRootNode;
 import com.endoflineblog.truffle.part_06.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeGen;
-import com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in.BuiltInFunctionBodyExpr;
+import com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_06.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_06.runtime.FunctionObject;
@@ -59,7 +59,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     }
 
     private void defineBuiltInFunction(EasyScriptLanguageContext context, String name,
-            NodeFactory<? extends BuiltInFunctionBodyExpr> nodeFactory) {
+            NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, nodeFactory.getExecutionSignature().size())
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);

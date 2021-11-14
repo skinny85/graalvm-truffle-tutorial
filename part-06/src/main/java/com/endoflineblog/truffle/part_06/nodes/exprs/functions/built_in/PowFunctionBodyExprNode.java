@@ -9,7 +9,7 @@ import com.oracle.truffle.api.dsl.Specialization;
  *
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/pow">Math.pow()</a>
  */
-public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExpr {
+public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(guards = "exponent >= 0", rewriteOn = ArithmeticException.class)
     protected int intPow(int base, int exponent) {
         int ret = 1;

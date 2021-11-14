@@ -15,5 +15,5 @@ import com.oracle.truffle.api.dsl.NodeChild;
  */
 @NodeChild(value = "arguments", type = EasyScriptExprNode[].class)
 @GenerateNodeFactory
-public abstract class BuiltInFunctionBodyExpr extends EasyScriptExprNode {
+public abstract class BuiltInFunctionBodyExprNode extends EasyScriptExprNode {
 }
