@@ -193,4 +193,12 @@ public class GlobalVariablesTest {
             assertEquals("'x' is not defined", e.getMessage());
         }
     }
+
+    @Test
+    public void parsing_a_large_integer_fall_backs_to_double() {
+        // this is 12,345,678,901
+        Value result = this.context.eval("ezs", "12345678901");
+
+        assertEquals(12_345_678_901D, result.asDouble(), 0.0);
+    }
 }
