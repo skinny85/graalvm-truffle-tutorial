@@ -131,11 +131,11 @@ public final class EasyScriptTruffleParser {
     private static EasyScriptExprNode parseLiteralExpr(EasyScriptParser.LiteralExpr3Context literalExpr) {
         TerminalNode intTerminal = literalExpr.literal().INT();
         if (intTerminal != null) {
-            return new IntLiteralExprNode(Integer.parseInt(intTerminal.getText()));
+            return parseIntLiteral(intTerminal.getText());
         }
         TerminalNode doubleTerminal = literalExpr.literal().DOUBLE();
         return doubleTerminal != null
-                ? new DoubleLiteralExprNode(Double.parseDouble(doubleTerminal.getText()))
+                ? parseDoubleLiteral(doubleTerminal.getText())
                 : new UndefinedLiteralExprNode();
     }
 
@@ -149,5 +149,19 @@ public final class EasyScriptTruffleParser {
                 callExpr.expr1().stream()
                         .map(EasyScriptTruffleParser::parseExpr1)
                         .collect(Collectors.toList()));
+    }
+
+    private static EasyScriptExprNode parseIntLiteral(String text) {
+        try {
+            return new IntLiteralExprNode(Integer.parseInt(text));
+        } catch (NumberFormatException e) {
+            // it's possible that the integer literal is too big to fit in a 32-bit Java `int` -
+            // in that case, fall back to a double literal
+            return parseDoubleLiteral(text);
+        }
+    }
+
+    private static DoubleLiteralExprNode parseDoubleLiteral(String text) {
+        return new DoubleLiteralExprNode(Double.parseDouble(text));
     }
 }
