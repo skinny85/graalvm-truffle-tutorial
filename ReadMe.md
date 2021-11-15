@@ -59,3 +59,4 @@ $ ./gradlew build
 * [Part 3 - specializations using Truffle DSL, `@TypeSystem`](part-03)
 * [Part 4 - parsing, and the `TruffleLanguage` class](part-04)
 * [Part 5 - global variables](part-05)
+* [Part 6 - static function calls](part-06)
