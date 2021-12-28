@@ -1,0 +1,8 @@
+language1.className=com.endoflineblog.truffle.part_04.EasyScriptTruffleLanguage
+language1.id=ezs
+language1.implementationName=
+language1.interactive=true
+language1.internal=false
+language1.mimeType.0=application/x-ezs
+language1.name=EasyScript
+language1.version=0.0.1
