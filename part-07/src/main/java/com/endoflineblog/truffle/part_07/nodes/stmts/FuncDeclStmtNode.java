@@ -6,6 +6,7 @@ import com.endoflineblog.truffle.part_07.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_07.nodes.UserDefinedFuncRootNode;
 import com.endoflineblog.truffle.part_07.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_07.runtime.Undefined;
+import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
@@ -30,7 +31,7 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     public Object executeStatement(VirtualFrame frame) {
         EasyScriptTruffleLanguage truffleLanguage = EasyScriptTruffleLanguage.get(this);
         UserDefinedFuncRootNode funcRootNode = new UserDefinedFuncRootNode(truffleLanguage, this.funcBody);
-        FunctionObject func = new FunctionObject(funcRootNode.getCallTarget());
+        FunctionObject func = new FunctionObject(Truffle.getRuntime().createCallTarget(funcRootNode));
 
         EasyScriptLanguageContext context = EasyScriptLanguageContext.get(this);
         if (!context.globalScopeObject.newConstant(this.funcName, func)) {
