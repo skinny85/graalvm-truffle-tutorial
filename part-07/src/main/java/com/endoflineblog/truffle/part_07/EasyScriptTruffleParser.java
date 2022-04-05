@@ -13,8 +13,10 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.FunctionCallExprNode;
+import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.ExprStmtNode;
+import com.endoflineblog.truffle.part_07.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.GlobalVarDeclStmtNodeGen;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -76,7 +78,9 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
-        throw new UnsupportedOperationException();
+        // ToDo add handling of parameters
+        return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
+                new BlockStmtNode(this.parseStmtList(funcDeclStmt.stmt())));
     }
 
     private List<EasyScriptStmtNode> parseVarDeclStmt(EasyScriptParser.VarDeclStmtContext varDeclStmt) {

@@ -7,11 +7,13 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.AbsFunct
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
+import com.endoflineblog.truffle.part_07.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_07.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
+import com.oracle.truffle.api.nodes.Node;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -27,6 +29,13 @@ import java.util.stream.IntStream;
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
+    private static final LanguageReference<EasyScriptTruffleLanguage> REF =
+            LanguageReference.create(EasyScriptTruffleLanguage.class);
+
+    public static EasyScriptTruffleLanguage get(Node node) {
+        return REF.get(node);
+    }
+
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         List<EasyScriptStmtNode> stmts = EasyScriptTruffleParser.parse(request.getSource().getReader());
