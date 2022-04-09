@@ -43,4 +43,15 @@ public class FunctionDefinitionsTest {
         assertTrue(result.isNull());
         assertEquals(result.toString(), "undefined");
     }
+
+    @Test
+    public void passing_a_parameter_to_a_function_works() {
+        Value result = this.context.eval("ezs",
+                "function addOne(a) {" +
+                    "a + 1; " +
+                "} " +
+                "addOne(4)"
+        );
+        assertEquals(5, result.asInt());
+    }
 }

@@ -13,6 +13,7 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.FunctionCallExprNode;
+import com.endoflineblog.truffle.part_07.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.ExprStmtNode;
@@ -57,7 +58,7 @@ public final class EasyScriptTruffleParser {
      * Function arguments will be mapped to integer indexes, starting at 0,
      * while local variables of functions will be mapped to their String names.
      */
-    private final Map<String, Object> functionLocals = new HashMap<>();
+    private final Map<String, Integer> functionLocals = new HashMap<>();
 
     private EasyScriptTruffleParser() {
     }
@@ -81,9 +82,21 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
-        // ToDo add handling of parameters
+        // add each parameter to the map,
+        // with the correct index
+        for (int i = 0; i < funcDeclStmt.params.ID().size(); i++) {
+            this.functionLocals.put(funcDeclStmt.params.ID(i).getText(), i);
+        }
+
+        // parse the statements in the function definition
+        List<EasyScriptStmtNode> funcStmts = this.parseStmtList(funcDeclStmt.stmt());
+
+        // finally, clear the map of the function locals,
+        // in case the program has more than one function inside it
+        this.functionLocals.clear();
+
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
-                new BlockStmtNode(this.parseStmtList(funcDeclStmt.stmt())));
+                new BlockStmtNode(funcStmts));
     }
 
     private List<EasyScriptStmtNode> parseVarDeclStmt(EasyScriptParser.VarDeclStmtContext varDeclStmt) {
@@ -166,8 +179,11 @@ public final class EasyScriptTruffleParser {
                 : new UndefinedLiteralExprNode();
     }
 
-    private GlobalVarReferenceExprNode parseReference(String variableId) {
-        return GlobalVarReferenceExprNodeGen.create(variableId);
+    private EasyScriptExprNode parseReference(String variableId) {
+        Integer paramIndex = this.functionLocals.get(variableId);
+        return paramIndex == null
+            ? GlobalVarReferenceExprNodeGen.create(variableId)
+            : new ReadFunctionArgExprNode(paramIndex);
     }
 
     private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr3Context callExpr) {
