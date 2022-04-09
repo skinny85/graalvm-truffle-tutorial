@@ -1,24 +1,14 @@
 package com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in;
 
-import com.endoflineblog.truffle.part_07.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_07.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.oracle.truffle.api.dsl.Fallback;
-import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * An expression Node that represents the implementation of the
  * {@code Math.abs()} JavaScript function.
- *
- * Note that we don't make it inherit from {@link BuiltInFunctionBodyExprNode}
- * on purpose, to illustrate the difference in adding this,
- * and {@link PowFunctionBodyExprNode}, to the global scope in
- * {@link com.endoflineblog.truffle.part_07.EasyScriptTruffleLanguage}.
- *
- * @see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/abs">Math.abs()</a>
+ * Identical to the class with the same name in part 6.
  */
-@NodeChild(value = "argument", type = ReadFunctionArgExprNode.class)
-public abstract class AbsFunctionBodyExprNode extends EasyScriptExprNode {
+public abstract class AbsFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
     protected int intAbs(int argument) {
         // Integer.MIN_VALUE is too big to fit negated into an int

@@ -59,13 +59,16 @@ public final class EasyScriptTruffleParser {
      */
     private final Map<String, Object> functionLocals = new HashMap<>();
 
+    private EasyScriptTruffleParser() {
+    }
+
     private List<EasyScriptStmtNode> parseStmtList(List<EasyScriptParser.StmtContext> stmts) {
         var result = new ArrayList<EasyScriptStmtNode>(stmts.size());
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.ExprStmtContext) {
                 result.add(parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.FuncDeclStmtContext) {
-                    result.add(parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
+                result.add(parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
             } else {
                 result.addAll(this.parseVarDeclStmt((EasyScriptParser.VarDeclStmtContext) stmt));
             }

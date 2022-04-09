@@ -6,23 +6,22 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
- * The {@link RootNode} for our built-in functions.
- * Simply wraps the statement block Node representing the body of the function.
+ * dsads
  */
-public final class UserDefinedFuncRootNode extends RootNode {
+public final class StmtBlockRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private BlockStmtNode functionBody;
+    private BlockStmtNode blockStmt;
 
-    public UserDefinedFuncRootNode(EasyScriptTruffleLanguage truffleLanguage,
-            BlockStmtNode functionBody) {
+    public StmtBlockRootNode(EasyScriptTruffleLanguage truffleLanguage,
+            BlockStmtNode blockStmt) {
         super(truffleLanguage);
 
-        this.functionBody = functionBody;
+        this.blockStmt = blockStmt;
     }
 
     @Override
     public Object execute(VirtualFrame frame) {
-        return this.functionBody.executeStatement(frame);
+        return this.blockStmt.executeStatement(frame);
     }
 }

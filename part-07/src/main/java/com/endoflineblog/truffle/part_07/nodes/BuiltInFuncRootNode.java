@@ -7,16 +7,17 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * The {@link RootNode} for our built-in functions.
- * Simply wraps the Node representing the body of the function.
+ * Simply wraps the expression Node representing the body of the function.
  */
-public final class FunctionRootNode extends RootNode {
+public final class BuiltInFuncRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode functionBodyExpr;
 
-    public FunctionRootNode(EasyScriptTruffleLanguage truffleLanguage,
+    public BuiltInFuncRootNode(EasyScriptTruffleLanguage truffleLanguage,
             EasyScriptExprNode functionBodyExpr) {
         super(truffleLanguage);
+
         this.functionBodyExpr = functionBodyExpr;
     }
 

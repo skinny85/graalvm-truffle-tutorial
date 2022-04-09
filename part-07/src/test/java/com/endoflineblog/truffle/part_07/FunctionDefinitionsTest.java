@@ -24,9 +24,9 @@ public class FunctionDefinitionsTest {
     @Test
     public void defining_a_function_works() {
         Value result = this.context.eval("ezs",
-                "function f() { 5; }\n" +
+                "function f() { Math.pow(4, 3); }\n" +
                 "f()"
         );
-        assertEquals(5, result.asInt());
+        assertEquals(64, result.asInt());
     }
 }

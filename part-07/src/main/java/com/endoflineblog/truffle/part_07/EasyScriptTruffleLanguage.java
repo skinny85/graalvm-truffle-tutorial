@@ -1,13 +1,13 @@
 package com.endoflineblog.truffle.part_07;
 
-import com.endoflineblog.truffle.part_07.nodes.FunctionRootNode;
-import com.endoflineblog.truffle.part_07.nodes.ProgramRootNode;
+import com.endoflineblog.truffle.part_07.nodes.BuiltInFuncRootNode;
+import com.endoflineblog.truffle.part_07.nodes.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.ReadFunctionArgExprNode;
-import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeGen;
+import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
+import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
-import com.endoflineblog.truffle.part_07.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_07.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
@@ -39,7 +39,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         List<EasyScriptStmtNode> stmts = EasyScriptTruffleParser.parse(request.getSource().getReader());
-        var programRootNode = new ProgramRootNode(this, stmts);
+        var programRootNode = new StmtBlockRootNode(this, new BlockStmtNode(stmts));
         return Truffle.getRuntime().createCallTarget(programRootNode);
     }
 
@@ -52,11 +52,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     protected EasyScriptLanguageContext createContext(Env env) {
         var context = new EasyScriptLanguageContext();
 
-        // an example of defining a function directly, without @GenerateNodeFactory
-        context.globalScopeObject.newConstant("Math.abs",
-                new FunctionObject(Truffle.getRuntime().createCallTarget(new FunctionRootNode(this,
-                        AbsFunctionBodyExprNodeGen.create(new ReadFunctionArgExprNode(0))))));
-        // an example of using our utility method, possible by annotating the Node class with @GenerateNodeFactory
+        this.defineBuiltInFunction(context, "Math.abs", AbsFunctionBodyExprNodeFactory.getInstance());
         this.defineBuiltInFunction(context, "Math.pow", PowFunctionBodyExprNodeFactory.getInstance());
 
         return context;
@@ -73,7 +69,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
         context.globalScopeObject.newConstant(name,
-                new FunctionObject(Truffle.getRuntime().createCallTarget(new FunctionRootNode(this,
+                new FunctionObject(Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
                         nodeFactory.createNode((Object) functionArguments)))));
     }
 }
