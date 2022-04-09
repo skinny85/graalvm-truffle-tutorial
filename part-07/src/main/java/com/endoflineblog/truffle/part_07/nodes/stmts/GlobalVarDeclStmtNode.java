@@ -22,7 +22,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 @NodeField(name = "declarationKind", type = DeclarationKind.class)
 public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     /*
-     * We use these getters in EasyScriptRootNode,
+     * We use these getters in BlockStmtNode,
      * that's why they're public.
      */
 

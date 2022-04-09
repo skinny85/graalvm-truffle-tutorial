@@ -23,10 +23,16 @@ public final class BlockStmtNode extends EasyScriptStmtNode {
     public BlockStmtNode(List<EasyScriptStmtNode> stmts) {
         // implement hoisting of 'var' declarations,
         // see: https://developer.mozilla.org/en-US/docs/Glossary/Hoisting
+        List<FuncDeclStmtNode> funcDeclarations = new LinkedList<>();
         List<GlobalVarDeclStmtNode> varDeclarations = new LinkedList<>();
         List<EasyScriptStmtNode> remainingStmts = new LinkedList<>();
         for (EasyScriptStmtNode stmt : stmts) {
-            if (stmt instanceof GlobalVarDeclStmtNode) {
+            if (stmt instanceof FuncDeclStmtNode) {
+                // function declarations go first, before the variables,
+                // because you can call functions in JavaScript before defining them
+                funcDeclarations.add((FuncDeclStmtNode) stmt);
+                continue;
+            } else if (stmt instanceof GlobalVarDeclStmtNode) {
                 var varDeclaration = (GlobalVarDeclStmtNode) stmt;
                 if (varDeclaration.getDeclarationKind() == DeclarationKind.VAR) {
                     // any 'var' declarations are replaced by two statements:
@@ -50,9 +56,12 @@ public final class BlockStmtNode extends EasyScriptStmtNode {
         }
 
         this.stmts = Stream.concat(
-                varDeclarations.stream(),
+                Stream.concat(
+                        funcDeclarations.stream(),
+                        varDeclarations.stream()
+                ),
                 remainingStmts.stream()
-        ).toArray(EasyScriptStmtNode[]::new);
+        ).toArray(size -> new EasyScriptStmtNode[size]);
     }
 
     /**
