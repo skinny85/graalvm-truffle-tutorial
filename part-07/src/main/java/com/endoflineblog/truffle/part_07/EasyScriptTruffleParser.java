@@ -6,7 +6,6 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNodeGen;
-import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.IntLiteralExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
@@ -57,8 +56,9 @@ public final class EasyScriptTruffleParser {
      * Map containing bindings for the function arguments and local variables when parsing function definitions.
      * Function arguments will be mapped to integer indexes, starting at 0,
      * while local variables of functions will be mapped to their String names.
+     * This field is non-null only if we are parsing a function definition.
      */
-    private final Map<String, Integer> functionLocals = new HashMap<>();
+    private Map<String, Integer> functionLocals;
 
     private EasyScriptTruffleParser() {
     }
@@ -82,10 +82,16 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
-        // add each parameter to the map,
-        // with the correct index
-        for (int i = 0; i < funcDeclStmt.params.ID().size(); i++) {
-            this.functionLocals.put(funcDeclStmt.params.ID(i).getText(), i);
+        if (this.functionLocals != null) {
+            // we do not allow nested functions (yet 😉)
+            throw new EasyScriptException("nested functions are not supported in EasyScript yet");
+        }
+
+        // add each parameter to the map, with the correct index
+        List<TerminalNode> funcParams = funcDeclStmt.params.ID();
+        this.functionLocals = new HashMap<>(funcParams.size());
+        for (int i = 0; i < funcParams.size(); i++) {
+            this.functionLocals.put(funcParams.get(i).getText(), i);
         }
 
         // parse the statements in the function definition
@@ -93,7 +99,7 @@ public final class EasyScriptTruffleParser {
 
         // finally, clear the map of the function locals,
         // in case the program has more than one function inside it
-        this.functionLocals.clear();
+        this.functionLocals = null;
 
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
                 new BlockStmtNode(funcStmts));
@@ -180,7 +186,9 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
-        Integer paramIndex = this.functionLocals.get(variableId);
+        Integer paramIndex = this.functionLocals == null
+            ? null
+            : this.functionLocals.get(variableId);
         return paramIndex == null
             ? GlobalVarReferenceExprNodeGen.create(variableId)
             : new ReadFunctionArgExprNode(paramIndex);

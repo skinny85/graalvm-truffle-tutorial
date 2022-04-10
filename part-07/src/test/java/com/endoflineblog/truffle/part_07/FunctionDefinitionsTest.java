@@ -1,13 +1,16 @@
 package com.endoflineblog.truffle.part_07;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FunctionDefinitionsTest {
     private Context context;
@@ -53,5 +56,33 @@ public class FunctionDefinitionsTest {
                 "addOne(4)"
         );
         assertEquals(5, result.asInt());
+    }
+
+    @Test
+    public void function_parameters_shadow_each_other() {
+        Value result = this.context.eval("ezs",
+                "function f(a, a) { " +
+                    "a; " +
+                "} " +
+                "f(1, 23);"
+        );
+        assertEquals(23, result.asInt());
+    }
+
+    @Test
+    public void nested_functions_are_unsupported() {
+        try {
+            this.context.eval("ezs",
+                    "function outer() { " +
+                        "function inner() { " +
+                        "} " +
+                    "}"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("nested functions are not supported in EasyScript yet", e.getMessage());
+        }
     }
 }
