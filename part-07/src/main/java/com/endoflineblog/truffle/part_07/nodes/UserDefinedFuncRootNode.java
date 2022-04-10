@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_07.nodes;
 
 import com.endoflineblog.truffle.part_07.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
@@ -15,8 +16,8 @@ public final class UserDefinedFuncRootNode extends RootNode {
     private BlockStmtNode functionBody;
 
     public UserDefinedFuncRootNode(EasyScriptTruffleLanguage truffleLanguage,
-            BlockStmtNode functionBody) {
-        super(truffleLanguage);
+            BlockStmtNode functionBody, FrameDescriptor frameDescriptor) {
+        super(truffleLanguage, frameDescriptor);
 
         this.functionBody = functionBody;
     }

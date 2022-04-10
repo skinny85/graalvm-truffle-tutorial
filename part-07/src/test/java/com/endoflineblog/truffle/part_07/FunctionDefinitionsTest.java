@@ -70,6 +70,19 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void local_variables_shadow_globals() {
+        Value result = this.context.eval("ezs",
+                "const a = 33; " +
+                "function f() { " +
+                    "var a = 3; " +
+                    "a;" +
+                "} " +
+                "f()"
+        );
+        assertEquals(3, result.asInt());
+    }
+
+    @Test
     public void nested_functions_are_unsupported() {
         try {
             this.context.eval("ezs",

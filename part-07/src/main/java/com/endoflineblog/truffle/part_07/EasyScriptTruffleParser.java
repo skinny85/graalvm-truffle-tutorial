@@ -8,6 +8,7 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNode
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.IntLiteralExprNode;
+import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.UndefinedLiteralExprNode;
@@ -18,6 +19,9 @@ import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.GlobalVarDeclStmtNodeGen;
+import com.endoflineblog.truffle.part_07.nodes.stmts.LocalVarDeclStmtNode;
+import com.oracle.truffle.api.frame.FrameDescriptor;
+import com.oracle.truffle.api.frame.FrameSlot;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -58,7 +62,8 @@ public final class EasyScriptTruffleParser {
      * while local variables of functions will be mapped to their String names.
      * This field is non-null only if we are parsing a function definition.
      */
-    private Map<String, Integer> functionLocals;
+    private Map<String, Object> functionLocals;
+    private FrameDescriptor frameDescriptor;
 
     private EasyScriptTruffleParser() {
     }
@@ -90,19 +95,24 @@ public final class EasyScriptTruffleParser {
         // add each parameter to the map, with the correct index
         List<TerminalNode> funcParams = funcDeclStmt.params.ID();
         this.functionLocals = new HashMap<>(funcParams.size());
+        this.frameDescriptor = new FrameDescriptor();
         for (int i = 0; i < funcParams.size(); i++) {
             this.functionLocals.put(funcParams.get(i).getText(), i);
         }
 
         // parse the statements in the function definition
         List<EasyScriptStmtNode> funcStmts = this.parseStmtList(funcDeclStmt.stmt());
+        FrameDescriptor frameDescriptor = this.frameDescriptor;
+
+        // create the FrameDescriptor for each local variable we've seen
 
         // finally, clear the map of the function locals,
         // in case the program has more than one function inside it
         this.functionLocals = null;
+        this.frameDescriptor = null;
 
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
-                new BlockStmtNode(funcStmts));
+                frameDescriptor, new BlockStmtNode(funcStmts));
     }
 
     private List<EasyScriptStmtNode> parseVarDeclStmt(EasyScriptParser.VarDeclStmtContext varDeclStmt) {
@@ -121,7 +131,15 @@ public final class EasyScriptTruffleParser {
             } else {
                 initializerExpr = parseExpr1(bindingExpr);
             }
-            result.add(GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, declarationKind));
+            if (this.functionLocals == null) {
+                // this is a global variable
+                result.add(GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, declarationKind));
+            } else {
+                // this is a function-local variable
+                FrameSlot frameSlot = this.frameDescriptor.addFrameSlot(variableId);
+                this.functionLocals.put(variableId, frameSlot);
+                result.add(new LocalVarDeclStmtNode(frameSlot, initializerExpr));
+            }
         }
         return result;
     }
@@ -186,12 +204,19 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
-        Integer paramIndex = this.functionLocals == null
-            ? null
-            : this.functionLocals.get(variableId);
-        return paramIndex == null
-            ? GlobalVarReferenceExprNodeGen.create(variableId)
-            : new ReadFunctionArgExprNode(paramIndex);
+        Object paramIndexOrFrameSlot = this.functionLocals == null
+                ? null
+                : this.functionLocals.get(variableId);
+        if (paramIndexOrFrameSlot == null) {
+            // we know for sure this is a reference to a global variable
+            return GlobalVarReferenceExprNodeGen.create(variableId);
+        } else {
+            return paramIndexOrFrameSlot instanceof Integer
+                    // an int means this is a function parameter
+                    ? new ReadFunctionArgExprNode((Integer) paramIndexOrFrameSlot)
+                    // this means this is a local variable
+                    : new LocalVarReferenceExprNode((FrameSlot) paramIndexOrFrameSlot);
+        }
     }
 
     private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr3Context callExpr) {
