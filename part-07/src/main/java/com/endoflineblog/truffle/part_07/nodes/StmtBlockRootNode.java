@@ -2,12 +2,14 @@ package com.endoflineblog.truffle.part_07.nodes;
 
 import com.endoflineblog.truffle.part_07.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
  * A {@link RootNode} that represents the execution of a {@link BlockStmtNode block of statements}.
- * Used as the {@link RootNode} for the entire EasyScript program.
+ * Used as the {@link RootNode} for the entire EasyScript program,
+ * and also for user-defined functions.
  */
 public final class StmtBlockRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
@@ -16,7 +18,12 @@ public final class StmtBlockRootNode extends RootNode {
 
     public StmtBlockRootNode(EasyScriptTruffleLanguage truffleLanguage,
             BlockStmtNode blockStmt) {
-        super(truffleLanguage);
+        this(truffleLanguage, blockStmt, null);
+    }
+
+    public StmtBlockRootNode(EasyScriptTruffleLanguage truffleLanguage,
+            BlockStmtNode blockStmt, FrameDescriptor frameDescriptor) {
+        super(truffleLanguage, frameDescriptor);
 
         this.blockStmt = blockStmt;
     }

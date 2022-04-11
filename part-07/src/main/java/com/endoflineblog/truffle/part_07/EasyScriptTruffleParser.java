@@ -95,6 +95,7 @@ public final class EasyScriptTruffleParser {
         // add each parameter to the map, with the correct index
         List<TerminalNode> funcParams = funcDeclStmt.params.ID();
         this.functionLocals = new HashMap<>(funcParams.size());
+        // create the FrameDescriptor for each local variable we've seen
         this.frameDescriptor = new FrameDescriptor();
         for (int i = 0; i < funcParams.size(); i++) {
             this.functionLocals.put(funcParams.get(i).getText(), i);
@@ -103,8 +104,6 @@ public final class EasyScriptTruffleParser {
         // parse the statements in the function definition
         List<EasyScriptStmtNode> funcStmts = this.parseStmtList(funcDeclStmt.stmt());
         FrameDescriptor frameDescriptor = this.frameDescriptor;
-
-        // create the FrameDescriptor for each local variable we've seen
 
         // finally, clear the map of the function locals,
         // in case the program has more than one function inside it

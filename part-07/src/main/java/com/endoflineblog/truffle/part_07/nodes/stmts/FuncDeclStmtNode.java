@@ -1,7 +1,7 @@
 package com.endoflineblog.truffle.part_07.nodes.stmts;
 
 import com.endoflineblog.truffle.part_07.EasyScriptException;
-import com.endoflineblog.truffle.part_07.nodes.UserDefinedFuncRootNode;
+import com.endoflineblog.truffle.part_07.nodes.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_07.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_07.runtime.Undefined;
 import com.oracle.truffle.api.Truffle;
@@ -28,7 +28,7 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     @Override
     public Object executeStatement(VirtualFrame frame) {
         var truffleLanguage = this.currentTruffleLanguage();
-        var funcRootNode = new UserDefinedFuncRootNode(truffleLanguage, this.funcBody, this.frameDescriptor);
+        var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.funcBody, this.frameDescriptor);
         var func = new FunctionObject(Truffle.getRuntime().createCallTarget(funcRootNode));
 
         var context = this.currentLanguageContext();
