@@ -75,11 +75,12 @@ public class FunctionDefinitionsTest {
                 "const a = 33; " +
                 "function f() { " +
                     "var a = 3; " +
+                    "a = 333; " +
                     "a;" +
                 "} " +
                 "f()"
         );
-        assertEquals(3, result.asInt());
+        assertEquals(333, result.asInt());
     }
 
     @Test

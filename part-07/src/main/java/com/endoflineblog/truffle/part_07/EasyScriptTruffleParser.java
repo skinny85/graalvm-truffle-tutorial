@@ -4,10 +4,10 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.AdditionExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.AdditionExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.IntLiteralExprNode;
+import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNodeGen;
@@ -149,9 +149,15 @@ public final class EasyScriptTruffleParser {
                 : parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
     }
 
-    private GlobalVarAssignmentExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
+    private EasyScriptExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
         String variableId = assignmentExpr.ID().getText();
-        return GlobalVarAssignmentExprNodeGen.create(parseExpr1(assignmentExpr.expr1()), variableId);
+        Object paramIndexOrFrameSlot = this.functionLocals == null
+                ? null
+                : this.functionLocals.get(variableId);
+        EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
+        return paramIndexOrFrameSlot == null
+            ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
+            : new LocalVarAssignmentExprNode((FrameSlot) paramIndexOrFrameSlot, initializerExpr);
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
