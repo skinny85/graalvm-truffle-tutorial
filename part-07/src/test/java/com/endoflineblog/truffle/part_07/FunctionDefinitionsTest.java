@@ -84,6 +84,19 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void function_parameters_can_be_reassigned() {
+        Value result = this.context.eval("ezs",
+                "let a = 222; " +
+                "function f(a, b) { " +
+                    "b = 22; " +
+                    "b; " +
+                "} " +
+                "f(2);"
+        );
+        assertEquals(22, result.asInt());
+    }
+
+    @Test
     public void nested_functions_are_unsupported() {
         try {
             this.context.eval("ezs",

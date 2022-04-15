@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_07.nodes.exprs.functions;
 
 import com.endoflineblog.truffle.part_07.EasyScriptException;
 import com.endoflineblog.truffle.part_07.runtime.FunctionObject;
+import com.endoflineblog.truffle.part_07.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -28,7 +29,7 @@ public abstract class FunctionDispatchNode extends Node {
             @SuppressWarnings("unused") FunctionObject function,
             Object[] arguments,
             @Cached("create(function.callTarget)") DirectCallNode directCallNode) {
-        return directCallNode.call(arguments);
+        return directCallNode.call(extendArguments(arguments, function));
     }
 
     /**
@@ -45,7 +46,7 @@ public abstract class FunctionDispatchNode extends Node {
             FunctionObject function,
             Object[] arguments,
             @Cached IndirectCallNode indirectCallNode) {
-        return indirectCallNode.call(function.callTarget, arguments);
+        return indirectCallNode.call(function.callTarget, extendArguments(arguments, function));
     }
 
     /**
@@ -57,5 +58,18 @@ public abstract class FunctionDispatchNode extends Node {
             Object nonFunction,
             @SuppressWarnings("unused") Object[] arguments) {
         throw new EasyScriptException("'" + nonFunction + "' is not a function");
+    }
+
+    private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
+        if (arguments.length >= function.argumentCount) {
+            return arguments;
+        }
+        Object[] ret = new Object[function.argumentCount];
+        for (int i = 0; i < function.argumentCount; i++) {
+            ret[i] = i < arguments.length
+                    ? arguments[i]
+                    : Undefined.INSTANCE;
+        }
+        return ret;
     }
 }

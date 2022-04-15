@@ -16,10 +16,12 @@ import com.oracle.truffle.api.library.ExportMessage;
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject implements TruffleObject {
     public final CallTarget callTarget;
+    public final int argumentCount;
     private final FunctionDispatchNode functionDispatchNode;
 
-    public FunctionObject(CallTarget callTarget) {
+    public FunctionObject(CallTarget callTarget, int argumentCount) {
         this.callTarget = callTarget;
+        this.argumentCount = argumentCount;
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
     }
 

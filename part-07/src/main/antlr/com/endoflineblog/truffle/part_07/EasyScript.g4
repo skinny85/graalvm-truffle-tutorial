@@ -8,10 +8,10 @@ start : stmt+ EOF ;
 
 stmt :       kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
      |                                                       expr1 ';'? #ExprStmt
-     | 'function' name=ID '(' params=func_params ')' '{' stmt* '}' ';'? #FuncDeclStmt
+     |     'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
      ;
 binding : ID ('=' expr1)? ;
-func_params : (ID (',' ID)* )? ;
+func_args : (ID (',' ID)* )? ;
 
 expr1 : ID '=' expr1                        #AssignmentExpr1
       | expr2                               #PrecedenceTwoExpr1

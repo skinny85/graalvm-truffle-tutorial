@@ -22,9 +22,7 @@ public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        Object[] arguments = frame.getArguments();
-        // In JavaScript, it's legal to call a function with fewer arguments than it declares;
-        // in that case, the arguments not provided are assigned 'undefined'
-        return this.index < arguments.length ? arguments[this.index] : Undefined.INSTANCE;
+        // we are guaranteed the argument array has enough elements
+        return frame.getArguments()[this.index];
     }
 }

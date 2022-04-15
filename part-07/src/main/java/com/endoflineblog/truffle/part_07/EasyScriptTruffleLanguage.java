@@ -65,11 +65,14 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     private void defineBuiltInFunction(EasyScriptLanguageContext context, String name,
             NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
-        ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, nodeFactory.getExecutionSignature().size())
+        int argumentCount = nodeFactory.getExecutionSignature().size();
+        ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
         context.globalScopeObject.newConstant(name,
-                new FunctionObject(Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
-                        nodeFactory.createNode((Object) functionArguments)))));
+                new FunctionObject(
+                        Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
+                                nodeFactory.createNode((Object) functionArguments))),
+                        argumentCount));
     }
 }

@@ -14,22 +14,24 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     private final String funcName;
     private final FrameDescriptor frameDescriptor;
+    private final int argumentCount;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private BlockStmtNode funcBody;
 
-    public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, BlockStmtNode funcBody) {
+    public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, BlockStmtNode funcBody, int argumentCount) {
         this.funcName = funcName;
         this.frameDescriptor = frameDescriptor;
         this.funcBody = funcBody;
+        this.argumentCount = argumentCount;
     }
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
         var truffleLanguage = this.currentTruffleLanguage();
         var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.funcBody, this.frameDescriptor);
-        var func = new FunctionObject(Truffle.getRuntime().createCallTarget(funcRootNode));
+        var func = new FunctionObject(Truffle.getRuntime().createCallTarget(funcRootNode), this.argumentCount);
 
         var context = this.currentLanguageContext();
         if (!context.globalScopeObject.newConstant(this.funcName, func)) {

@@ -14,6 +14,7 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.FunctionCallExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.ReadFunctionArgExprNode;
+import com.endoflineblog.truffle.part_07.nodes.exprs.functions.WriteFunctionArgExprNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.ExprStmtNode;
@@ -93,12 +94,13 @@ public final class EasyScriptTruffleParser {
         }
 
         // add each parameter to the map, with the correct index
-        List<TerminalNode> funcParams = funcDeclStmt.params.ID();
-        this.functionLocals = new HashMap<>(funcParams.size());
+        List<TerminalNode> funcArgs = funcDeclStmt.args.ID();
+        int argumentCount = funcArgs.size();
+        this.functionLocals = new HashMap<>(argumentCount);
         // create the FrameDescriptor for each local variable we've seen
         this.frameDescriptor = new FrameDescriptor();
-        for (int i = 0; i < funcParams.size(); i++) {
-            this.functionLocals.put(funcParams.get(i).getText(), i);
+        for (int i = 0; i < argumentCount; i++) {
+            this.functionLocals.put(funcArgs.get(i).getText(), i);
         }
 
         // parse the statements in the function definition
@@ -111,7 +113,7 @@ public final class EasyScriptTruffleParser {
         this.frameDescriptor = null;
 
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
-                frameDescriptor, new BlockStmtNode(funcStmts));
+                frameDescriptor, new BlockStmtNode(funcStmts), argumentCount);
     }
 
     private List<EasyScriptStmtNode> parseVarDeclStmt(EasyScriptParser.VarDeclStmtContext varDeclStmt) {
@@ -156,8 +158,10 @@ public final class EasyScriptTruffleParser {
                 : this.functionLocals.get(variableId);
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
         return paramIndexOrFrameSlot == null
-            ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
-            : new LocalVarAssignmentExprNode((FrameSlot) paramIndexOrFrameSlot, initializerExpr);
+                ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
+                : (paramIndexOrFrameSlot instanceof Integer
+                    ? new WriteFunctionArgExprNode((Integer) paramIndexOrFrameSlot, initializerExpr)
+                    : new LocalVarAssignmentExprNode((FrameSlot) paramIndexOrFrameSlot, initializerExpr));
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
