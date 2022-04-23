@@ -12,6 +12,6 @@ public final class LocalVarReferenceExprNode extends EasyScriptExprNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        return frame.getValue(this.frameSlot);
+        return frame.getValue(this.frameSlot); // ToDo add specializations handling
     }
 }

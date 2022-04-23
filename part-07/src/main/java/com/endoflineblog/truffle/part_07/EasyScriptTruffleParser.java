@@ -63,10 +63,11 @@ public final class EasyScriptTruffleParser {
      * while local variables of functions will be mapped to their String names.
      * This field is non-null only if we are parsing a function definition.
      */
-    private Map<String, Object> functionLocals;
+    private final Map<String, Object> functionLocals;
     private FrameDescriptor frameDescriptor;
 
     private EasyScriptTruffleParser() {
+        this.functionLocals = new HashMap<>();
     }
 
     private List<EasyScriptStmtNode> parseStmtList(List<EasyScriptParser.StmtContext> stmts) {
@@ -88,7 +89,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
-        if (this.functionLocals != null) {
+        if (this.frameDescriptor != null) {
             // we do not allow nested functions (yet 😉)
             throw new EasyScriptException("nested functions are not supported in EasyScript yet");
         }
@@ -96,9 +97,9 @@ public final class EasyScriptTruffleParser {
         // add each parameter to the map, with the correct index
         List<TerminalNode> funcArgs = funcDeclStmt.args.ID();
         int argumentCount = funcArgs.size();
-        this.functionLocals = new HashMap<>(argumentCount);
-        // create the FrameDescriptor for each local variable we've seen
+        // create the FrameDescriptor to store each local variable we've seen
         this.frameDescriptor = new FrameDescriptor();
+        // first, initialize the locals with function arguments
         for (int i = 0; i < argumentCount; i++) {
             this.functionLocals.put(funcArgs.get(i).getText(), i);
         }
@@ -109,7 +110,7 @@ public final class EasyScriptTruffleParser {
 
         // finally, clear the map of the function locals,
         // in case the program has more than one function inside it
-        this.functionLocals = null;
+        this.functionLocals.clear();
         this.frameDescriptor = null;
 
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
@@ -132,7 +133,7 @@ public final class EasyScriptTruffleParser {
             } else {
                 initializerExpr = parseExpr1(bindingExpr);
             }
-            if (this.functionLocals == null) {
+            if (this.frameDescriptor == null) {
                 // this is a global variable
                 result.add(GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, declarationKind));
             } else {
@@ -153,9 +154,7 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
         String variableId = assignmentExpr.ID().getText();
-        Object paramIndexOrFrameSlot = this.functionLocals == null
-                ? null
-                : this.functionLocals.get(variableId);
+        Object paramIndexOrFrameSlot = this.functionLocals.get(variableId);
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
         return paramIndexOrFrameSlot == null
                 ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
@@ -213,9 +212,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
-        Object paramIndexOrFrameSlot = this.functionLocals == null
-                ? null
-                : this.functionLocals.get(variableId);
+        Object paramIndexOrFrameSlot = this.functionLocals.get(variableId);
         if (paramIndexOrFrameSlot == null) {
             // we know for sure this is a reference to a global variable
             return GlobalVarReferenceExprNodeGen.create(variableId);

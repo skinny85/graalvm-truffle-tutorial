@@ -18,7 +18,7 @@ public final class LocalVarAssignmentExprNode extends EasyScriptExprNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         Object varValue = this.initializerExpr.executeGeneric(frame);
-        frame.setObject(this.frameSlot, varValue);
+        frame.setObject(this.frameSlot, varValue); // ToDo add specializations handling
         return varValue;
     }
 }

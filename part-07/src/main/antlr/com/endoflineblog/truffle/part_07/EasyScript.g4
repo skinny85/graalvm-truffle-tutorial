@@ -6,9 +6,9 @@ package com.endoflineblog.truffle.part_07;
 
 start : stmt+ EOF ;
 
-stmt :       kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
-     |                                                       expr1 ';'? #ExprStmt
-     |     'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
+stmt :   kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
+     |                                                   expr1 ';'? #ExprStmt
+     | 'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
      ;
 binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;
