@@ -1,6 +1,5 @@
 package com.endoflineblog.truffle.part_07.nodes.stmts;
 
-import com.endoflineblog.truffle.part_07.EasyScriptException;
 import com.endoflineblog.truffle.part_07.nodes.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_07.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_07.runtime.Undefined;
@@ -34,9 +33,8 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
         var func = new FunctionObject(Truffle.getRuntime().createCallTarget(funcRootNode), this.argumentCount);
 
         var context = this.currentLanguageContext();
-        if (!context.globalScopeObject.newConstant(this.funcName, func)) {
-            throw new EasyScriptException(this, "Identifier '" + this.funcName + "' has already been declared");
-        }
+        // we allow functions to be redefined, to comply with JavaScript semantics
+        context.globalScopeObject.newConstant(this.funcName, func);
 
         // we return 'undefined' for statements that declare functions
         return Undefined.INSTANCE;

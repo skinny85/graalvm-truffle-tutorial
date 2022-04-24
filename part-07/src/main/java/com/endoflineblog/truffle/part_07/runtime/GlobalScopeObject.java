@@ -33,11 +33,15 @@ public final class GlobalScopeObject implements TruffleObject {
      * which we treat as constants in this part of the series.
      */
     public boolean newConstant(String name, Object value) {
-        return newVariable(name, value, false);
+        return newVariable(name, value, true);
     }
 
     public boolean newVariable(String name, Object value, boolean isConst) {
-        Object existingValue = this.variables.putIfAbsent(name, value);
+        // We allow overwriting variables, because some things
+        // (like functions) can be overwritten.
+        // If it shouldn't be allowed, the caller of this method can check the return value,
+        // and react appropriately (most likely, by throwing).
+        Object existingValue = this.variables.put(name, value);
         if (isConst) {
             this.constants.add(name);
         }

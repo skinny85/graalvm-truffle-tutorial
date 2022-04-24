@@ -97,6 +97,16 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void functions_can_be_overwritten() {
+        Value result = this.context.eval("ezs",
+                "function f() { 6; } " +
+                "function f() { 7; } " +
+                "f(); "
+        );
+        assertEquals(7, result.asInt());
+    }
+
+    @Test
     public void nested_functions_are_unsupported() {
         try {
             this.context.eval("ezs",
