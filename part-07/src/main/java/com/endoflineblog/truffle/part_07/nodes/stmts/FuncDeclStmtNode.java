@@ -34,7 +34,7 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
 
         var context = this.currentLanguageContext();
         // we allow functions to be redefined, to comply with JavaScript semantics
-        context.globalScopeObject.newConstant(this.funcName, func);
+        context.globalScopeObject.newFunction(this.funcName, func);
 
         // we return 'undefined' for statements that declare functions
         return Undefined.INSTANCE;

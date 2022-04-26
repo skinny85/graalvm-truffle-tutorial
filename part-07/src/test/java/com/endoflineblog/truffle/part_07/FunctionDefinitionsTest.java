@@ -48,6 +48,24 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void cycle_between_let_and_function_does_not_work() {
+        try {
+            this.context.eval("ezs",
+                    "let v = f(); " +
+                    "function f() { " +
+                        "v; " +
+                    "} " +
+                    "v;"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Cannot access 'v' before initialization", e.getMessage());
+        }
+    }
+
+    @Test
     public void passing_a_parameter_to_a_function_works() {
         Value result = this.context.eval("ezs",
                 "function addOne(a) {" +
@@ -104,6 +122,20 @@ public class FunctionDefinitionsTest {
                 "f(); "
         );
         assertEquals(7, result.asInt());
+    }
+
+    @Test
+    public void local_variables_get_hoisted() {
+        Value result = this.context.eval("ezs",
+                "function f() { " +
+                    "var a = b; " +
+                    "var b = 3; " +
+                    "a; " +
+                "} " +
+                "f();"
+        );
+        assertTrue(result.isNull());
+        assertEquals(result.toString(), "undefined");
     }
 
     @Test

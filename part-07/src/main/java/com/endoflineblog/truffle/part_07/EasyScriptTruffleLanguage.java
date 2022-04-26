@@ -69,7 +69,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
-        context.globalScopeObject.newConstant(name,
+        context.globalScopeObject.newFunction(name,
                 new FunctionObject(
                         Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
                                 nodeFactory.createNode((Object) functionArguments))),
