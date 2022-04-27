@@ -23,8 +23,7 @@ public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     public Object executeStatement(VirtualFrame frame) {
         EasyScriptLanguageContext context = this.currentLanguageContext();
         if (!context.globalScopeObject.newVariable(this.variableId, this.declarationKind)) {
-            // ToDo apparently, this check should only happen for let & const, not var
-            throw new EasyScriptException(this, "Identifier '" + variableId + "' has already been declared");
+            throw new EasyScriptException(this, "Identifier '" + this.variableId + "' has already been declared");
         }
         // we return 'undefined' for statements that declare variables
         return Undefined.INSTANCE;

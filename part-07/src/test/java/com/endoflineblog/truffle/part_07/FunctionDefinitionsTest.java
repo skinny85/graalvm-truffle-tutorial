@@ -54,8 +54,7 @@ public class FunctionDefinitionsTest {
                     "let v = f(); " +
                     "function f() { " +
                         "v; " +
-                    "} " +
-                    "v;"
+                    "} "
             );
             fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
@@ -115,7 +114,7 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
-    public void functions_can_be_overwritten() {
+    public void functions_can_be_redefined() {
         Value result = this.context.eval("ezs",
                 "function f() { 6; } " +
                 "function f() { 7; } " +
@@ -127,6 +126,7 @@ public class FunctionDefinitionsTest {
     @Test
     public void local_variables_get_hoisted() {
         Value result = this.context.eval("ezs",
+                "const b = 5; " +
                 "function f() { " +
                     "var a = b; " +
                     "var b = 3; " +
@@ -136,6 +136,39 @@ public class FunctionDefinitionsTest {
         );
         assertTrue(result.isNull());
         assertEquals(result.toString(), "undefined");
+    }
+
+    @Test
+    public void duplicate_vars_in_a_function_cause_an_error() {
+        try {
+            this.context.eval("ezs",
+                    "function f() { " +
+                        "var a = 1; " +
+                        "var a = 2; " +
+                    "}"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Identifier 'a' has already been declared", e.getMessage());
+        }
+    }
+
+    @Test
+    public void var_shadowing_a_function_argument_is_not_allowed() {
+        try {
+            this.context.eval("ezs",
+                    "function f(a) { " +
+                        "var a = 1; " +
+                    "}"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Identifier 'a' has already been declared", e.getMessage());
+        }
     }
 
     @Test

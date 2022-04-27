@@ -91,9 +91,15 @@ public final class EasyScriptTruffleParser {
                         varDecls.add(new GlobalVarDeclStmtNode(variableId, declarationKind));
                     } else {
                         // this is a function-local variable
-                        FrameSlot frameSlot = this.frameDescriptor.addFrameSlot(variableId);
-                        // ToDo check for duplicates with function arguments here
-                        this.functionLocals.put(variableId, frameSlot);
+                        FrameSlot frameSlot;
+                        try {
+                            frameSlot = this.frameDescriptor.addFrameSlot(variableId);
+                        } catch (IllegalArgumentException e) {
+                            throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
+                        }
+                        if (this.functionLocals.put(variableId, frameSlot) != null) {
+                            throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
+                        }
                         varDecls.add(new LocalVarDeclStmtNode(frameSlot, declarationKind));
                     }
                 }
