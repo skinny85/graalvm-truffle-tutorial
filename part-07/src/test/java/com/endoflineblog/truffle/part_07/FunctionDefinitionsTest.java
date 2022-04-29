@@ -139,6 +139,18 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void higher_order_functions_are_supported() {
+        Value result = this.context.eval("ezs",
+                "function f() { 5; } " +
+                "function g(a) { " +
+                    "1 + a(); " +
+                "} " +
+                "g(f);"
+        );
+        assertEquals(result.asInt(), 6);
+    }
+
+    @Test
     public void duplicate_vars_in_a_function_cause_an_error() {
         try {
             this.context.eval("ezs",

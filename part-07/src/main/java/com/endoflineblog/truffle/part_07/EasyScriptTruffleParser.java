@@ -7,7 +7,7 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.IntLiteralExprNode;
-import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarAssignmentExprNode;
+import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNodeGen;
@@ -133,16 +133,16 @@ public final class EasyScriptTruffleParser {
                     }
                     EasyScriptExprNode assignmentExpr = this.frameDescriptor == null
                             ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
-                            : new LocalVarAssignmentExprNode(this.frameDescriptor.findFrameSlot(variableId), initializerExpr);
+                            :  LocalVarAssignmentExprNodeGen.create(initializerExpr, this.frameDescriptor.findFrameSlot(variableId));
                     exprStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
                 }
             }
         }
 
         // the final result is: the function declarations first,
-        // then the variable declarations,
+        // then the variable declarations (initialized with default values),
         // and then finally the expression statements
-        // (including
+        // (including the variable initializers turned into assignment expressions)
         var result = new ArrayList<EasyScriptStmtNode>(funcDecls.size() + varDecls.size() + exprStmts.size());
         result.addAll(funcDecls);
         result.addAll(varDecls);
@@ -197,7 +197,7 @@ public final class EasyScriptTruffleParser {
                 ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
                 : (paramIndexOrFrameSlot instanceof Integer
                     ? new WriteFunctionArgExprNode((Integer) paramIndexOrFrameSlot, initializerExpr)
-                    : new LocalVarAssignmentExprNode((FrameSlot) paramIndexOrFrameSlot, initializerExpr));
+                    : LocalVarAssignmentExprNodeGen.create(initializerExpr, (FrameSlot) paramIndexOrFrameSlot));
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
