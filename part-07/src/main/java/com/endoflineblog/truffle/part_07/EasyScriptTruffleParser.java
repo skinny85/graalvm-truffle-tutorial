@@ -23,6 +23,7 @@ import com.endoflineblog.truffle.part_07.nodes.stmts.GlobalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.LocalVarDeclStmtNode;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -93,14 +94,14 @@ public final class EasyScriptTruffleParser {
                         // this is a function-local variable
                         FrameSlot frameSlot;
                         try {
-                            frameSlot = this.frameDescriptor.addFrameSlot(variableId);
+                            frameSlot = this.frameDescriptor.addFrameSlot(variableId, declarationKind, FrameSlotKind.Object);
                         } catch (IllegalArgumentException e) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
                         if (this.functionLocals.put(variableId, frameSlot) != null) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
-                        varDecls.add(new LocalVarDeclStmtNode(frameSlot, declarationKind));
+                        varDecls.add(new LocalVarDeclStmtNode(frameSlot));
                     }
                 }
             }
@@ -133,7 +134,8 @@ public final class EasyScriptTruffleParser {
                     }
                     EasyScriptExprNode assignmentExpr = this.frameDescriptor == null
                             ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
-                            :  LocalVarAssignmentExprNodeGen.create(initializerExpr, this.frameDescriptor.findFrameSlot(variableId));
+                            :  LocalVarAssignmentExprNodeGen.create(initializerExpr,
+                                    this.frameDescriptor.findFrameSlot(variableId), /* initializingAssignment */ true);
                     exprStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
                 }
             }
@@ -197,7 +199,8 @@ public final class EasyScriptTruffleParser {
                 ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
                 : (paramIndexOrFrameSlot instanceof Integer
                     ? new WriteFunctionArgExprNode((Integer) paramIndexOrFrameSlot, initializerExpr)
-                    : LocalVarAssignmentExprNodeGen.create(initializerExpr, (FrameSlot) paramIndexOrFrameSlot));
+                    : LocalVarAssignmentExprNodeGen.create(initializerExpr,
+                        (FrameSlot) paramIndexOrFrameSlot, /* initializingAssignment */ false));
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {

@@ -128,7 +128,7 @@ public class FunctionDefinitionsTest {
         Value result = this.context.eval("ezs",
                 "const b = 5; " +
                 "function f() { " +
-                    "var a = b; " +
+                    "const a = b; " +
                     "var b = 3; " +
                     "a; " +
                 "} " +
@@ -148,6 +148,24 @@ public class FunctionDefinitionsTest {
                 "g(f);"
         );
         assertEquals(result.asInt(), 6);
+    }
+
+    @Test
+    public void const_local_variables_cannot_be_reassigned() {
+        try {
+            this.context.eval("ezs",
+                    "function f() { " +
+                        "const a = 5; " +
+                        "a = 10; " +
+                    "} " +
+                    "f()"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Assignment to constant variable 'a'", e.getMessage());
+        }
     }
 
     @Test

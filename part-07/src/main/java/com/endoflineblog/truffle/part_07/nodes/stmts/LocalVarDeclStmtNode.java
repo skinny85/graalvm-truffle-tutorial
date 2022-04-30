@@ -14,16 +14,14 @@ public final class LocalVarDeclStmtNode extends EasyScriptStmtNode {
     };
 
     private final FrameSlot frameSlot;
-    private final DeclarationKind declarationKind;
 
-    public LocalVarDeclStmtNode(FrameSlot frameSlot, DeclarationKind declarationKind) {
+    public LocalVarDeclStmtNode(FrameSlot frameSlot) {
         this.frameSlot = frameSlot;
-        this.declarationKind = declarationKind;
     }
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
-        frame.setObject(this.frameSlot, this.declarationKind == DeclarationKind.VAR
+        frame.setObject(this.frameSlot, this.frameSlot.getInfo() == DeclarationKind.VAR
                 // the default value for 'var' is 'undefined'
                 ? Undefined.INSTANCE
                 // for 'const' and 'let', we write a "dummy" value that LocalVarReferenceExprNode treats specially
