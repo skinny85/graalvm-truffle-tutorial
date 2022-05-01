@@ -135,7 +135,7 @@ public final class EasyScriptTruffleParser {
                     EasyScriptExprNode assignmentExpr = this.frameDescriptor == null
                             ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
                             :  LocalVarAssignmentExprNodeGen.create(initializerExpr,
-                                    this.frameDescriptor.findFrameSlot(variableId), /* initializingAssignment */ true);
+                                    this.frameDescriptor.findFrameSlot(variableId));
                     exprStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
                 }
             }
@@ -195,12 +195,19 @@ public final class EasyScriptTruffleParser {
         String variableId = assignmentExpr.ID().getText();
         Object paramIndexOrFrameSlot = this.functionLocals.get(variableId);
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
-        return paramIndexOrFrameSlot == null
-                ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
-                : (paramIndexOrFrameSlot instanceof Integer
-                    ? new WriteFunctionArgExprNode((Integer) paramIndexOrFrameSlot, initializerExpr)
-                    : LocalVarAssignmentExprNodeGen.create(initializerExpr,
-                        (FrameSlot) paramIndexOrFrameSlot, /* initializingAssignment */ false));
+        if (paramIndexOrFrameSlot == null) {
+            return GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId);
+        } else {
+            if (paramIndexOrFrameSlot instanceof Integer) {
+                return new WriteFunctionArgExprNode((Integer) paramIndexOrFrameSlot, initializerExpr);
+            } else {
+                FrameSlot frameSlot = (FrameSlot) paramIndexOrFrameSlot;
+                if (frameSlot.getInfo() == DeclarationKind.CONST) {
+                    throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
+                }
+                return LocalVarAssignmentExprNodeGen.create(initializerExpr, frameSlot);
+            }
+        }
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {

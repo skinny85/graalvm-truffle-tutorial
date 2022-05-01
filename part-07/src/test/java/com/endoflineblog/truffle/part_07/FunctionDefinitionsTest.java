@@ -157,8 +157,7 @@ public class FunctionDefinitionsTest {
                     "function f() { " +
                         "const a = 5; " +
                         "a = 10; " +
-                    "} " +
-                    "f()"
+                    "}"
             );
             fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
