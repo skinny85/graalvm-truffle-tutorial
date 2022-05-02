@@ -1,23 +1,28 @@
 package com.endoflineblog.truffle.part_07.nodes.exprs;
 
-import com.endoflineblog.truffle.part_07.EasyScriptException;
-import com.endoflineblog.truffle.part_07.nodes.stmts.LocalVarDeclStmtNode;
+import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.NodeField;
+import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameUtil;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-public final class LocalVarReferenceExprNode extends EasyScriptExprNode {
-    private final FrameSlot frameSlot;
+@NodeField(name = "frameSlot", type = FrameSlot.class)
+public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
+    protected abstract FrameSlot getFrameSlot();
 
-    public LocalVarReferenceExprNode(FrameSlot frameSlot) {
-        this.frameSlot = frameSlot;
+    @Specialization(guards = "frame.isInt(getFrameSlot())")
+    protected int readInt(VirtualFrame frame) {
+        return FrameUtil.getIntSafe(frame, this.getFrameSlot());
     }
 
-    @Override
-    public Object executeGeneric(VirtualFrame frame) {
-        Object ret = frame.getValue(this.frameSlot);
-        if (ret == LocalVarDeclStmtNode.DUMMY) {
-            throw new EasyScriptException("Cannot access '" + this.frameSlot.getIdentifier() + "' before initialization");
-        }
-        return ret; // ToDo add specializations handling
+    @Specialization(guards = "frame.isDouble(getFrameSlot())", replaces = "readInt")
+    protected double readDouble(VirtualFrame frame) {
+        return FrameUtil.getDoubleSafe(frame, this.getFrameSlot());
+    }
+
+    @Fallback
+    protected Object readObject(VirtualFrame frame) {
+        return FrameUtil.getObjectSafe(frame, this.getFrameSlot());
     }
 }

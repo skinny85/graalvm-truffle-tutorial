@@ -8,7 +8,7 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNode
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.IntLiteralExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarAssignmentExprNodeGen;
-import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarReferenceExprNode;
+import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.UndefinedLiteralExprNode;
@@ -268,7 +268,7 @@ public final class EasyScriptTruffleParser {
                     // an int means this is a function parameter
                     ? new ReadFunctionArgExprNode((Integer) paramIndexOrFrameSlot)
                     // this means this is a local variable
-                    : new LocalVarReferenceExprNode((FrameSlot) paramIndexOrFrameSlot);
+                    : LocalVarReferenceExprNodeGen.create((FrameSlot) paramIndexOrFrameSlot);
         }
     }
 
