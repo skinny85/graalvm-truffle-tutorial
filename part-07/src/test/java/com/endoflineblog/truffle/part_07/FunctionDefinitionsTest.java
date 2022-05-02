@@ -168,6 +168,23 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void var_cannot_override_a_function() {
+        try {
+            this.context.eval("ezs",
+                    "var f = 5; " +
+                    "function f() { " +
+                        "6; " +
+                    "}"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Identifier 'f' has already been declared", e.getMessage());
+        }
+    }
+
+    @Test
     public void duplicate_vars_in_a_function_cause_an_error() {
         try {
             this.context.eval("ezs",

@@ -29,7 +29,7 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     @Override
     public Object executeStatement(VirtualFrame frame) {
         var truffleLanguage = this.currentTruffleLanguage();
-        var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.funcBody, this.frameDescriptor);
+        var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.frameDescriptor, this.funcBody);
         var func = new FunctionObject(Truffle.getRuntime().createCallTarget(funcRootNode), this.argumentCount);
 
         var context = this.currentLanguageContext();

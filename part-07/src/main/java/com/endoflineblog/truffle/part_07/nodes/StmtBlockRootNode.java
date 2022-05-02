@@ -18,11 +18,11 @@ public final class StmtBlockRootNode extends RootNode {
 
     public StmtBlockRootNode(EasyScriptTruffleLanguage truffleLanguage,
             BlockStmtNode blockStmt) {
-        this(truffleLanguage, blockStmt, null);
+        this(truffleLanguage, null, blockStmt);
     }
 
     public StmtBlockRootNode(EasyScriptTruffleLanguage truffleLanguage,
-            BlockStmtNode blockStmt, FrameDescriptor frameDescriptor) {
+            FrameDescriptor frameDescriptor, BlockStmtNode blockStmt) {
         super(truffleLanguage, frameDescriptor);
 
         this.blockStmt = blockStmt;

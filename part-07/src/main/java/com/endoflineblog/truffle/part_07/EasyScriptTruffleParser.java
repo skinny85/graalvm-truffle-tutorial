@@ -166,16 +166,16 @@ public final class EasyScriptTruffleParser {
         List<TerminalNode> funcArgs = funcDeclStmt.args.ID();
         int argumentCount = funcArgs.size();
         // create the FrameDescriptor to store each local variable we've seen
-        this.frameDescriptor = new FrameDescriptor();
         // first, initialize the locals with function arguments
         for (int i = 0; i < argumentCount; i++) {
             this.functionLocals.put(funcArgs.get(i).getText(), i);
         }
 
+        this.frameDescriptor = new FrameDescriptor();
         // parse the statements in the function definition
         List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(funcDeclStmt.stmt());
-        FrameDescriptor frameDescriptor = this.frameDescriptor;
 
+        FrameDescriptor frameDescriptor = this.frameDescriptor;
         // finally, clear the map of the function locals,
         // in case the program has more than one function inside it
         this.functionLocals.clear();
