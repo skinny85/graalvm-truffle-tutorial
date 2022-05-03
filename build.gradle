@@ -20,10 +20,15 @@ subprojects {
                     'org.graalvm.truffle/com.oracle.truffle.api.nodes=ALL-UNNAMED',
                 '--add-exports',
                     'org.graalvm.truffle/com.oracle.truffle.api.dsl=ALL-UNNAMED'
+
+        testLogging {
+            events 'failed'
+            exceptionFormat 'full'
+        }
     }
 
     ext {
-        graal_version = '21.2.0'
+        graal_version = '21.3.1'
     }
 
     dependencies {
