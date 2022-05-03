@@ -168,6 +168,24 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void cannot_use_a_let_variable_before_initialization() {
+        try {
+            this.context.eval("ezs",
+                    "function f() { " +
+                        "const a = b; " +
+                        "let b = 10; " +
+                    "} " +
+                    "f()"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Cannot access 'b' before initialization", e.getMessage());
+        }
+    }
+
+    @Test
     public void var_cannot_override_a_function() {
         try {
             this.context.eval("ezs",

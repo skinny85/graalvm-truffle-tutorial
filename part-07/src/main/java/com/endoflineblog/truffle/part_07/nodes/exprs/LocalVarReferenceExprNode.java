@@ -1,5 +1,7 @@
 package com.endoflineblog.truffle.part_07.nodes.exprs;
 
+import com.endoflineblog.truffle.part_07.EasyScriptException;
+import com.endoflineblog.truffle.part_07.nodes.stmts.LocalVarDeclStmtNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -23,6 +25,10 @@ public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
 
     @Fallback
     protected Object readObject(VirtualFrame frame) {
-        return FrameUtil.getObjectSafe(frame, this.getFrameSlot());
+        Object ret = FrameUtil.getObjectSafe(frame, this.getFrameSlot());
+        if (ret == LocalVarDeclStmtNode.DUMMY) {
+            throw new EasyScriptException("Cannot access '" + this.getFrameSlot().getIdentifier() + "' before initialization");
+        }
+        return ret;
     }
 }
