@@ -61,10 +61,14 @@ public final class EasyScriptTruffleParser {
     /**
      * Map containing bindings for the function arguments and local variables when parsing function definitions.
      * Function arguments will be mapped to integer indexes, starting at 0,
-     * while local variables of functions will be mapped to their String names.
-     * This field is non-null only if we are parsing a function definition.
+     * while local variables of functions will be mapped to their {@link FrameSlot}s.
      */
     private final Map<String, Object> functionLocals;
+
+    /**
+     * The {@link FrameDescriptor} for a given function definition.
+     * This field is non-null only if we are parsing a function definition.
+     */
     private FrameDescriptor frameDescriptor;
 
     private EasyScriptTruffleParser() {

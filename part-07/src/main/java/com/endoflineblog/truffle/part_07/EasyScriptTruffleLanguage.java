@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_07;
 
 import com.endoflineblog.truffle.part_07.nodes.BuiltInFuncRootNode;
+import com.endoflineblog.truffle.part_07.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_07.nodes.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
@@ -20,18 +21,19 @@ import java.util.stream.IntStream;
 
 /**
  * The {@link TruffleLanguage} implementation for this part of the article series.
- * Very similar to the class with the same name from part 5,
- * the only difference is that this adds the supported built-in functions
- * ({@code Math.abs} and {@code Math.pow})
- * to the global scope in the {@link #createContext} method.
+ * Basically identical to the class with the same name from part 6,
+ * the major difference being the {@link #get} method backed by the
+ * {@link TruffleLanguage.LanguageReference} field,
+ * and used in the {@link EasyScriptNode#currentTruffleLanguage()} method.
  *
- * @see #createContext
+ * @see #get
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
     private static final LanguageReference<EasyScriptTruffleLanguage> REF =
             LanguageReference.create(EasyScriptTruffleLanguage.class);
 
+    /** Retrieve the current language instance for the given {@link Node}. */
     public static EasyScriptTruffleLanguage get(Node node) {
         return REF.get(node);
     }
@@ -43,11 +45,6 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return Truffle.getRuntime().createCallTarget(programRootNode);
     }
 
-    /**
-     * We create a new instance of {@link EasyScriptLanguageContext},
-     * and return it, but not before adding the built-in functions to
-     * the global scope the context object holds.
-     */
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
         var context = new EasyScriptLanguageContext();

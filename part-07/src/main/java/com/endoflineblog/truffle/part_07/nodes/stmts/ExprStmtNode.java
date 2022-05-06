@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node that represents an expression statement.
- * Identical to the class with the same name from part 5.
+ * Identical to the class with the same name from part 6.
  */
 public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
@@ -40,8 +40,8 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
     @Override
     public Object executeStatement(VirtualFrame frame) {
         Object exprResult = this.expr.executeGeneric(frame);
-        // if this statement was created because of hoisting a 'var' declaration to the top,
-        // return 'undefined', to be consistent with how 'let' and 'const' declarations work
+        // if this statement was created because of hoisting a variable declaration,
+        // return 'undefined', to be consistent with how other declarations work
         return this.discardExpressionValue ? Undefined.INSTANCE : exprResult;
     }
 }

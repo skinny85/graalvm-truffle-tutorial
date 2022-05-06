@@ -9,7 +9,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * A Node that represents the expression of referencing a global variable in EasyScript.
- * Identical to the class with the same name from part 5.
+ * Identical to the class with the same name from part 6.
  */
 @NodeField(name = "name", type = String.class)
 public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {

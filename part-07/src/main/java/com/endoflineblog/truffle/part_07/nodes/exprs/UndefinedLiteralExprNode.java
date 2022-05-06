@@ -6,7 +6,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 /**
  * The AST node that represents the 'undefined' literal JavaScript expression.
- * Identical to the class with the same name from part 5.
+ * Identical to the class with the same name from part 6.
  */
 public final class UndefinedLiteralExprNode extends EasyScriptExprNode {
     @Override

@@ -91,6 +91,10 @@ public final class GlobalScopeObject implements TruffleObject {
     }
 }
 
+/**
+ * The class that implements the collection of member names of the global scope.
+ * Used in the {@link GlobalScopeObject#getMembers} method.
+ */
 @ExportLibrary(InteropLibrary.class)
 final class GlobalVariableNamesObject implements TruffleObject {
     private final List<String> names;

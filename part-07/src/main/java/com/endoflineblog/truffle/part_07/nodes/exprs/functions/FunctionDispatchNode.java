@@ -14,6 +14,12 @@ import com.oracle.truffle.api.nodes.Node;
  * A helper Node that contains specialization for functions calls.
  * Used by {@link FunctionCallExprNode},
  * and by {@link FunctionObject}.
+ * Almost identical to the class with the same name from part 6,
+ * the only difference is that we need to extend the arguments we get called with
+ * to have at least as many arguments as the function takes
+ * (we fill the blanks with {@link Undefined undefineds}).
+ * This is in order to allow correctly
+ * {@link WriteFunctionArgExprNode writing to function arguments}.
  */
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);

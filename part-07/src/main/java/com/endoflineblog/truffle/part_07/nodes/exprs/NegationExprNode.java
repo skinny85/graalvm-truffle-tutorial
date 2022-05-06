@@ -7,6 +7,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 /**
  * The Node that represents the negation expression in JavaScript
  * ("unary minus"), like {@code -3}.
+ * Identical to the class with the same name from part 6.
  */
 @NodeChild("expr")
 public abstract class NegationExprNode extends EasyScriptExprNode {

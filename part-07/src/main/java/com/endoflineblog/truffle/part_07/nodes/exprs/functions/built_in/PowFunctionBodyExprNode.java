@@ -6,8 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 /**
  * An expression Node that represents the implementation of the
  * {@code Math.pow()} JavaScript function.
- *
- * @see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/pow">Math.pow()</a>
+ * Identical to the class with the same name from part 6.
  */
 public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(guards = "exponent >= 0", rewriteOn = ArithmeticException.class)

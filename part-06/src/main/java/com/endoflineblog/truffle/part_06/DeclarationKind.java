@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_06;
 
 /**
  * An enum that represents the different kinds of variable declarations in JavaScript.
+ * Identical to the enum with the same name from part 5.
  */
 public enum DeclarationKind {
     /** This represents the 'var' declaration kind. */

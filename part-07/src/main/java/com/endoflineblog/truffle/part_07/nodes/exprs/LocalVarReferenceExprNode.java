@@ -9,6 +9,9 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameUtil;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+/**
+ * A Node that represents the reference to a variable local to a function.
+ */
 @NodeField(name = "frameSlot", type = FrameSlot.class)
 public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
     protected abstract FrameSlot getFrameSlot();

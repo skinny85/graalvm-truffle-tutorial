@@ -5,7 +5,7 @@ import com.oracle.truffle.api.nodes.Node;
 
 /**
  * The exception that's thrown from the EasyScript implementation if any semantic errors are found.
- * Identical to the class with the same name from part 5.
+ * Identical to the class with the same name from part 6.
  */
 public final class EasyScriptException extends AbstractTruffleException {
     public EasyScriptException(String message) {

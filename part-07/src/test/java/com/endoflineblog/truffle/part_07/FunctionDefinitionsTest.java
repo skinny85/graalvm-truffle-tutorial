@@ -12,6 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+/** This is a set of unit tests for defining functions. */
 public class FunctionDefinitionsTest {
     private Context context;
 

@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * The Node representing number addition.
- * Identical to the class with the same name from part 5.
+ * Identical to the class with the same name from part 6.
  */
 @NodeChild("leftNode")
 @NodeChild("rightNode")

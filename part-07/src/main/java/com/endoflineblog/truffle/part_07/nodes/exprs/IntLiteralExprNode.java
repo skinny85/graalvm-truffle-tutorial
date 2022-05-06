@@ -4,7 +4,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * The AST node that represents an integer literal expression in EasyScript.
- * Identical to the class with the same name from part 5.
+ * Identical to the class with the same name from part 6.
  */
 public final class IntLiteralExprNode extends EasyScriptExprNode {
     private final int value;

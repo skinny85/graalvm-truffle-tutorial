@@ -5,6 +5,9 @@ import com.endoflineblog.truffle.part_07.runtime.Undefined;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+/**
+ * A Node that represents the declaration of a variable local to a function.
+ */
 public final class LocalVarDeclStmtNode extends EasyScriptStmtNode {
     public static final Object DUMMY = new Object() {
         @Override

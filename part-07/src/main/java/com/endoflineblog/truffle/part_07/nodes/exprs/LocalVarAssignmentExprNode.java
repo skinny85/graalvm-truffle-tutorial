@@ -8,6 +8,9 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+/**
+ * A Node that represents the assignment to a variable local to a function.
+ */
 @NodeChild("initializerExpr")
 @NodeField(name = "frameSlot", type = FrameSlot.class)
 public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
