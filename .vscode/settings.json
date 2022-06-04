@@ -1,0 +1,6 @@
+{
+    "java.test.config": {
+        "name": "MyTestConfig",
+        "vmArgs": ["-Dgraalvm.locatorDisabled=true"]
+    }
+}
