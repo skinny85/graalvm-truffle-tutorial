@@ -60,3 +60,4 @@ $ ./gradlew build
 * [Part 4 - parsing, and the `TruffleLanguage` class](part-04)
 * [Part 5 - global variables](part-05)
 * [Part 6 - static function calls](part-06)
+* [Part 7 - function definitions](part-07)
