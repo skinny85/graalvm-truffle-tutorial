@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_08.nodes.stmts;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.nodes.Node;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  * and also the body of a user-defined function.
  */
 public final class BlockStmtNode extends EasyScriptStmtNode {
-    @Node.Children
+    @Children
     private final EasyScriptStmtNode[] stmts;
 
     public BlockStmtNode(List<EasyScriptStmtNode> stmts) {

@@ -6,7 +6,6 @@ import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.Node;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
@@ -17,7 +16,7 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     private final int argumentCount;
 
     @SuppressWarnings("FieldMayBeFinal")
-    @Node.Child
+    @Child
     private BlockStmtNode funcBody;
 
     public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, BlockStmtNode funcBody, int argumentCount) {

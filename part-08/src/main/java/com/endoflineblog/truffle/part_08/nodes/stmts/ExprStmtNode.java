@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_08.nodes.stmts;
 import com.endoflineblog.truffle.part_08.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.Node;
 
 /**
  * A Node that represents an expression statement.
@@ -11,7 +10,7 @@ import com.oracle.truffle.api.nodes.Node;
  */
 public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
-    @Node.Child
+    @Child
     private EasyScriptExprNode expr;
     private final boolean discardExpressionValue;
 
