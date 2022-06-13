@@ -1,7 +1,7 @@
 package com.endoflineblog.truffle.part_08.nodes;
 
 import com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage;
-import com.endoflineblog.truffle.part_08.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_08.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
@@ -12,10 +12,10 @@ import com.oracle.truffle.api.nodes.RootNode;
 public final class BuiltInFuncRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private EasyScriptExprNode functionBodyExpr;
+    private BuiltInFunctionBodyExprNode functionBodyExpr;
 
     public BuiltInFuncRootNode(EasyScriptTruffleLanguage truffleLanguage,
-            EasyScriptExprNode functionBodyExpr) {
+            BuiltInFunctionBodyExprNode functionBodyExpr) {
         super(truffleLanguage);
 
         this.functionBodyExpr = functionBodyExpr;
