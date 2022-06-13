@@ -1,35 +1,37 @@
 package com.endoflineblog.truffle.part_08.nodes.stmts;
 
+import com.endoflineblog.truffle.part_08.ReturnException;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 import java.util.List;
 
-/**
- * A Node that represents a block of statements.
- * Used for representing the contents of the entire program,
- * and also the body of a user-defined function.
- */
-public final class BlockStmtNode extends EasyScriptStmtNode {
+/** A Node for representing the body of a user-defined function in EasyScript. */
+public final class UserFuncBlockStmtNode extends EasyScriptStmtNode {
     @Children
     private final EasyScriptStmtNode[] stmts;
 
-    public BlockStmtNode(List<EasyScriptStmtNode> stmts) {
+    public UserFuncBlockStmtNode(List<EasyScriptStmtNode> stmts) {
         this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
     }
 
     /**
      * Evaluating the block statement evaluates all statements inside it,
-     * and returns the result of executing the last statement.
+     * and returns whatever a 'return' statement inside it returns.
      */
     @Override
     @ExplodeLoop
     public Object executeStatement(VirtualFrame frame) {
-        Object ret = Undefined.INSTANCE;
         for (EasyScriptStmtNode stmt : this.stmts) {
-            ret = stmt.executeStatement(frame);
+            try {
+                stmt.executeStatement(frame);
+            } catch (ReturnException e) {
+                return e.returnValue;
+            }
         }
-        return ret;
+        // if there was no return statement,
+        // then we return 'undefined'
+        return Undefined.INSTANCE;
     }
 }

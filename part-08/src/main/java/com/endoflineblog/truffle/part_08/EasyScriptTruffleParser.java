@@ -15,12 +15,13 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.FunctionCallExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.WriteFunctionArgExprNode;
-import com.endoflineblog.truffle.part_08.nodes.stmts.BlockStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.GlobalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.LocalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.ReturnStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.UserFuncBlockStmtNode;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
@@ -113,10 +114,12 @@ public final class EasyScriptTruffleParser {
 
         // in the second pass, only handle expression statements
         // (and add new expression statements that represent the initializer of the variable declarations)
-        var exprStmts = new ArrayList<ExprStmtNode>();
+        var exprStmts = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.ExprStmtContext) {
                 exprStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
+            } else if (stmt instanceof EasyScriptParser.ReturnStmtContext) {
+                exprStmts.add(this.parseReturnStmt((EasyScriptParser.ReturnStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
                 // we turn the variable declaration into an assignment expression
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
@@ -160,6 +163,15 @@ public final class EasyScriptTruffleParser {
         return new ExprStmtNode(this.parseExpr1(exprStmt.expr1()));
     }
 
+    private ReturnStmtNode parseReturnStmt(EasyScriptParser.ReturnStmtContext returnStmt) {
+        if (this.frameDescriptor == null) {
+            throw new EasyScriptException("return statement is not allowed outside functions");
+        }
+        return new ReturnStmtNode(returnStmt.expr1() == null
+                ? new UndefinedLiteralExprNode()
+                : this.parseExpr1(returnStmt.expr1()));
+    }
+
     private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
         if (this.frameDescriptor != null) {
             // we do not allow nested functions (yet 😉)
@@ -186,7 +198,7 @@ public final class EasyScriptTruffleParser {
         this.frameDescriptor = null;
 
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
-                frameDescriptor, new BlockStmtNode(funcStmts), argumentCount);
+                frameDescriptor, new UserFuncBlockStmtNode(funcStmts), argumentCount);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {

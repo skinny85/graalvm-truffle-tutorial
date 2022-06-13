@@ -8,6 +8,7 @@ start : stmt+ EOF ;
 
 stmt :   kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
      |                                                   expr1 ';'? #ExprStmt
+     |                                         'return' expr1? ';'? #ReturnStmt
      | 'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
      ;
 binding : ID ('=' expr1)? ;

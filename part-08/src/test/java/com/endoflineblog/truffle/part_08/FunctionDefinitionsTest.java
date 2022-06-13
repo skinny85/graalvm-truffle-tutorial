@@ -29,10 +29,20 @@ public class FunctionDefinitionsTest {
     @Test
     public void defining_a_function_works() {
         Value result = this.context.eval("ezs",
-                "function f() { Math.pow(4, 3); }" +
+                "function f() { return Math.pow(4, 3); }" +
                 "f()"
         );
         assertEquals(64, result.asInt());
+    }
+
+    @Test
+    public void return_without_expression_returns_undefined() {
+        Value result = this.context.eval("ezs",
+                "function f() { return; }" +
+                "f()"
+        );
+        assertTrue(result.isNull());
+        assertEquals(result.toString(), "undefined");
     }
 
     @Test
@@ -40,7 +50,7 @@ public class FunctionDefinitionsTest {
         Value result = this.context.eval("ezs",
                 "var v = f();" +
                 "function f() {" +
-                    "v;" +
+                    "return v;" +
                 "}" +
                 "v"
         );
@@ -54,7 +64,7 @@ public class FunctionDefinitionsTest {
             this.context.eval("ezs",
                     "let v = f(); " +
                     "function f() { " +
-                        "v; " +
+                        "return v; " +
                     "} "
             );
             fail("expected PolyglotException to be thrown");
@@ -69,7 +79,7 @@ public class FunctionDefinitionsTest {
     public void passing_a_parameter_to_a_function_works() {
         Value result = this.context.eval("ezs",
                 "function addOne(a) {" +
-                    "a + 1; " +
+                    "return a + 1; " +
                 "} " +
                 "addOne(4)"
         );
@@ -80,7 +90,7 @@ public class FunctionDefinitionsTest {
     public void function_parameters_shadow_each_other() {
         Value result = this.context.eval("ezs",
                 "function f(a, a) { " +
-                    "a; " +
+                    "return a; " +
                 "} " +
                 "f(1, 23);"
         );
@@ -94,7 +104,7 @@ public class FunctionDefinitionsTest {
                 "function f() { " +
                     "var a = 3; " +
                     "a = 333; " +
-                    "a;" +
+                    "return a;" +
                 "} " +
                 "f()"
         );
@@ -107,7 +117,7 @@ public class FunctionDefinitionsTest {
                 "let a = 222; " +
                 "function f(a, b) { " +
                     "b = 22; " +
-                    "b; " +
+                    "return b; " +
                 "} " +
                 "f(2);"
         );
@@ -117,8 +127,8 @@ public class FunctionDefinitionsTest {
     @Test
     public void functions_can_be_redefined() {
         Value result = this.context.eval("ezs",
-                "function f() { 6; } " +
-                "function f() { 7; } " +
+                "function f() { return 6; } " +
+                "function f() { return 7; } " +
                 "f(); "
         );
         assertEquals(7, result.asInt());
@@ -131,7 +141,7 @@ public class FunctionDefinitionsTest {
                 "function f() { " +
                     "const a = b; " +
                     "var b = 3; " +
-                    "a; " +
+                    "return a; " +
                 "} " +
                 "f();"
         );
@@ -142,9 +152,9 @@ public class FunctionDefinitionsTest {
     @Test
     public void higher_order_functions_are_supported() {
         Value result = this.context.eval("ezs",
-                "function f() { 5; } " +
+                "function f() { return 5; } " +
                 "function g(a) { " +
-                    "1 + a(); " +
+                    "return 1 + a(); " +
                 "} " +
                 "g(f);"
         );
@@ -192,7 +202,7 @@ public class FunctionDefinitionsTest {
             this.context.eval("ezs",
                     "var f = 5; " +
                     "function f() { " +
-                        "6; " +
+                        "return 6; " +
                     "}"
             );
             fail("expected PolyglotException to be thrown");

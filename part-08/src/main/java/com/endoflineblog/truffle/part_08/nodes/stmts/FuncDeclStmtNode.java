@@ -17,9 +17,9 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private BlockStmtNode funcBody;
+    private UserFuncBlockStmtNode funcBody;
 
-    public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, BlockStmtNode funcBody, int argumentCount) {
+    public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, UserFuncBlockStmtNode funcBody, int argumentCount) {
         this.funcName = funcName;
         this.frameDescriptor = frameDescriptor;
         this.funcBody = funcBody;
