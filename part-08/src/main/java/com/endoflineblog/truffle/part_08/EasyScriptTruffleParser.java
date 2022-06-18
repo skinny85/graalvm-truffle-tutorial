@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_08;
 
 import com.endoflineblog.truffle.part_08.nodes.exprs.AdditionExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.AdditionExprNodeGen;
+import com.endoflineblog.truffle.part_08.nodes.exprs.BoolLiteralExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.GlobalVarAssignmentExprNodeGen;
@@ -269,9 +270,14 @@ public final class EasyScriptTruffleParser {
             return parseIntLiteral(intTerminal.getText());
         }
         TerminalNode doubleTerminal = literalExpr.literal().DOUBLE();
-        return doubleTerminal != null
-                ? parseDoubleLiteral(doubleTerminal.getText())
-                : new UndefinedLiteralExprNode();
+        if (doubleTerminal != null) {
+            return parseDoubleLiteral(doubleTerminal.getText());
+        }
+        EasyScriptParser.Bool_literalContext boolLiteral = literalExpr.literal().bool_literal();
+        if (boolLiteral != null) {
+            return new BoolLiteralExprNode("true".equals(boolLiteral.getText()));
+        }
+        return new UndefinedLiteralExprNode();
     }
 
     private EasyScriptExprNode parseReference(String variableId) {

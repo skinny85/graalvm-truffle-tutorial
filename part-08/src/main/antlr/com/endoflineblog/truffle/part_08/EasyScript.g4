@@ -28,7 +28,8 @@ expr3 : literal                             #LiteralExpr3
       | '(' expr1 ')'                       #PrecedenceOneExpr3
       ;
 
-literal : INT | DOUBLE | 'undefined' ;
+literal : INT | DOUBLE | 'undefined' | bool_literal ;
+bool_literal : 'true' | 'false' ;
 
 fragment DIGIT : [0-9] ;
 INT : DIGIT+ ;

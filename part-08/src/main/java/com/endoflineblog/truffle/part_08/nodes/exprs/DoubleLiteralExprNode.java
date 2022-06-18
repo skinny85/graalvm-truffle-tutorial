@@ -15,6 +15,11 @@ public final class DoubleLiteralExprNode extends EasyScriptExprNode {
     }
 
     @Override
+    public boolean executeBool(VirtualFrame frame) {
+        return this.value != 0.0;
+    }
+
+    @Override
     public double executeDouble(VirtualFrame frame) {
         return this.value;
     }

@@ -5,9 +5,11 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 
 /**
  * The {@link TypeSystem} for EasyScript.
- * Identical to the class with the same name from part 6.
+ * Similar to the class with the same name from part 7,
+ * the only difference is that we add boolean to the hierarchy of EasyScript types.
  */
 @TypeSystem({
+        boolean.class,
         int.class,
         double.class,
 })

@@ -127,11 +127,11 @@ public class FunctionDefinitionsTest {
     @Test
     public void functions_can_be_redefined() {
         Value result = this.context.eval("ezs",
-                "function f() { return 6; } " +
-                "function f() { return 7; } " +
+                "function f() { return false; } " +
+                "function f() { return true;  } " +
                 "f(); "
         );
-        assertEquals(7, result.asInt());
+        assertTrue(result.asBoolean());
     }
 
     @Test

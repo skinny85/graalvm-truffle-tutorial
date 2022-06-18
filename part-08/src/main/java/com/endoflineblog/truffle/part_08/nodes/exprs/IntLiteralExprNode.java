@@ -14,6 +14,11 @@ public final class IntLiteralExprNode extends EasyScriptExprNode {
     }
 
     @Override
+    public boolean executeBool(VirtualFrame frame) {
+        return this.value != 0;
+    }
+
+    @Override
     public int executeInt(VirtualFrame frame) {
         return this.value;
     }
