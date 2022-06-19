@@ -228,43 +228,51 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
-        if (expr2 instanceof EasyScriptParser.AddExpr2Context) {
-            return parseAdditionExpr((EasyScriptParser.AddExpr2Context) expr2);
-        } else if (expr2 instanceof EasyScriptParser.UnaryMinusExpr2Context) {
-            return parseUnaryMinusExpr((EasyScriptParser.UnaryMinusExpr2Context) expr2);
-        } else {
-            return parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
-        }
-    }
-
-    private AdditionExprNode parseAdditionExpr(EasyScriptParser.AddExpr2Context addExpr) {
-        return AdditionExprNodeGen.create(
-                parseExpr2(addExpr.left),
-                parseExpr3(addExpr.right));
-    }
-
-    private NegationExprNode parseUnaryMinusExpr(EasyScriptParser.UnaryMinusExpr2Context unaryMinusExpr) {
-        return NegationExprNodeGen.create(parseExpr3(unaryMinusExpr.expr3()));
+        return this.parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
     }
 
     private EasyScriptExprNode parseExpr3(EasyScriptParser.Expr3Context expr3) {
-        if (expr3 instanceof EasyScriptParser.LiteralExpr3Context) {
-            return parseLiteralExpr((EasyScriptParser.LiteralExpr3Context) expr3);
-        } else if (expr3 instanceof EasyScriptParser.SimpleReferenceExpr3Context) {
-            return parseReference(((EasyScriptParser.SimpleReferenceExpr3Context) expr3).ID().getText());
-        } else if (expr3 instanceof EasyScriptParser.ComplexReferenceExpr3Context) {
-            var complexRef = (EasyScriptParser.ComplexReferenceExpr3Context) expr3;
-            return parseReference(complexRef.ID().stream()
-                    .map(id -> id.getText())
-                    .collect(Collectors.joining(".")));
-        } else if (expr3 instanceof EasyScriptParser.CallExpr3Context) {
-            return parseCallExpr((EasyScriptParser.CallExpr3Context) expr3);
+        return this.parseExpr4(((EasyScriptParser.PrecedenceFourExpr3Context) expr3).expr4());
+    }
+
+    private EasyScriptExprNode parseExpr4(EasyScriptParser.Expr4Context expr4) {
+        if (expr4 instanceof EasyScriptParser.AddExpr4Context) {
+            return parseAdditionExpr((EasyScriptParser.AddExpr4Context) expr4);
+        } else if (expr4 instanceof EasyScriptParser.UnaryMinusExpr4Context) {
+            return parseUnaryMinusExpr((EasyScriptParser.UnaryMinusExpr4Context) expr4);
         } else {
-            return parseExpr1(((EasyScriptParser.PrecedenceOneExpr3Context) expr3).expr1());
+            return parseExpr5(((EasyScriptParser.PrecedenceFiveExpr4Context) expr4).expr5());
         }
     }
 
-    private EasyScriptExprNode parseLiteralExpr(EasyScriptParser.LiteralExpr3Context literalExpr) {
+    private AdditionExprNode parseAdditionExpr(EasyScriptParser.AddExpr4Context addExpr) {
+        return AdditionExprNodeGen.create(
+                parseExpr4(addExpr.left),
+                parseExpr5(addExpr.right));
+    }
+
+    private NegationExprNode parseUnaryMinusExpr(EasyScriptParser.UnaryMinusExpr4Context unaryMinusExpr) {
+        return NegationExprNodeGen.create(parseExpr5(unaryMinusExpr.expr5()));
+    }
+
+    private EasyScriptExprNode parseExpr5(EasyScriptParser.Expr5Context expr5) {
+        if (expr5 instanceof EasyScriptParser.LiteralExpr5Context) {
+            return parseLiteralExpr((EasyScriptParser.LiteralExpr5Context) expr5);
+        } else if (expr5 instanceof EasyScriptParser.SimpleReferenceExpr5Context) {
+            return parseReference(((EasyScriptParser.SimpleReferenceExpr5Context) expr5).ID().getText());
+        } else if (expr5 instanceof EasyScriptParser.ComplexReferenceExpr5Context) {
+            var complexRef = (EasyScriptParser.ComplexReferenceExpr5Context) expr5;
+            return parseReference(complexRef.ID().stream()
+                    .map(id -> id.getText())
+                    .collect(Collectors.joining(".")));
+        } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
+            return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
+        } else {
+            return parseExpr1(((EasyScriptParser.PrecedenceOneExpr5Context) expr5).expr1());
+        }
+    }
+
+    private EasyScriptExprNode parseLiteralExpr(EasyScriptParser.LiteralExpr5Context literalExpr) {
         TerminalNode intTerminal = literalExpr.literal().INT();
         if (intTerminal != null) {
             return parseIntLiteral(intTerminal.getText());
@@ -294,9 +302,9 @@ public final class EasyScriptTruffleParser {
         }
     }
 
-    private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr3Context callExpr) {
+    private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr5Context callExpr) {
         return new FunctionCallExprNode(
-                parseExpr3(callExpr.expr3()),
+                parseExpr5(callExpr.expr5()),
                 callExpr.expr1().stream()
                         .map(this::parseExpr1)
                         .collect(Collectors.toList()));
