@@ -36,7 +36,16 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
         return value;
     }
 
-    @Specialization(replaces = {"intAssignment", "doubleAssignment"})
+    @Specialization(guards = "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Illegal || " +
+            "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Boolean")
+    protected boolean boolAssignment(VirtualFrame frame, boolean value) {
+        FrameSlot frameSlot = this.getFrameSlot();
+        frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Int);
+        frame.setBoolean(frameSlot, value);
+        return value;
+    }
+
+    @Specialization(replaces = {"intAssignment", "doubleAssignment", "boolAssignment"})
     protected Object objectAssignment(VirtualFrame frame, Object value) {
         FrameSlot frameSlot = this.getFrameSlot();
         frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Object);

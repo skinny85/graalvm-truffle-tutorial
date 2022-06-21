@@ -25,7 +25,12 @@ public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
         return FrameUtil.getDoubleSafe(frame, this.getFrameSlot());
     }
 
-    @Specialization(replaces = {"readInt", "readDouble"})
+    @Specialization(guards = "frame.isBoolean(getFrameSlot())")
+    protected boolean readBool(VirtualFrame frame) {
+        return FrameUtil.getBooleanSafe(frame, this.getFrameSlot());
+    }
+
+    @Specialization(replaces = {"readInt", "readDouble", "readBool"})
     protected Object readObject(VirtualFrame frame) {
         Object ret = FrameUtil.getObjectSafe(frame, this.getFrameSlot());
         if (ret == LocalVarDeclStmtNode.DUMMY) {
