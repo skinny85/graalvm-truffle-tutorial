@@ -40,8 +40,9 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
-        List<EasyScriptStmtNode> stmts = EasyScriptTruffleParser.parse(request.getSource().getReader());
-        var programRootNode = new StmtBlockRootNode(this, new ProgramBlockStmtNode(stmts));
+        ParsingResult parsingResult = EasyScriptTruffleParser.parse(request.getSource().getReader());
+        var programRootNode = new StmtBlockRootNode(this, parsingResult.topLevelFrameDescriptor,
+                parsingResult.programStmtBlock);
         return Truffle.getRuntime().createCallTarget(programRootNode);
     }
 

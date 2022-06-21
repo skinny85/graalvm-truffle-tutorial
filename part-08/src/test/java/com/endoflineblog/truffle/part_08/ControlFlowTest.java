@@ -27,6 +27,33 @@ public class ControlFlowTest {
     }
 
     @Test
+    public void var_declarations_are_local_in_nested_blocks() {
+        Value result = this.context.eval("ezs",
+                "var v = 3; " +
+                "{ " +
+                    "var v = 5; " +
+                "} " +
+                "v"
+        );
+        assertEquals(3, result.asInt());
+    }
+
+    @Test
+    public void var_declarations_are_local_in_nested_blocks_of_functions() {
+        Value result = this.context.eval("ezs",
+                "function f() { " +
+                    "var v = 3; " +
+                    "{ " +
+                        "var v = 5; " +
+                    "} " +
+                    "return v; " +
+                "} " +
+                "f() "
+        );
+        assertEquals(3, result.asInt());
+    }
+
+    @Test
     public void a_function_is_eqal_to_itself() {
         Value result = this.context.eval("ezs",
                 "function f() { return false; } " +

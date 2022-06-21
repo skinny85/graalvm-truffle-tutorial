@@ -23,6 +23,7 @@ import com.endoflineblog.truffle.part_08.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.GlobalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.LocalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.ProgramBlockStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ReturnStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.UserFuncBlockStmtNode;
 import com.oracle.truffle.api.frame.FrameDescriptor;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
@@ -50,7 +52,7 @@ import java.util.stream.Collectors;
  * @see #parse
  */
 public final class EasyScriptTruffleParser {
-    public static List<EasyScriptStmtNode> parse(Reader program) throws IOException {
+    public static ParsingResult parse(Reader program) throws IOException {
         var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
         // remove the default console error listener
         lexer.removeErrorListeners();
@@ -59,24 +61,43 @@ public final class EasyScriptTruffleParser {
         parser.removeErrorListeners();
         // throw an exception when a parsing error is encountered
         parser.setErrorHandler(new BailErrorStrategy());
-        return new EasyScriptTruffleParser().parseStmtsList(parser.start().stmt());
+        EasyScriptTruffleParser easyScriptTruffleParser = new EasyScriptTruffleParser();
+        List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
+        return new ParsingResult(
+                new ProgramBlockStmtNode(stmts),
+                easyScriptTruffleParser.frameDescriptor);
     }
 
-    /**
-     * Map containing bindings for the function arguments and local variables when parsing function definitions.
-     * Function arguments will be mapped to integer indexes, starting at 0,
-     * while local variables of functions will be mapped to their {@link FrameSlot}s.
-     */
-    private final Map<String, Object> functionLocals;
+    enum ParserState { TOP_LEVEL, NESTED_SCOPE_IN_TOP_LEVEL, FUNC_DEF }
+
+    /** Whether we're parsing a function definition. */
+    private ParserState state;
 
     /**
-     * The {@link FrameDescriptor} for a given function definition.
-     * This field is non-null only if we are parsing a function definition.
+     * The {@link FrameDescriptor} for either a given function definition,
+     * or for any local variables in the statements of the top-level program.
      */
     private FrameDescriptor frameDescriptor;
 
+    /**
+     * Map containing bindings for the function arguments and local variables when parsing function definitions
+     * and nested scopes of the top-level object.
+     * Function arguments will be mapped to integer indexes, starting at 0,
+     * while local variables of functions will be mapped to their {@link FrameSlot}s.
+     */
+    private Stack<Map<String, Object>> localScopes;
+
+    /**
+     * The counter that makes it easy to generate unique variable names for local variables
+     * (as their names can repeat in nested scopes).
+     */
+    private int localVariablesCounter;
+
     private EasyScriptTruffleParser() {
-        this.functionLocals = new HashMap<>();
+        this.state = ParserState.TOP_LEVEL;
+        this.frameDescriptor = new FrameDescriptor();
+        this.localScopes = new Stack<>();
+        this.localVariablesCounter = 0;
     }
 
     private List<EasyScriptStmtNode> parseStmtsList(List<EasyScriptParser.StmtContext> stmts) {
@@ -95,18 +116,14 @@ public final class EasyScriptTruffleParser {
                 DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
                 for (EasyScriptParser.BindingContext varBinding : varDeclBindings) {
                     String variableId = varBinding.ID().getText();
-                    if (this.frameDescriptor == null) {
+                    if (this.state == ParserState.TOP_LEVEL) {
                         // this is a global variable
                         varDecls.add(new GlobalVarDeclStmtNode(variableId, declarationKind));
                     } else {
-                        // this is a function-local variable
-                        FrameSlot frameSlot;
-                        try {
-                            frameSlot = this.frameDescriptor.addFrameSlot(variableId, declarationKind, FrameSlotKind.Object);
-                        } catch (IllegalArgumentException e) {
-                            throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
-                        }
-                        if (this.functionLocals.put(variableId, frameSlot) != null) {
+                        // this is a local variable (either of a function, or on the top-level)
+                        String variableFrameSlotName = variableId + "-" + (++this.localVariablesCounter);
+                        FrameSlot frameSlot = this.frameDescriptor.addFrameSlot(variableFrameSlotName, declarationKind, FrameSlotKind.Object);
+                        if (this.localScopes.peek().putIfAbsent(variableId, frameSlot) != null) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
                         varDecls.add(new LocalVarDeclStmtNode(frameSlot));
@@ -123,6 +140,12 @@ public final class EasyScriptTruffleParser {
                 exprStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.ReturnStmtContext) {
                 exprStmts.add(this.parseReturnStmt((EasyScriptParser.ReturnStmtContext) stmt));
+            } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
+                // nested blocks can have vars which get hoisted to the top level
+                List<EasyScriptStmtNode> stmtNodes = this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt);
+                exprStmts.add(this.state == ParserState.FUNC_DEF
+                         ? new UserFuncBlockStmtNode(stmtNodes)
+                         : new ProgramBlockStmtNode(stmtNodes));
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
                 // we turn the variable declaration into an assignment expression
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
@@ -142,10 +165,10 @@ public final class EasyScriptTruffleParser {
                     } else {
                         initializerExpr = this.parseExpr1(bindingExpr);
                     }
-                    EasyScriptExprNode assignmentExpr = this.frameDescriptor == null
+                    EasyScriptExprNode assignmentExpr = this.state == ParserState.TOP_LEVEL
                             ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
                             :  LocalVarAssignmentExprNodeGen.create(initializerExpr,
-                                    this.frameDescriptor.findFrameSlot(variableId));
+                                (FrameSlot) this.localScopes.peek().get(variableId));
                     exprStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
                 }
             }
@@ -167,7 +190,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private ReturnStmtNode parseReturnStmt(EasyScriptParser.ReturnStmtContext returnStmt) {
-        if (this.frameDescriptor == null) {
+        if (this.state != ParserState.FUNC_DEF) {
             throw new EasyScriptException("return statement is not allowed outside functions");
         }
         return new ReturnStmtNode(returnStmt.expr1() == null
@@ -175,30 +198,59 @@ public final class EasyScriptTruffleParser {
                 : this.parseExpr1(returnStmt.expr1()));
     }
 
+    private List<EasyScriptStmtNode> parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
+        // save the current state of the parser (before entering the block)
+        ParserState previousParserState = this.state;
+
+        if (this.state == ParserState.TOP_LEVEL) {
+            this.state = ParserState.NESTED_SCOPE_IN_TOP_LEVEL;
+        }
+        this.localScopes.push(new HashMap<>());
+
+        // perform the parsing
+        List<EasyScriptStmtNode> ret = this.parseStmtsList(blockStmt.stmt());
+
+        // bring back the old state
+        this.state = previousParserState;
+        this.localScopes.pop();
+
+        return ret;
+    }
+
     private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
-        if (this.frameDescriptor != null) {
+        if (this.state == ParserState.FUNC_DEF) {
             // we do not allow nested functions (yet 😉)
             throw new EasyScriptException("nested functions are not supported in EasyScript yet");
         }
 
+        // save the current state of the parser (before entering the function)
+        FrameDescriptor previousFrameDescriptor = this.frameDescriptor;
+        ParserState previousParserState = this.state;
+        var previousLocalScopes = this.localScopes;
+
+        // initialize the new state
+        this.frameDescriptor = new FrameDescriptor();
+        this.state = ParserState.FUNC_DEF;
+        this.localScopes = new Stack<>();
+
+        var localVariables = new HashMap<String, Object>();
         // add each parameter to the map, with the correct index
         List<TerminalNode> funcArgs = funcDeclStmt.args.ID();
         int argumentCount = funcArgs.size();
-        // create the FrameDescriptor to store each local variable we've seen
         // first, initialize the locals with function arguments
         for (int i = 0; i < argumentCount; i++) {
-            this.functionLocals.put(funcArgs.get(i).getText(), i);
+            localVariables.put(funcArgs.get(i).getText(), i);
         }
+        this.localScopes.push(localVariables);
 
-        this.frameDescriptor = new FrameDescriptor();
         // parse the statements in the function definition
         List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(funcDeclStmt.stmt());
 
         FrameDescriptor frameDescriptor = this.frameDescriptor;
-        // finally, clear the map of the function locals,
-        // in case the program has more than one function inside it
-        this.functionLocals.clear();
-        this.frameDescriptor = null;
+        // bring back the old state
+        this.frameDescriptor = previousFrameDescriptor;
+        this.state = previousParserState;
+        this.localScopes = previousLocalScopes;
 
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
                 frameDescriptor, new UserFuncBlockStmtNode(funcStmts), argumentCount);
@@ -212,7 +264,7 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
         String variableId = assignmentExpr.ID().getText();
-        Object paramIndexOrFrameSlot = this.functionLocals.get(variableId);
+        Object paramIndexOrFrameSlot = this.findLocalVariable(variableId);
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
         if (paramIndexOrFrameSlot == null) {
             return GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId);
@@ -303,7 +355,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
-        Object paramIndexOrFrameSlot = this.functionLocals.get(variableId);
+        Object paramIndexOrFrameSlot = this.findLocalVariable(variableId);
         if (paramIndexOrFrameSlot == null) {
             // we know for sure this is a reference to a global variable
             return GlobalVarReferenceExprNodeGen.create(variableId);
@@ -336,5 +388,15 @@ public final class EasyScriptTruffleParser {
 
     private DoubleLiteralExprNode parseDoubleLiteral(String text) {
         return new DoubleLiteralExprNode(Double.parseDouble(text));
+    }
+
+    private Object findLocalVariable(String variableId) {
+        for (var scope : this.localScopes) {
+            Object ret = scope.get(variableId);
+            if (ret != null) {
+                return ret;
+            }
+        }
+        return null;
     }
 }
