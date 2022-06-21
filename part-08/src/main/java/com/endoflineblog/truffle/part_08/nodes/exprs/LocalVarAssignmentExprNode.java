@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_08.nodes.exprs;
 
-import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -13,10 +13,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 @NodeChild("initializerExpr")
 @NodeField(name = "frameSlot", type = FrameSlot.class)
+@ImportStatic(FrameSlotKind.class)
 public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
     protected abstract FrameSlot getFrameSlot();
 
-    @Specialization
+    @Specialization(guards = "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Illegal || " +
+            "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Int")
     protected int intAssignment(VirtualFrame frame, int value) {
         FrameSlot frameSlot = this.getFrameSlot();
         frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Int);
@@ -24,7 +26,9 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
         return value;
     }
 
-    @Specialization(replaces = "intAssignment")
+    @Specialization(replaces = "intAssignment",
+            guards = "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Illegal || " +
+                    "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Double")
     protected double doubleAssignment(VirtualFrame frame, double value) {
         FrameSlot frameSlot = this.getFrameSlot();
         frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Double);
@@ -32,7 +36,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
         return value;
     }
 
-    @Fallback
+    @Specialization(replaces = {"intAssignment", "doubleAssignment"})
     protected Object objectAssignment(VirtualFrame frame, Object value) {
         FrameSlot frameSlot = this.getFrameSlot();
         frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Object);
