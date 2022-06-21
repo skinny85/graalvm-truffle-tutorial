@@ -13,6 +13,8 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.LocalVarReferenceExprNodeGe
 import com.endoflineblog.truffle.part_08.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_08.nodes.exprs.UndefinedLiteralExprNode;
+import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.EqualityExprNodeGen;
+import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.InequalityExprNodeGen;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.FunctionCallExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.WriteFunctionArgExprNode;
@@ -228,7 +230,19 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
-        return this.parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
+        if (expr2 instanceof EasyScriptParser.EqNotEqExpr2Context) {
+            return this.parseEqNotEqExpression(((EasyScriptParser.EqNotEqExpr2Context) expr2));
+        } else {
+            return this.parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
+        }
+    }
+
+    private EasyScriptExprNode parseEqNotEqExpression(EasyScriptParser.EqNotEqExpr2Context eqNotEqExpr) {
+        EasyScriptExprNode leftSide = this.parseExpr2(eqNotEqExpr.expr2());
+        EasyScriptExprNode rightSide = this.parseExpr3(eqNotEqExpr.expr3());
+        return "===".equals(eqNotEqExpr.c.getText())
+                ? EqualityExprNodeGen.create(leftSide, rightSide)
+                : InequalityExprNodeGen.create(leftSide, rightSide);
     }
 
     private EasyScriptExprNode parseExpr3(EasyScriptParser.Expr3Context expr3) {

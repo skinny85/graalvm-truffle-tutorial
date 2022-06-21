@@ -27,6 +27,15 @@ public class ControlFlowTest {
     }
 
     @Test
+    public void a_function_is_eqal_to_itself() {
+        Value result = this.context.eval("ezs",
+                "function f() { return false; } " +
+                "f === f"
+        );
+        assertTrue(result.asBoolean());
+    }
+
+    @Test
     public void return_statement_is_not_allowed_on_top_level() {
         try {
             this.context.eval("ezs",

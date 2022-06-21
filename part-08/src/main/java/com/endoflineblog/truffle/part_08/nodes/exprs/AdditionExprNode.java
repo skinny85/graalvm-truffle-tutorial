@@ -1,16 +1,13 @@
 package com.endoflineblog.truffle.part_08.nodes.exprs;
 
 import com.oracle.truffle.api.dsl.Fallback;
-import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * The Node representing number addition.
  * Identical to the class with the same name from part 6.
  */
-@NodeChild("leftNode")
-@NodeChild("rightNode")
-public abstract class AdditionExprNode extends EasyScriptExprNode {
+public abstract class AdditionExprNode extends BinaryOperationExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
     protected int addInts(int leftValue, int rightValue) {
         return Math.addExact(leftValue, rightValue);
