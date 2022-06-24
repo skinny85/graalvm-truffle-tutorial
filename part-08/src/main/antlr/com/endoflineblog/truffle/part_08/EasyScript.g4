@@ -21,7 +21,7 @@ expr1 : ID '=' expr1                                       #AssignmentExpr1
 expr2 : left=expr2 c=('===' | '!==') right=expr3           #EqNotEqExpr2
       | expr3                                              #PrecedenceThreeExpr2
       ;
-expr3 : left=expr3 c=('<' | '<=' | '>' | '>=') right=expr4 #ComparExpr3
+expr3 : left=expr3 c=('<' | '<=' | '>' | '>=') right=expr4 #ComparisonExpr3
       | expr4                                              #PrecedenceFourExpr3
       ;
 expr4 : left=expr4 '+' right=expr5                         #AddExpr4

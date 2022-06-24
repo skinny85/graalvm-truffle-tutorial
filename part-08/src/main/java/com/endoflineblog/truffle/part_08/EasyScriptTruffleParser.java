@@ -14,7 +14,11 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.NegationExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_08.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.EqualityExprNodeGen;
+import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.GreaterExprNodeGen;
+import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.GreaterOrEqualExprNodeGen;
 import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.InequalityExprNodeGen;
+import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.LesserExprNodeGen;
+import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.LesserOrEqualExprNodeGen;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.FunctionCallExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.WriteFunctionArgExprNode;
@@ -298,7 +302,23 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr3(EasyScriptParser.Expr3Context expr3) {
-        return this.parseExpr4(((EasyScriptParser.PrecedenceFourExpr3Context) expr3).expr4());
+        if (expr3 instanceof EasyScriptParser.ComparisonExpr3Context) {
+            return this.parseComparisonExpr(((EasyScriptParser.ComparisonExpr3Context) expr3));
+        } else {
+            return this.parseExpr4(((EasyScriptParser.PrecedenceFourExpr3Context) expr3).expr4());
+        }
+    }
+
+    private EasyScriptExprNode parseComparisonExpr(EasyScriptParser.ComparisonExpr3Context comparisonExpr) {
+        EasyScriptExprNode leftSide = this.parseExpr3(comparisonExpr.expr3());
+        EasyScriptExprNode rightSide = this.parseExpr4(comparisonExpr.expr4());
+        switch (comparisonExpr.c.getText()) {
+            case "<": return LesserExprNodeGen.create(leftSide, rightSide);
+            case "<=": return LesserOrEqualExprNodeGen.create(leftSide, rightSide);
+            case ">": return GreaterExprNodeGen.create(leftSide, rightSide);
+            default:
+            case ">=": return GreaterOrEqualExprNodeGen.create(leftSide, rightSide);
+        }
     }
 
     private EasyScriptExprNode parseExpr4(EasyScriptParser.Expr4Context expr4) {

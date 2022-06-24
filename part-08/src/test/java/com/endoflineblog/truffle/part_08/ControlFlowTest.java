@@ -54,12 +54,17 @@ public class ControlFlowTest {
     }
 
     @Test
-    public void a_function_is_eqal_to_itself() {
-        Value result = this.context.eval("ezs",
+    public void a_function_is_eqal_to_itself_but_not_lte() {
+        this.context.eval("ezs",
                 "function f() { return false; } " +
-                "f === f"
+                "var t1 = f === f; " +
+                "let f1 = f  <  f; " +
+                "var f2 = f  <= f; "
         );
-        assertTrue(result.asBoolean());
+        Value bindings = this.context.getBindings("ezs");
+        assertTrue(bindings.getMember("t1").asBoolean());
+        assertFalse(bindings.getMember("f1").asBoolean());
+        assertFalse(bindings.getMember("f2").asBoolean());
     }
 
     @Test
