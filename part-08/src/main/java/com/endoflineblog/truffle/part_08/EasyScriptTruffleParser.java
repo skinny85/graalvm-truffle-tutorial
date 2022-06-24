@@ -26,6 +26,7 @@ import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.GlobalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.IfStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.LocalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ProgramBlockStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ReturnStmtNode;
@@ -144,6 +145,8 @@ public final class EasyScriptTruffleParser {
                 exprStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.ReturnStmtContext) {
                 exprStmts.add(this.parseReturnStmt((EasyScriptParser.ReturnStmtContext) stmt));
+            } else if (stmt instanceof EasyScriptParser.IfStmtContext) {
+                exprStmts.add(this.parseIfStmt((EasyScriptParser.IfStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
                 // nested blocks can have vars which get hoisted to the top level
                 List<EasyScriptStmtNode> stmtNodes = this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt);
@@ -200,6 +203,19 @@ public final class EasyScriptTruffleParser {
         return new ReturnStmtNode(returnStmt.expr1() == null
                 ? new UndefinedLiteralExprNode()
                 : this.parseExpr1(returnStmt.expr1()));
+    }
+
+    private IfStmtNode parseIfStmt(EasyScriptParser.IfStmtContext ifStmt) {
+        return new IfStmtNode(
+                this.parseExpr1(ifStmt.expr1()),
+                this.parseStmt(ifStmt.then_stmt),
+                this.parseStmt(ifStmt.else_stmt));
+    }
+
+    private EasyScriptStmtNode parseStmt(EasyScriptParser.StmtContext stmt) {
+        return stmt == null
+                ? null
+                : this.parseStmtsList(List.of(stmt)).get(0);
     }
 
     private List<EasyScriptStmtNode> parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {

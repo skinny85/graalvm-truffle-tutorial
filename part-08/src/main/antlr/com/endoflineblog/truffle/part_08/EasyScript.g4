@@ -6,11 +6,12 @@ package com.endoflineblog.truffle.part_08;
 
 start : stmt+ EOF ;
 
-stmt :   kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
-     |                                                   expr1 ';'? #ExprStmt
-     |                                         'return' expr1? ';'? #ReturnStmt
-     | 'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
-     |                                           '{' stmt* '}' ';'? #BlockStmt
+stmt :      kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
+     |                                                      expr1 ';'? #ExprStmt
+     |                                            'return' expr1? ';'? #ReturnStmt
+     |    'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
+     |                                              '{' stmt* '}' ';'? #BlockStmt
+     | 'if' '(' cond=expr1 ')' then_stmt=stmt ('else' else_stmt=stmt)? #IfStmt
      ;
 binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;

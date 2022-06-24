@@ -68,6 +68,24 @@ public class ControlFlowTest {
     }
 
     @Test
+    public void if_in_a_function_works() {
+        this.context.eval("ezs",
+                "function sig(n) {" +
+                "    if (n < 0) return -1; " +
+                "    else if (n > 0) return 1; " +
+                "    else return 0; " +
+                "} " +
+                "var s1 = sig(34); " +
+                "var s2 = sig(0); " +
+                "var s3 = sig(-12); "
+        );
+        Value bindings = this.context.getBindings("ezs");
+        assertEquals(1, bindings.getMember("s1").asInt());
+        assertEquals(0, bindings.getMember("s2").asInt());
+        assertEquals(-1, bindings.getMember("s3").asInt());
+    }
+
+    @Test
     public void return_statement_is_not_allowed_on_top_level() {
         try {
             this.context.eval("ezs",
