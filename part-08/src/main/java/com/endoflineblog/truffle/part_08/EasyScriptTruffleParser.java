@@ -58,6 +58,16 @@ import java.util.stream.Collectors;
  * @see #parse
  */
 public final class EasyScriptTruffleParser {
+    public static final class ParsingResult {
+        public final ProgramBlockStmtNode programStmtBlock;
+        public final FrameDescriptor topLevelFrameDescriptor;
+
+        public ParsingResult(ProgramBlockStmtNode programStmtBlock, FrameDescriptor topLevelFrameDescriptor) {
+            this.programStmtBlock = programStmtBlock;
+            this.topLevelFrameDescriptor = topLevelFrameDescriptor;
+        }
+    }
+
     public static ParsingResult parse(Reader program) throws IOException {
         var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
         // remove the default console error listener
@@ -127,8 +137,8 @@ public final class EasyScriptTruffleParser {
                         varDecls.add(new GlobalVarDeclStmtNode(variableId, declarationKind));
                     } else {
                         // this is a local variable (either of a function, or on the top-level)
-                        String variableFrameSlotName = variableId + "-" + (++this.localVariablesCounter);
-                        FrameSlot frameSlot = this.frameDescriptor.addFrameSlot(variableFrameSlotName, declarationKind, FrameSlotKind.Object);
+                        var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
+                        FrameSlot frameSlot = this.frameDescriptor.addFrameSlot(frameSlotId, declarationKind, FrameSlotKind.Object);
                         if (this.localScopes.peek().putIfAbsent(variableId, frameSlot) != null) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }

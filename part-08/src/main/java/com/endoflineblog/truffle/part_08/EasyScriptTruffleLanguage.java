@@ -7,8 +7,6 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.functions.ReadFunctionArgEx
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
-import com.endoflineblog.truffle.part_08.nodes.stmts.ProgramBlockStmtNode;
-import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
@@ -16,7 +14,6 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
 
-import java.util.List;
 import java.util.stream.IntStream;
 
 /**
@@ -40,7 +37,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
-        ParsingResult parsingResult = EasyScriptTruffleParser.parse(request.getSource().getReader());
+        EasyScriptTruffleParser.ParsingResult parsingResult = EasyScriptTruffleParser.parse(request.getSource().getReader());
         var programRootNode = new StmtBlockRootNode(this, parsingResult.topLevelFrameDescriptor,
                 parsingResult.programStmtBlock);
         return Truffle.getRuntime().createCallTarget(programRootNode);
