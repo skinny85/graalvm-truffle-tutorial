@@ -31,6 +31,7 @@ import com.endoflineblog.truffle.part_08.nodes.stmts.LocalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ProgramBlockStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ReturnStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.UserFuncBlockStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.WhileStmtNode;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
@@ -147,6 +148,8 @@ public final class EasyScriptTruffleParser {
                 exprStmts.add(this.parseReturnStmt((EasyScriptParser.ReturnStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.IfStmtContext) {
                 exprStmts.add(this.parseIfStmt((EasyScriptParser.IfStmtContext) stmt));
+            } else if (stmt instanceof EasyScriptParser.WhileStmtContext) {
+                exprStmts.add(this.parseWhileStmt((EasyScriptParser.WhileStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
                 // nested blocks can have vars which get hoisted to the top level
                 List<EasyScriptStmtNode> stmtNodes = this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt);
@@ -207,9 +210,15 @@ public final class EasyScriptTruffleParser {
 
     private IfStmtNode parseIfStmt(EasyScriptParser.IfStmtContext ifStmt) {
         return new IfStmtNode(
-                this.parseExpr1(ifStmt.expr1()),
+                this.parseExpr1(ifStmt.cond),
                 this.parseStmt(ifStmt.then_stmt),
                 this.parseStmt(ifStmt.else_stmt));
+    }
+
+    private WhileStmtNode parseWhileStmt(EasyScriptParser.WhileStmtContext whileStmt) {
+        return new WhileStmtNode(
+                this.parseExpr1(whileStmt.cond),
+                this.parseStmt(whileStmt.body));
     }
 
     private EasyScriptStmtNode parseStmt(EasyScriptParser.StmtContext stmt) {

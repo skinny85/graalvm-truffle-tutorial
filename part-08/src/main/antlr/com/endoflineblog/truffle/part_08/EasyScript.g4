@@ -12,6 +12,7 @@ stmt :      kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclS
      |    'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
      |                                              '{' stmt* '}' ';'? #BlockStmt
      | 'if' '(' cond=expr1 ')' then_stmt=stmt ('else' else_stmt=stmt)? #IfStmt
+     |                            'while' '(' cond=expr1 ')' body=stmt #WhileStmt
      ;
 binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;

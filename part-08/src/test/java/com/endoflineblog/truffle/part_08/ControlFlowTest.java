@@ -86,6 +86,27 @@ public class ControlFlowTest {
     }
 
     @Test
+    public void iterative_fibonacci_works() {
+        Value result = this.context.eval("ezs",
+                "function fib(n) { " +
+                "    if (n < 2) { " +
+                "        return n; " +
+                "    } " +
+                "    let a = 0, b = 1, i = 2; " +
+                "    while (i <= n) { " +
+                "        let f = a + b; " +
+                "        a = b; " +
+                "        b = f; " +
+                "        i = i + 1; " +
+                "    } " +
+                "    return b; " +
+                "} " +
+                "fib(7)"
+        );
+        assertEquals(13, result.asInt());
+    }
+
+    @Test
     public void return_statement_is_not_allowed_on_top_level() {
         try {
             this.context.eval("ezs",
