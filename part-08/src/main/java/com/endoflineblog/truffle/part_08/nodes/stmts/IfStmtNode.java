@@ -26,12 +26,11 @@ public final class IfStmtNode extends EasyScriptStmtNode {
     @Override
     public Object executeStatement(VirtualFrame frame) {
         if (this.condition.profile(this.conditionExpr.executeBool(frame))) {
-            this.thenStmt.executeStatement(frame);
+            return this.thenStmt.executeStatement(frame);
         } else {
-            if (this.elseStmt != null) {
-                this.elseStmt.executeStatement(frame);
-            }
+            return this.elseStmt == null
+                    ? Undefined.INSTANCE
+                    : this.elseStmt.executeStatement(frame);
         }
-        return Undefined.INSTANCE;
     }
 }

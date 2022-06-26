@@ -148,6 +148,17 @@ public class ControlFlowTest {
     }
 
     @Test
+    public void if_statement_returns_value() {
+        Value result = this.context.eval("ezs",
+                "if (true) { " +
+                "    42; " +
+                "}"
+        );
+        assertTrue(result.fitsInInt());
+        assertEquals(42, result.asInt());
+    }
+
+    @Test
     public void return_statement_is_not_allowed_on_top_level() {
         try {
             this.context.eval("ezs",
