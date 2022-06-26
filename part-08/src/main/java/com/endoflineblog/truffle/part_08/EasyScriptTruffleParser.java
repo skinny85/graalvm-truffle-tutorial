@@ -22,6 +22,7 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.comparisons.LesserOrEqualEx
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.FunctionCallExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.WriteFunctionArgExprNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.DoWhileStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.FuncDeclStmtNode;
@@ -160,6 +161,8 @@ public final class EasyScriptTruffleParser {
                 exprStmts.add(this.parseIfStmt((EasyScriptParser.IfStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.WhileStmtContext) {
                 exprStmts.add(this.parseWhileStmt((EasyScriptParser.WhileStmtContext) stmt));
+            } else if (stmt instanceof EasyScriptParser.DoWhileStmtContext) {
+                exprStmts.add(this.parseDoWhileStmt((EasyScriptParser.DoWhileStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
                 // nested blocks can have vars which get hoisted to the top level
                 List<EasyScriptStmtNode> stmtNodes = this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt);
@@ -231,6 +234,12 @@ public final class EasyScriptTruffleParser {
                 this.parseStmt(whileStmt.body));
     }
 
+    private DoWhileStmtNode parseDoWhileStmt(EasyScriptParser.DoWhileStmtContext doWhileStmt) {
+        return new DoWhileStmtNode(
+                this.parseExpr1(doWhileStmt.cond),
+                new UserFuncBlockStmtNode(this.parseStmtBlock(doWhileStmt.stmt())));
+    }
+
     private EasyScriptStmtNode parseStmt(EasyScriptParser.StmtContext stmt) {
         return stmt == null
                 ? null
@@ -238,6 +247,10 @@ public final class EasyScriptTruffleParser {
     }
 
     private List<EasyScriptStmtNode> parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
+        return parseStmtBlock(blockStmt.stmt());
+    }
+
+    private List<EasyScriptStmtNode> parseStmtBlock(List<EasyScriptParser.StmtContext> stmts) {
         // save the current state of the parser (before entering the block)
         ParserState previousParserState = this.state;
 
@@ -247,7 +260,7 @@ public final class EasyScriptTruffleParser {
         this.localScopes.push(new HashMap<>());
 
         // perform the parsing
-        List<EasyScriptStmtNode> ret = this.parseStmtsList(blockStmt.stmt());
+        List<EasyScriptStmtNode> ret = this.parseStmtsList(stmts);
 
         // bring back the old state
         this.state = previousParserState;

@@ -13,6 +13,7 @@ stmt :      kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclS
      |                                              '{' stmt* '}' ';'? #BlockStmt
      | 'if' '(' cond=expr1 ')' then_stmt=stmt ('else' else_stmt=stmt)? #IfStmt
      |                            'while' '(' cond=expr1 ')' body=stmt #WhileStmt
+     |              'do' '{' stmt* '}' 'while' '(' cond=expr1 ')' ';'? #DoWhileStmt
      ;
 binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;
