@@ -25,6 +25,7 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.functions.WriteFunctionArgE
 import com.endoflineblog.truffle.part_08.nodes.stmts.DoWhileStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ExprStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.ForStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.GlobalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.IfStmtNode;
@@ -163,6 +164,8 @@ public final class EasyScriptTruffleParser {
                 exprStmts.add(this.parseWhileStmt((EasyScriptParser.WhileStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.DoWhileStmtContext) {
                 exprStmts.add(this.parseDoWhileStmt((EasyScriptParser.DoWhileStmtContext) stmt));
+            } else if (stmt instanceof EasyScriptParser.ForStmtContext) {
+                exprStmts.add(this.parseForStmt((EasyScriptParser.ForStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
                 // nested blocks can have vars which get hoisted to the top level
                 List<EasyScriptStmtNode> stmtNodes = this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt);
@@ -240,10 +243,36 @@ public final class EasyScriptTruffleParser {
                 new UserFuncBlockStmtNode(this.parseStmtBlock(doWhileStmt.stmt())));
     }
 
+    private ForStmtNode parseForStmt(EasyScriptParser.ForStmtContext forStmt) {
+        // a 'for' loop is its own scope
+        ParserState previousParserState = this.state;
+
+        if (this.state == ParserState.TOP_LEVEL) {
+            this.state = ParserState.NESTED_SCOPE_IN_TOP_LEVEL;
+        }
+        this.localScopes.push(new HashMap<>());
+
+        ForStmtNode ret = new ForStmtNode(
+                this.parseStmt(forStmt.init),
+                this.parseExpr1(forStmt.cond),
+                this.parseExpr1(forStmt.updt),
+                this.parseStmt(forStmt.body));
+
+        // bring back the old state
+        this.state = previousParserState;
+        this.localScopes.pop();
+
+        return ret;
+    }
+
     private EasyScriptStmtNode parseStmt(EasyScriptParser.StmtContext stmt) {
-        return stmt == null
-                ? null
-                : this.parseStmtsList(List.of(stmt)).get(0);
+        if (stmt == null) {
+            return null;
+        }
+        List<EasyScriptStmtNode> parsedStmts = this.parseStmtsList(List.of(stmt));
+        return parsedStmts.size() == 1
+            ? parsedStmts.get(0)
+            : new UserFuncBlockStmtNode(parsedStmts);
     }
 
     private List<EasyScriptStmtNode> parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {

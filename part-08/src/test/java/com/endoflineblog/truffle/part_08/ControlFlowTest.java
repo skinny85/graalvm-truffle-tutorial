@@ -128,6 +128,26 @@ public class ControlFlowTest {
     }
 
     @Test
+    public void for_loop_executes_as_expected() {
+        Value result = this.context.eval("ezs",
+                "function fib(n) { " +
+                "    if (n < 2) { " +
+                "        return n; " +
+                "    } " +
+                "    let a = 0, b = 1; " +
+                "    for (var i = 2; i <= n; i = i + 1) { " +
+                "        let f = a + b; " +
+                "        a = b; " +
+                "        b = f; " +
+                "    } " +
+                "    return b; " +
+                "} " +
+                "fib(7)"
+        );
+        assertEquals(13, result.asInt());
+    }
+
+    @Test
     public void return_statement_is_not_allowed_on_top_level() {
         try {
             this.context.eval("ezs",

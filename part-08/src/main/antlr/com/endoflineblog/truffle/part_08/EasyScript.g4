@@ -6,14 +6,15 @@ package com.endoflineblog.truffle.part_08;
 
 start : stmt+ EOF ;
 
-stmt :      kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
-     |                                                      expr1 ';'? #ExprStmt
-     |                                            'return' expr1? ';'? #ReturnStmt
-     |    'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
-     |                                              '{' stmt* '}' ';'? #BlockStmt
-     | 'if' '(' cond=expr1 ')' then_stmt=stmt ('else' else_stmt=stmt)? #IfStmt
-     |                            'while' '(' cond=expr1 ')' body=stmt #WhileStmt
-     |              'do' '{' stmt* '}' 'while' '(' cond=expr1 ')' ';'? #DoWhileStmt
+stmt :         kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
+     |                                                         expr1 ';'? #ExprStmt
+     |                                               'return' expr1? ';'? #ReturnStmt
+     |       'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
+     |                                                 '{' stmt* '}' ';'? #BlockStmt
+     |    'if' '(' cond=expr1 ')' then_stmt=stmt ('else' else_stmt=stmt)? #IfStmt
+     |                               'while' '(' cond=expr1 ')' body=stmt #WhileStmt
+     |                 'do' '{' stmt* '}' 'while' '(' cond=expr1 ')' ';'? #DoWhileStmt
+     | 'for' '(' init=stmt? ';' cond=expr1? ';' updt=expr1? ')' body=stmt #ForStmt
      ;
 binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;
