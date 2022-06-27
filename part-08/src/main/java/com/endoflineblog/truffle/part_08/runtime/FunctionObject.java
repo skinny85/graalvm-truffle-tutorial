@@ -1,7 +1,7 @@
 package com.endoflineblog.truffle.part_08.runtime;
 
-import com.endoflineblog.truffle.part_08.EasyScriptException;
 import com.endoflineblog.truffle.part_08.EasyScriptTypeSystemGen;
+import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.FunctionDispatchNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.FunctionDispatchNodeGen;
 import com.oracle.truffle.api.CallTarget;

@@ -1,5 +1,7 @@
 package com.endoflineblog.truffle.part_08;
 
+import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
+
 /**
  * An enum that represents the different kinds of variable declarations in JavaScript.
  * Identical to the enum with the same name from part 6.

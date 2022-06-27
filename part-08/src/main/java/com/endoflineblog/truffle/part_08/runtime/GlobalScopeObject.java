@@ -1,8 +1,8 @@
 package com.endoflineblog.truffle.part_08.runtime;
 
 import com.endoflineblog.truffle.part_08.DeclarationKind;
-import com.endoflineblog.truffle.part_08.EasyScriptException;
 import com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage;
+import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.InvalidArrayIndexException;

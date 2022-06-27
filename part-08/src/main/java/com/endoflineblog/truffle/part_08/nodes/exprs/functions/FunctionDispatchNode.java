@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_08.nodes.exprs.functions;
 
-import com.endoflineblog.truffle.part_08.EasyScriptException;
+import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_08.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
