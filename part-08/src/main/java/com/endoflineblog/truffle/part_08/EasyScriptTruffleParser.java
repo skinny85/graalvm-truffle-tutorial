@@ -23,6 +23,7 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.functions.FunctionCallExprN
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.WriteFunctionArgExprNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.BreakStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.ContinueStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.DoWhileStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ExprStmtNode;
@@ -171,6 +172,8 @@ public final class EasyScriptTruffleParser {
                 exprStmts.add(this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BreakStmtContext) {
                 exprStmts.add(new BreakStmtNode());
+            } else if (stmt instanceof EasyScriptParser.ContinueStmtContext) {
+                exprStmts.add(new ContinueStmtNode());
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
                 // we turn the variable declaration into an assignment expression
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;

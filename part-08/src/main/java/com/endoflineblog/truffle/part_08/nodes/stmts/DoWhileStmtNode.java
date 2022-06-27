@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_08.nodes.stmts;
 
 import com.endoflineblog.truffle.part_08.BreakException;
+import com.endoflineblog.truffle.part_08.ContinueException;
 import com.endoflineblog.truffle.part_08.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.Truffle;
@@ -46,6 +47,8 @@ public final class DoWhileStmtNode extends EasyScriptStmtNode {
             } catch (BreakException e) {
                 // 'break' means 'stop the loop'
                 return false;
+            } catch (ContinueException e) {
+                // fall-through on 'continue'
             }
             return this.conditionExpr.executeBool(frame);
         }

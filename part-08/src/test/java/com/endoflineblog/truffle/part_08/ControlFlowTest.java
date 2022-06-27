@@ -121,6 +121,8 @@ public class ControlFlowTest {
                 "        i = i + 1; " +
                 "        if (i > n) " +
                 "            break; " +
+                "        else " +
+                "            continue; " +
                 "    } while (true); " +
                 "    return b; " +
                 "} " +

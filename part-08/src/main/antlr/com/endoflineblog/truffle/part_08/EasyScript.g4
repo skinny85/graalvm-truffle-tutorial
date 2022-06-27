@@ -16,6 +16,7 @@ stmt :         kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDe
      |                 'do' '{' stmt* '}' 'while' '(' cond=expr1 ')' ';'? #DoWhileStmt
      | 'for' '(' init=stmt? ';' cond=expr1? ';' updt=expr1? ')' body=stmt #ForStmt
      |                                                       'break' ';'? #BreakStmt
+     |                                                    'continue' ';'? #ContinueStmt
      ;
 binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;
