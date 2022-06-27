@@ -168,10 +168,7 @@ public final class EasyScriptTruffleParser {
                 exprStmts.add(this.parseForStmt((EasyScriptParser.ForStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
                 // nested blocks can have vars which get hoisted to the top level
-                List<EasyScriptStmtNode> stmtNodes = this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt);
-                exprStmts.add(this.state == ParserState.FUNC_DEF
-                         ? new UserFuncBlockStmtNode(stmtNodes)
-                         : new ProgramBlockStmtNode(stmtNodes));
+                exprStmts.add(this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
                 // we turn the variable declaration into an assignment expression
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
@@ -240,7 +237,7 @@ public final class EasyScriptTruffleParser {
     private DoWhileStmtNode parseDoWhileStmt(EasyScriptParser.DoWhileStmtContext doWhileStmt) {
         return new DoWhileStmtNode(
                 this.parseExpr1(doWhileStmt.cond),
-                new UserFuncBlockStmtNode(this.parseStmtBlock(doWhileStmt.stmt())));
+                this.parseStmtBlock(doWhileStmt.stmt()));
     }
 
     private ForStmtNode parseForStmt(EasyScriptParser.ForStmtContext forStmt) {
@@ -272,14 +269,16 @@ public final class EasyScriptTruffleParser {
         List<EasyScriptStmtNode> parsedStmts = this.parseStmtsList(List.of(stmt));
         return parsedStmts.size() == 1
             ? parsedStmts.get(0)
-            : new UserFuncBlockStmtNode(parsedStmts);
+            : (this.state == ParserState.FUNC_DEF
+                ? new UserFuncBlockStmtNode(parsedStmts)
+                : new ProgramBlockStmtNode(parsedStmts));
     }
 
-    private List<EasyScriptStmtNode> parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
+    private EasyScriptStmtNode parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
         return parseStmtBlock(blockStmt.stmt());
     }
 
-    private List<EasyScriptStmtNode> parseStmtBlock(List<EasyScriptParser.StmtContext> stmts) {
+    private EasyScriptStmtNode parseStmtBlock(List<EasyScriptParser.StmtContext> stmts) {
         // save the current state of the parser (before entering the block)
         ParserState previousParserState = this.state;
 
@@ -295,7 +294,9 @@ public final class EasyScriptTruffleParser {
         this.state = previousParserState;
         this.localScopes.pop();
 
-        return ret;
+        return this.state == ParserState.FUNC_DEF
+                ? new UserFuncBlockStmtNode(ret)
+                : new ProgramBlockStmtNode(ret);
     }
 
     private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
@@ -363,11 +364,9 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
-        if (expr2 instanceof EasyScriptParser.EqNotEqExpr2Context) {
-            return this.parseEqNotEqExpression(((EasyScriptParser.EqNotEqExpr2Context) expr2));
-        } else {
-            return this.parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
-        }
+        return expr2 instanceof EasyScriptParser.EqNotEqExpr2Context
+                ? this.parseEqNotEqExpression(((EasyScriptParser.EqNotEqExpr2Context) expr2))
+                : this.parseExpr3(((EasyScriptParser.PrecedenceThreeExpr2Context) expr2).expr3());
     }
 
     private EasyScriptExprNode parseEqNotEqExpression(EasyScriptParser.EqNotEqExpr2Context eqNotEqExpr) {
@@ -390,9 +389,9 @@ public final class EasyScriptTruffleParser {
         EasyScriptExprNode leftSide = this.parseExpr3(comparisonExpr.expr3());
         EasyScriptExprNode rightSide = this.parseExpr4(comparisonExpr.expr4());
         switch (comparisonExpr.c.getText()) {
-            case "<": return LesserExprNodeGen.create(leftSide, rightSide);
+            case  "<": return LesserExprNodeGen.create(leftSide, rightSide);
             case "<=": return LesserOrEqualExprNodeGen.create(leftSide, rightSide);
-            case ">": return GreaterExprNodeGen.create(leftSide, rightSide);
+            case  ">": return GreaterExprNodeGen.create(leftSide, rightSide);
             default:
             case ">=": return GreaterOrEqualExprNodeGen.create(leftSide, rightSide);
         }
