@@ -119,7 +119,9 @@ public class ControlFlowTest {
                 "        a = b; " +
                 "        b = f; " +
                 "        i = i + 1; " +
-                "    } while (i <= n); " +
+                "        if (i > n) " +
+                "            break; " +
+                "    } while (true); " +
                 "    return b; " +
                 "} " +
                 "fib(7)"
