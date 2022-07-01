@@ -82,14 +82,14 @@ public final class EasyScriptTruffleParser {
         parser.removeErrorListeners();
         // throw an exception when a parsing error is encountered
         parser.setErrorHandler(new BailErrorStrategy());
-        EasyScriptTruffleParser easyScriptTruffleParser = new EasyScriptTruffleParser();
+        var easyScriptTruffleParser = new EasyScriptTruffleParser();
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
         return new ParsingResult(
                 new ProgramBlockStmtNode(stmts),
                 easyScriptTruffleParser.frameDescriptor);
     }
 
-    enum ParserState { TOP_LEVEL, NESTED_SCOPE_IN_TOP_LEVEL, FUNC_DEF }
+    private enum ParserState { TOP_LEVEL, NESTED_SCOPE_IN_TOP_LEVEL, FUNC_DEF }
 
     /** Whether we're parsing a function definition. */
     private ParserState state;
@@ -255,7 +255,7 @@ public final class EasyScriptTruffleParser {
         }
         this.localScopes.push(new HashMap<>());
 
-        ForStmtNode ret = new ForStmtNode(
+        var ret = new ForStmtNode(
                 this.parseStmt(forStmt.init),
                 this.parseExpr1(forStmt.cond),
                 this.parseExpr1(forStmt.updt),
@@ -275,9 +275,7 @@ public final class EasyScriptTruffleParser {
         List<EasyScriptStmtNode> parsedStmts = this.parseStmtsList(List.of(stmt));
         return parsedStmts.size() == 1
             ? parsedStmts.get(0)
-            : (this.state == ParserState.FUNC_DEF
-                ? new UserFuncBlockStmtNode(parsedStmts)
-                : new ProgramBlockStmtNode(parsedStmts));
+            : new ProgramBlockStmtNode(parsedStmts);
     }
 
     private EasyScriptStmtNode parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
@@ -300,9 +298,7 @@ public final class EasyScriptTruffleParser {
         this.state = previousParserState;
         this.localScopes.pop();
 
-        return this.state == ParserState.FUNC_DEF
-                ? new UserFuncBlockStmtNode(ret)
-                : new ProgramBlockStmtNode(ret);
+        return new ProgramBlockStmtNode(ret);
     }
 
     private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {

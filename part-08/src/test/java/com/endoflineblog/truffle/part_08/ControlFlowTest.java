@@ -126,9 +126,9 @@ public class ControlFlowTest {
                 "    } while (true); " +
                 "    return b; " +
                 "} " +
-                "fib(7)"
+                "fib(8)"
         );
-        assertEquals(13, result.asInt());
+        assertEquals(21, result.asInt());
     }
 
     @Test
@@ -146,9 +146,23 @@ public class ControlFlowTest {
                 "    } " +
                 "    return b; " +
                 "} " +
-                "fib(7)"
+                "fib(6)"
         );
-        assertEquals(13, result.asInt());
+        assertEquals(8, result.asInt());
+    }
+
+    @Test
+    public void recursive_fibonacci_works() {
+        Value result = this.context.eval("ezs",
+                "function fib(n) { " +
+                "    if (n > -2) { " +
+                "        return Math.abs(n); " +
+                "    } " +
+                "    return fib(n + 1) + fib(n + 2); " +
+                "} " +
+                "fib(-9)"
+        );
+        assertEquals(34, result.asInt());
     }
 
     @Test
