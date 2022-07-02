@@ -1,7 +1,7 @@
-package com.endoflineblog.truffle.part_07.nodes;
+package com.endoflineblog.truffle.part_08.nodes.root;
 
-import com.endoflineblog.truffle.part_07.EasyScriptTruffleLanguage;
-import com.endoflineblog.truffle.part_07.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
+import com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage;
+import com.endoflineblog.truffle.part_08.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
