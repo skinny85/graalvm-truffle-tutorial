@@ -2,7 +2,7 @@ package com.endoflineblog.truffle.part_08.nodes.stmts.variables;
 
 import com.endoflineblog.truffle.part_08.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
-import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.UserFuncBlockStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.UserFuncBodyStmtNode;
 import com.endoflineblog.truffle.part_08.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.Truffle;
@@ -19,9 +19,9 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private UserFuncBlockStmtNode funcBody;
+    private UserFuncBodyStmtNode funcBody;
 
-    public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, UserFuncBlockStmtNode funcBody, int argumentCount) {
+    public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, UserFuncBodyStmtNode funcBody, int argumentCount) {
         this.funcName = funcName;
         this.frameDescriptor = frameDescriptor;
         this.funcBody = funcBody;

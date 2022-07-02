@@ -8,12 +8,14 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 import java.util.List;
 
-/** A Node for representing the statement blocks of a user-defined function in EasyScript. */
-public final class UserFuncBlockStmtNode extends EasyScriptStmtNode {
+/**
+ * A Node for representing the statement blocks of a user-defined function in EasyScript.
+ */
+public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
     @Children
     private final EasyScriptStmtNode[] stmts;
 
-    public UserFuncBlockStmtNode(List<EasyScriptStmtNode> stmts) {
+    public UserFuncBodyStmtNode(List<EasyScriptStmtNode> stmts) {
         this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
     }
 

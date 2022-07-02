@@ -2,8 +2,8 @@ package com.endoflineblog.truffle.part_08.nodes.root;
 
 import com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
-import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.ProgramBlockStmtNode;
-import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.UserFuncBlockStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.BlockStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.UserFuncBodyStmtNode;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -19,12 +19,12 @@ public final class StmtBlockRootNode extends RootNode {
     private EasyScriptStmtNode blockStmt;
 
     public StmtBlockRootNode(EasyScriptTruffleLanguage truffleLanguage,
-            FrameDescriptor frameDescriptor, ProgramBlockStmtNode blockStmt) {
+            FrameDescriptor frameDescriptor, BlockStmtNode blockStmt) {
         this(truffleLanguage, frameDescriptor, (EasyScriptStmtNode) blockStmt);
     }
 
     public StmtBlockRootNode(EasyScriptTruffleLanguage truffleLanguage,
-            FrameDescriptor frameDescriptor, UserFuncBlockStmtNode blockStmt) {
+            FrameDescriptor frameDescriptor, UserFuncBodyStmtNode blockStmt) {
         this(truffleLanguage, frameDescriptor, (EasyScriptStmtNode) blockStmt);
     }
 

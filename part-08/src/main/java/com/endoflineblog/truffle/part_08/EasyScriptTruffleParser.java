@@ -25,8 +25,8 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.variables.LocalVarAssignmen
 import com.endoflineblog.truffle.part_08.nodes.exprs.variables.LocalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.ExprStmtNode;
-import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.ProgramBlockStmtNode;
-import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.UserFuncBlockStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.BlockStmtNode;
+import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.UserFuncBodyStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.controlflow.BreakStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.controlflow.ContinueStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.controlflow.IfStmtNode;
@@ -64,10 +64,10 @@ import java.util.stream.Collectors;
  */
 public final class EasyScriptTruffleParser {
     public static final class ParsingResult {
-        public final ProgramBlockStmtNode programStmtBlock;
+        public final BlockStmtNode programStmtBlock;
         public final FrameDescriptor topLevelFrameDescriptor;
 
-        public ParsingResult(ProgramBlockStmtNode programStmtBlock, FrameDescriptor topLevelFrameDescriptor) {
+        public ParsingResult(BlockStmtNode programStmtBlock, FrameDescriptor topLevelFrameDescriptor) {
             this.programStmtBlock = programStmtBlock;
             this.topLevelFrameDescriptor = topLevelFrameDescriptor;
         }
@@ -85,7 +85,7 @@ public final class EasyScriptTruffleParser {
         var easyScriptTruffleParser = new EasyScriptTruffleParser();
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
         return new ParsingResult(
-                new ProgramBlockStmtNode(stmts),
+                new BlockStmtNode(stmts),
                 easyScriptTruffleParser.frameDescriptor);
     }
 
@@ -275,7 +275,7 @@ public final class EasyScriptTruffleParser {
         List<EasyScriptStmtNode> parsedStmts = this.parseStmtsList(List.of(stmt));
         return parsedStmts.size() == 1
             ? parsedStmts.get(0)
-            : new ProgramBlockStmtNode(parsedStmts);
+            : new BlockStmtNode(parsedStmts);
     }
 
     private EasyScriptStmtNode parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
@@ -298,7 +298,7 @@ public final class EasyScriptTruffleParser {
         this.state = previousParserState;
         this.localScopes.pop();
 
-        return new ProgramBlockStmtNode(ret);
+        return new BlockStmtNode(ret);
     }
 
     private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
@@ -337,7 +337,7 @@ public final class EasyScriptTruffleParser {
         this.localScopes = previousLocalScopes;
 
         return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
-                frameDescriptor, new UserFuncBlockStmtNode(funcStmts), argumentCount);
+                frameDescriptor, new UserFuncBodyStmtNode(funcStmts), argumentCount);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
