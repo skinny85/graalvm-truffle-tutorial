@@ -8,8 +8,8 @@ start : stmt+ EOF ;
 
 stmt :         kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
      |                                                         expr1 ';'? #ExprStmt
-     |                                               'return' expr1? ';'? #ReturnStmt
      |       'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
+     |                                               'return' expr1? ';'? #ReturnStmt
      |                                                 '{' stmt* '}' ';'? #BlockStmt
      |    'if' '(' cond=expr1 ')' then_stmt=stmt ('else' else_stmt=stmt)? #IfStmt
      |                               'while' '(' cond=expr1 ')' body=stmt #WhileStmt
