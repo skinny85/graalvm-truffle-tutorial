@@ -1,4 +1,4 @@
-package com.endoflineblog.truffle.part_08;
+package com.endoflineblog.truffle.part_08.common;
 
 import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 

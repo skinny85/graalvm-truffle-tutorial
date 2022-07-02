@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_08.nodes.exprs.variables;
 
-import com.endoflineblog.truffle.part_08.LocalVariableFrameSlotId;
+import com.endoflineblog.truffle.part_08.common.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_08.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.variables.LocalVarDeclStmtNode;

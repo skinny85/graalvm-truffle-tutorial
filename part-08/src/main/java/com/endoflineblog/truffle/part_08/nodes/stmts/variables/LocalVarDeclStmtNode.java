@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_08.nodes.stmts.variables;
 
-import com.endoflineblog.truffle.part_08.DeclarationKind;
+import com.endoflineblog.truffle.part_08.common.DeclarationKind;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.frame.FrameSlot;

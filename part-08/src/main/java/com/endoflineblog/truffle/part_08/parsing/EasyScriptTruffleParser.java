@@ -1,8 +1,7 @@
 package com.endoflineblog.truffle.part_08.parsing;
 
-import com.endoflineblog.truffle.part_08.DeclarationKind;
-import com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage;
-import com.endoflineblog.truffle.part_08.LocalVariableFrameSlotId;
+import com.endoflineblog.truffle.part_08.common.DeclarationKind;
+import com.endoflineblog.truffle.part_08.common.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_08.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.arithmetic.AdditionExprNode;
@@ -63,7 +62,7 @@ import java.util.stream.Collectors;
  * This is the class that parses the program and turns it into a Truffle AST.
  * It uses ANTLR to perform the actual parsing,
  * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_07/EasyScript.g4 file.
- * This class is invoked by the {@link EasyScriptTruffleLanguage TruffleLanguage implementation for this part}.
+ * This class is invoked by the {@link com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage TruffleLanguage implementation for this part}.
  *
  * @see #parse
  */
@@ -97,7 +96,7 @@ public final class EasyScriptTruffleParser {
 
     /**
      * Map containing bindings for the function arguments and local variables when parsing function definitions
-     * and nested scopes of the top-level object.
+     * and nested scopes of the top-level scope.
      * Function arguments will be mapped to integer indexes, starting at 0,
      * while local variables of functions will be mapped to their {@link FrameSlot}s.
      */
