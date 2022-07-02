@@ -278,11 +278,11 @@ public final class EasyScriptTruffleParser {
             : new BlockStmtNode(parsedStmts);
     }
 
-    private EasyScriptStmtNode parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
+    private BlockStmtNode parseStmtBlock(EasyScriptParser.BlockStmtContext blockStmt) {
         return parseStmtBlock(blockStmt.stmt());
     }
 
-    private EasyScriptStmtNode parseStmtBlock(List<EasyScriptParser.StmtContext> stmts) {
+    private BlockStmtNode parseStmtBlock(List<EasyScriptParser.StmtContext> stmts) {
         // save the current state of the parser (before entering the block)
         ParserState previousParserState = this.state;
 

@@ -56,8 +56,9 @@ public final class FunctionObject implements TruffleObject {
 
     private boolean isEasyScriptValue(Object argument) {
         // as of this chapter, the only available types in EasyScript are
-        // numbers (ints and doubles), 'undefined', and functions
+        // numbers (ints and doubles), booleans, 'undefined', and functions
         return EasyScriptTypeSystemGen.isImplicitDouble(argument) ||
+                EasyScriptTypeSystemGen.isBoolean(argument) ||
                 argument == Undefined.INSTANCE ||
                 argument instanceof FunctionObject;
     }
