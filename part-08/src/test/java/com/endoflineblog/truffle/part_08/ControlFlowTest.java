@@ -109,12 +109,27 @@ public class ControlFlowTest {
     @Test
     public void do_while_always_executes_at_least_once() {
         Value result = this.context.eval("ezs",
+                "function f(n) { " +
+                "    let ret = n + 2; " +
+                "    do { " +
+                "        ret = n + 4; " +
+                "    } while (false); " +
+                "    return ret; " +
+                "} " +
+                "f(8)"
+        );
+        assertEquals(12, result.asInt());
+    }
+
+    @Test
+    public void for_parts_are_all_optional() {
+        Value result = this.context.eval("ezs",
                 "function fib(n) { " +
                 "    if (n < 2) { " +
                 "        return n; " +
                 "    } " +
                 "    let a = 0, b = 1, i = 2; " +
-                "    do { " +
+                "    for (;;) { " +
                 "        let f = a + b; " +
                 "        a = b; " +
                 "        b = f; " +
@@ -123,7 +138,7 @@ public class ControlFlowTest {
                 "            break; " +
                 "        else " +
                 "            continue; " +
-                "    } while (true); " +
+                "    } " +
                 "    return b; " +
                 "} " +
                 "fib(8)"

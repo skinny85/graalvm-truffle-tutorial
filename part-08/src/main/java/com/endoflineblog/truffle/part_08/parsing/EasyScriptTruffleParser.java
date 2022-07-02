@@ -336,6 +336,9 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
+        if (expr1 == null) {
+            return null;
+        }
         return expr1 instanceof EasyScriptParser.AssignmentExpr1Context
                 ? parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1)
                 : parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
