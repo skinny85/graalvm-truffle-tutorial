@@ -1,7 +1,7 @@
 grammar EasyScript ;
 
 @header{
-package com.endoflineblog.truffle.part_08;
+package com.endoflineblog.truffle.part_08.parsing.antlr;
 }
 
 start : stmt+ EOF ;

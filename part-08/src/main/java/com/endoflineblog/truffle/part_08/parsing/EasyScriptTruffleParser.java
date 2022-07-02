@@ -1,5 +1,8 @@
-package com.endoflineblog.truffle.part_08;
+package com.endoflineblog.truffle.part_08.parsing;
 
+import com.endoflineblog.truffle.part_08.DeclarationKind;
+import com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage;
+import com.endoflineblog.truffle.part_08.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_08.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.arithmetic.AdditionExprNode;
@@ -37,6 +40,8 @@ import com.endoflineblog.truffle.part_08.nodes.stmts.loops.WhileStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.variables.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.variables.GlobalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.variables.LocalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_08.parsing.antlr.EasyScriptLexer;
+import com.endoflineblog.truffle.part_08.parsing.antlr.EasyScriptParser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
@@ -63,16 +68,6 @@ import java.util.stream.Collectors;
  * @see #parse
  */
 public final class EasyScriptTruffleParser {
-    public static final class ParsingResult {
-        public final BlockStmtNode programStmtBlock;
-        public final FrameDescriptor topLevelFrameDescriptor;
-
-        public ParsingResult(BlockStmtNode programStmtBlock, FrameDescriptor topLevelFrameDescriptor) {
-            this.programStmtBlock = programStmtBlock;
-            this.topLevelFrameDescriptor = topLevelFrameDescriptor;
-        }
-    }
-
     public static ParsingResult parse(Reader program) throws IOException {
         var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
         // remove the default console error listener
