@@ -41,7 +41,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
             "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Boolean")
     protected boolean boolAssignment(VirtualFrame frame, boolean value) {
         FrameSlot frameSlot = this.getFrameSlot();
-        frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Int);
+        frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Boolean);
         frame.setBoolean(frameSlot, value);
         return value;
     }
