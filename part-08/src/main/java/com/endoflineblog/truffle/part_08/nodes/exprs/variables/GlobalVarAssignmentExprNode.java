@@ -11,7 +11,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * A Node that represents the expression of assigning a value to a global variable in EasyScript.
- * Identical to the class with the same name from part 6.
+ * Identical to the class with the same name from part 7.
  */
 @NodeChild(value = "assignmentExpr")
 @NodeField(name = "name", type = String.class)

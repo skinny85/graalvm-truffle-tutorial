@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
+ * Identical to the class with the same name from part 7.
  */
 public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     private final String funcName;

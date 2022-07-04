@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
 /**
  * This is the class that parses the program and turns it into a Truffle AST.
  * It uses ANTLR to perform the actual parsing,
- * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_07/EasyScript.g4 file.
+ * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_08/parsing/antlr/EasyScript.g4 file.
  * This class is invoked by the {@link com.endoflineblog.truffle.part_08.EasyScriptTruffleLanguage TruffleLanguage implementation for this part}.
  *
  * @see #parse

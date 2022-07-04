@@ -12,6 +12,11 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node that represents the reference to a variable local to a function.
+ * Almost identical to the class with the same name from part 7,
+ * the only difference is a new specialization, {@link #readBool},
+ * that deals with boolean values.
+ *
+ * @see #readBool
  */
 @NodeField(name = "frameSlot", type = FrameSlot.class)
 public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {

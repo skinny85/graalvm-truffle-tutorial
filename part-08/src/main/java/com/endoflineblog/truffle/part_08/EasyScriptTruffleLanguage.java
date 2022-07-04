@@ -1,6 +1,5 @@
 package com.endoflineblog.truffle.part_08;
 
-import com.endoflineblog.truffle.part_08.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_08.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
@@ -20,12 +19,10 @@ import java.util.stream.IntStream;
 
 /**
  * The {@link TruffleLanguage} implementation for this part of the article series.
- * Basically identical to the class with the same name from part 6,
- * the major difference being the {@link #get} method backed by the
- * {@link TruffleLanguage.LanguageReference} field,
- * and used in the {@link EasyScriptNode#currentTruffleLanguage()} method.
- *
- * @see #get
+ * Basically identical to the class with the same name from part 7,
+ * the only difference is creating the main {@link com.oracle.truffle.api.nodes.RootNode}
+ * with a {@link com.oracle.truffle.api.frame.FrameDescriptor}
+ * returned by {@link EasyScriptTruffleParser#parse}.
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {

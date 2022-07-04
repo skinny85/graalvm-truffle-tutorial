@@ -10,7 +10,9 @@ import java.util.List;
 
 /**
  * The EasyScript Graal polyglot language implementation.
- * Very similar to EasyScriptTruffleLanguage in part 4.
+ * Very similar to EasyScriptTruffleLanguage in part 4,
+ * the main difference is that we now need a context class,
+ * because that's where we store the object containing our global variables.
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
@@ -21,11 +23,13 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return Truffle.getRuntime().createCallTarget(rootNode);
     }
 
+    /** We return the context that contains the global scope object. */
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
         return new EasyScriptLanguageContext();
     }
 
+    /** The top-level scope is kept as a field of our context class.  */
     @Override
     protected Object getScope(EasyScriptLanguageContext context) {
         return context.globalScopeObject;

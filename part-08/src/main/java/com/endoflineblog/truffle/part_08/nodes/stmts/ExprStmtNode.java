@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node that represents an expression statement.
- * Identical to the class with the same name from part 6.
+ * Identical to the class with the same name from part 7.
  */
 public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")

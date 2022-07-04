@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * The Node representing number addition.
- * Identical to the class with the same name from part 6.
+ * Identical to the class with the same name from part 7.
  */
 public abstract class AdditionExprNode extends BinaryOperationExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
@@ -20,9 +20,10 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
     }
 
     /**
-     * Strictly speaking, adding functions results in turning them to strings in JavaScript.
-     * However, since we don't have strings in EasyScript yet,
-     * let's just keep returning NaN for additions involving any non-numbers.
+     * Strictly speaking, booleans can be interpreted as numbers in JavaScript -
+     * for example, {@code true + 3} evaluates to {@code 4}.
+     * However, we won't bother implementing these sort of edge cases,
+     * and we'll just return NaN for all of them.
      */
     @Fallback
     protected double addNonNumber(Object leftValue, Object rightValue) {

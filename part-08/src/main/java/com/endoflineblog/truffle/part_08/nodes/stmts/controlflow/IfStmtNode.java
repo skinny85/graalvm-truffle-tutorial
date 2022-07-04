@@ -6,6 +6,9 @@ import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.profiles.ConditionProfile;
 
+/**
+ * A Node that represents an {@code if} statement.
+ */
 public final class IfStmtNode extends EasyScriptStmtNode {
     @Child
     private EasyScriptExprNode conditionExpr;

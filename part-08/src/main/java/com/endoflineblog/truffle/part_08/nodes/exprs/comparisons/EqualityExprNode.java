@@ -4,6 +4,9 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.BinaryOperationExprNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+/**
+ * Node class representing the strict equality ({@code ===}) operator.
+ */
 public abstract class EqualityExprNode extends BinaryOperationExprNode {
     @Specialization
     protected boolean intEquality(int leftValue, int rightValue) {

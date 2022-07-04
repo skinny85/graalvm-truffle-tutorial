@@ -8,7 +8,12 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import java.util.List;
 
 /**
- * A Node for representing the statement blocks of the EasyScript program.
+ * A Node for representing the EasyScript program itself,
+ * and any statement blocks,
+ * for example those used as the branch of an {@code if} statement
+ * (with the exception of the block for a user-defined function's body,
+ * which is represented by {@link UserFuncBodyStmtNode}).
+ * Identical to the class with the same name from part 7.
  */
 public final class BlockStmtNode extends EasyScriptStmtNode {
     @Children

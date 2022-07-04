@@ -11,6 +11,11 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node that represents the assignment to a variable local to a function.
+ * Almost identical to the class with the same name from part 7,
+ * the only difference is a new specialization, {@link #boolAssignment},
+ * that deals with boolean values.
+ *
+ * @see #boolAssignment
  */
 @NodeChild("initializerExpr")
 @NodeField(name = "frameSlot", type = FrameSlot.class)

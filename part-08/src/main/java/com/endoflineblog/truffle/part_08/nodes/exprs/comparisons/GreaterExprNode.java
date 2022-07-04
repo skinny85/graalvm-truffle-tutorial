@@ -4,6 +4,9 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.BinaryOperationExprNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+/**
+ * Node class representing the greater ({@code >}) operator.
+ */
 public abstract class GreaterExprNode extends BinaryOperationExprNode {
     @Specialization
     protected boolean intGreater(int leftValue, int rightValue) {

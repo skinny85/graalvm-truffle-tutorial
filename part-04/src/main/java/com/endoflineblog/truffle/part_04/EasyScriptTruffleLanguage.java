@@ -33,9 +33,9 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<Void> {
 
     /**
      * This is an abstract method in {@link TruffleLanguage},
-     * so you have to override it,
+     * so we have to override it,
      * but we don't need a Context for EasyScript yet,
-     * so we just return {@code null} here.
+     * so we just return {@code null}.
      */
     @Override
     protected Void createContext(Env env) {

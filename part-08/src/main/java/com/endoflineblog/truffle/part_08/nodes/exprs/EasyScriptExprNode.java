@@ -10,12 +10,24 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 /**
  * The abstract common ancestor of all expression Nodes in EasyScript.
- * Identical to the class with the same name from part 6.
+ * Almost identical to the class with the same name from part 7,
+ * the only difference is the additional {@link #executeBool}
+ * method from {@link EasyScriptExprNode}.
+ *
+ * @see #executeBool
  */
 @TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends EasyScriptNode {
     public abstract Object executeGeneric(VirtualFrame frame);
 
+    /**
+     * Evaluate a given expression as a boolean.
+     * Unlike the other {@code execute*()} methods,
+     * doesn't throw {@link UnexpectedResultException},
+     * as every value in JavaScript can be interpreted as a boolean -
+     * only {@code false}, {@code 0} and {@code undefined} are interpreted as {@code false},
+     * the remaining values are {@code true}.
+     */
     public boolean executeBool(VirtualFrame frame) {
         Object value = this.executeGeneric(frame);
         // 'undefined' is falsy

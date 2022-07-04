@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * The Node representing the expression of calling a function in EasyScript,
  * for example {@code Math.pow(2, 3)}.
- * Identical to the class with the same name from part 6.
+ * Identical to the class with the same name from part 7.
  */
 public final class FunctionCallExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")

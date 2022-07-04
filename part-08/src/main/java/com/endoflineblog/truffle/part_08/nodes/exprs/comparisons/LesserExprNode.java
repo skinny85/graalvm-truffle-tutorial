@@ -4,6 +4,9 @@ import com.endoflineblog.truffle.part_08.nodes.exprs.BinaryOperationExprNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+/**
+ * Node class representing the lesser ({@code <}) operator.
+ */
 public abstract class LesserExprNode extends BinaryOperationExprNode {
     @Specialization
     protected boolean intLesser(int leftValue, int rightValue) {
