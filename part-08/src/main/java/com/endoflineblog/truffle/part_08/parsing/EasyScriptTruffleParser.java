@@ -147,28 +147,28 @@ public final class EasyScriptTruffleParser {
             }
         }
 
-        // in the second pass, only handle expression statements
+        // in the second pass, only handle non-declaration statements
         // (and add new expression statements that represent the initializer of the variable declarations)
-        var exprStmts = new ArrayList<EasyScriptStmtNode>();
+        var nonDeclStmts = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.ExprStmtContext) {
-                exprStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
+                nonDeclStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.ReturnStmtContext) {
-                exprStmts.add(this.parseReturnStmt((EasyScriptParser.ReturnStmtContext) stmt));
+                nonDeclStmts.add(this.parseReturnStmt((EasyScriptParser.ReturnStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.IfStmtContext) {
-                exprStmts.add(this.parseIfStmt((EasyScriptParser.IfStmtContext) stmt));
+                nonDeclStmts.add(this.parseIfStmt((EasyScriptParser.IfStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.WhileStmtContext) {
-                exprStmts.add(this.parseWhileStmt((EasyScriptParser.WhileStmtContext) stmt));
+                nonDeclStmts.add(this.parseWhileStmt((EasyScriptParser.WhileStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.DoWhileStmtContext) {
-                exprStmts.add(this.parseDoWhileStmt((EasyScriptParser.DoWhileStmtContext) stmt));
+                nonDeclStmts.add(this.parseDoWhileStmt((EasyScriptParser.DoWhileStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.ForStmtContext) {
-                exprStmts.add(this.parseForStmt((EasyScriptParser.ForStmtContext) stmt));
+                nonDeclStmts.add(this.parseForStmt((EasyScriptParser.ForStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
-                exprStmts.add(this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt));
+                nonDeclStmts.add(this.parseStmtBlock((EasyScriptParser.BlockStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.BreakStmtContext) {
-                exprStmts.add(new BreakStmtNode());
+                nonDeclStmts.add(new BreakStmtNode());
             } else if (stmt instanceof EasyScriptParser.ContinueStmtContext) {
-                exprStmts.add(new ContinueStmtNode());
+                nonDeclStmts.add(new ContinueStmtNode());
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
                 // we turn the variable declaration into an assignment expression
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
@@ -192,19 +192,19 @@ public final class EasyScriptTruffleParser {
                             ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
                             :  LocalVarAssignmentExprNodeGen.create(initializerExpr,
                                 (FrameSlot) this.localScopes.peek().get(variableId));
-                    exprStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
+                    nonDeclStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
                 }
             }
         }
 
         // the final result is: the function declarations first,
         // then the variable declarations (initialized with default values),
-        // and then finally the expression statements
+        // and then finally all remaining statements
         // (including the variable initializers turned into assignment expressions)
-        var result = new ArrayList<EasyScriptStmtNode>(funcDecls.size() + varDecls.size() + exprStmts.size());
+        var result = new ArrayList<EasyScriptStmtNode>(funcDecls.size() + varDecls.size() + nonDeclStmts.size());
         result.addAll(funcDecls);
         result.addAll(varDecls);
-        result.addAll(exprStmts);
+        result.addAll(nonDeclStmts);
         return result;
     }
 
