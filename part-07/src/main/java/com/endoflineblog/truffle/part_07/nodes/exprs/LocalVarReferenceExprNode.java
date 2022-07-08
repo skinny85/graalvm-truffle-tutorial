@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_07.nodes.exprs;
 
 import com.endoflineblog.truffle.part_07.EasyScriptException;
 import com.endoflineblog.truffle.part_07.nodes.stmts.LocalVarDeclStmtNode;
-import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
@@ -26,7 +25,7 @@ public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
         return FrameUtil.getDoubleSafe(frame, this.getFrameSlot());
     }
 
-    @Fallback
+    @Specialization(replaces = {"readInt", "readDouble"})
     protected Object readObject(VirtualFrame frame) {
         Object ret = FrameUtil.getObjectSafe(frame, this.getFrameSlot());
         if (ret == LocalVarDeclStmtNode.DUMMY) {

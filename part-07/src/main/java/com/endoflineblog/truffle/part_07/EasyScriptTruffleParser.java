@@ -102,7 +102,7 @@ public final class EasyScriptTruffleParser {
                         } catch (IllegalArgumentException e) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
-                        // a local variable cannot shadow a function argument
+                        // a local variable cannot have the same name as a function argument
                         if (this.functionLocals.put(variableId, frameSlot) != null) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
