@@ -71,7 +71,7 @@ and also [lesser (`<`)](src/main/java/com/endoflineblog/truffle/part_08/nodes/ex
 [greater or equal (`>=`)](src/main/java/com/endoflineblog/truffle/part_08/nodes/exprs/comparisons/GreaterOrEqualExprNode.java).
 
 We don't worry about edge cases with comparisons,
-such as if `true` is greater than `0`,
+such as whether `true` is greater than `0`,
 or if `undefined` is lesser or equal than `undefined` --
 we simply return `false` in all of these cases.
 
