@@ -4,10 +4,16 @@ plugins {
 }
 
 dependencies {
+    implementation project(':part-08')
     antlr 'org.antlr:antlr4:4.5.1'
 }
 
 // required to allow GraalVM to discover our EasyScript language class
 test {
     jvmArgs '-Dgraalvm.locatorDisabled=true'
+}
+
+jmh {
+    fork = 1
+    jvmArgsAppend = ['-Dgraalvm.locatorDisabled=true']
 }
