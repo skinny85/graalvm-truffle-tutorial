@@ -12,7 +12,3 @@ dependencies {
 test {
     jvmArgs '-Dgraalvm.locatorDisabled=true'
 }
-
-jmh {
-    jvmArgsAppend = ['-Dgraalvm.locatorDisabled=true']
-}
