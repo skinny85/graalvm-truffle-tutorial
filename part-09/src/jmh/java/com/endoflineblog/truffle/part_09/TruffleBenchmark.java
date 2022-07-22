@@ -48,7 +48,11 @@ public class TruffleBenchmark {
         return this.truffleContext.eval("ezs", FIBONACCI_JS_PROGRAM).asInt();
     }
 
-    @Fork(jvmArgsAppend = "-Dgraalvm.locatorDisabled=false")
+    @Fork(jvmArgsAppend = {
+            "-Dgraalvm.locatorDisabled=false",
+            "-Dgraal.Dump=:1",
+            "-Dgraal.PrintGraph=Network"
+    })
     @Benchmark
     public int fibonacci_recursive_js_slow() {
         return this.truffleContext.eval("js", FIBONACCI_JS_PROGRAM).asInt();
