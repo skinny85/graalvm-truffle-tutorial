@@ -14,6 +14,5 @@ test {
 }
 
 jmh {
-    fork = 1
     jvmArgsAppend = ['-Dgraalvm.locatorDisabled=true']
 }
