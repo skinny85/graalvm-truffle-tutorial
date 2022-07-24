@@ -24,6 +24,20 @@ public class FibonacciBenchmark extends TruffleBenchmark {
     }
 
     @Benchmark
+    public int recursive_sl_eval() {
+        return this.truffleContext.eval("sl", "" +
+                "function fib(n) { " +
+                "    if (n < 2) { " +
+                "        return 1; " +
+                "    } " +
+                "    return fib(n - 1) + fib(n - 2); " +
+                "} " +
+                "function main() { " +
+                "    return fib(20); " +
+                "} ").asInt();
+    }
+
+    @Benchmark
     public int recursive_java() {
         return fibonacciRecursive(-20);
     }
