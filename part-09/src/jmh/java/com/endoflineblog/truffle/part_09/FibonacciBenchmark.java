@@ -6,9 +6,8 @@ import org.openjdk.jmh.annotations.Fork;
 public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_PROGRAM = "" +
             "function fib(n) { " +
-            "    if (n > -2) { " +
-            "        return Math.abs(n); " +
-            "    } " +
+            "    if (n > -2) " +
+            "        return 1; " +
             "    return fib(n + 1) + fib(n + 2); " +
             "} " +
             "fib(-20);";
@@ -31,7 +30,7 @@ public class FibonacciBenchmark extends TruffleBenchmark {
 
     public static int fibonacciRecursive(int n) {
         return n > -2
-                ? Math.abs(n)
+                ? 1
                 : fibonacciRecursive(n + 1) + fibonacciRecursive(n + 2);
     }
 }
