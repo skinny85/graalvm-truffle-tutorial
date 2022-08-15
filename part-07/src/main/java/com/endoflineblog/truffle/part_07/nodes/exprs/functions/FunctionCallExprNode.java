@@ -14,7 +14,7 @@ import java.util.List;
 public final class FunctionCallExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private EasyScriptExprNode callTarget;
+    private EasyScriptExprNode targetFunction;
 
     @Children
     private final EasyScriptExprNode[] callArguments;
@@ -23,9 +23,9 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
     @Child
     private FunctionDispatchNode dispatchNode;
 
-    public FunctionCallExprNode(EasyScriptExprNode callTarget, List<EasyScriptExprNode> callArguments) {
+    public FunctionCallExprNode(EasyScriptExprNode targetFunction, List<EasyScriptExprNode> callArguments) {
         super();
-        this.callTarget = callTarget;
+        this.targetFunction = targetFunction;
         this.callArguments = callArguments.toArray(new EasyScriptExprNode[]{});
         this.dispatchNode = FunctionDispatchNodeGen.create();
     }
@@ -33,7 +33,7 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
-        Object function = this.callTarget.executeGeneric(frame);
+        Object function = this.targetFunction.executeGeneric(frame);
 
         Object[] argumentValues = new Object[this.callArguments.length];
         for (int i = 0; i < this.callArguments.length; i++) {
