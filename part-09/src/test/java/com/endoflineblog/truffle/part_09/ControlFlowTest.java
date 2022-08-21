@@ -184,6 +184,20 @@ public class ControlFlowTest {
     }
 
     @Test
+    public void recursive_fibonacci_with_subtraction_works() {
+        Value result = this.context.eval("ezs", "" +
+                "function fib(n) { " +
+                "    if (n < 2) { " +
+                "        return n; " +
+                "    } " +
+                "    return fib(n - 1) + fib(n - 2); " +
+                "} " +
+                "fib(9)"
+        );
+        assertEquals(34, result.asInt());
+    }
+
+    @Test
     public void if_statement_returns_value() {
         Value result = this.context.eval("ezs",
                 "if (true) { " +

@@ -5,10 +5,10 @@ import com.endoflineblog.truffle.part_09.common.DeclarationKind;
 import com.endoflineblog.truffle.part_09.common.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_09.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_09.nodes.exprs.arithmetic.AdditionExprNode;
 import com.endoflineblog.truffle.part_09.nodes.exprs.arithmetic.AdditionExprNodeGen;
 import com.endoflineblog.truffle.part_09.nodes.exprs.arithmetic.NegationExprNode;
 import com.endoflineblog.truffle.part_09.nodes.exprs.arithmetic.NegationExprNodeGen;
+import com.endoflineblog.truffle.part_09.nodes.exprs.arithmetic.SubtractionExprNodeGen;
 import com.endoflineblog.truffle.part_09.nodes.exprs.comparisons.EqualityExprNodeGen;
 import com.endoflineblog.truffle.part_09.nodes.exprs.comparisons.GreaterExprNodeGen;
 import com.endoflineblog.truffle.part_09.nodes.exprs.comparisons.GreaterOrEqualExprNodeGen;
@@ -398,8 +398,8 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr4(EasyScriptParser.Expr4Context expr4) {
-        if (expr4 instanceof EasyScriptParser.AddExpr4Context) {
-            return parseAdditionExpr((EasyScriptParser.AddExpr4Context) expr4);
+        if (expr4 instanceof EasyScriptParser.AddSubtractExpr4Context) {
+            return this.parseAdditionSubtractionExpr((EasyScriptParser.AddSubtractExpr4Context) expr4);
         } else if (expr4 instanceof EasyScriptParser.UnaryMinusExpr4Context) {
             return parseUnaryMinusExpr((EasyScriptParser.UnaryMinusExpr4Context) expr4);
         } else {
@@ -407,10 +407,16 @@ public final class EasyScriptTruffleParser {
         }
     }
 
-    private AdditionExprNode parseAdditionExpr(EasyScriptParser.AddExpr4Context addExpr) {
-        return AdditionExprNodeGen.create(
-                parseExpr4(addExpr.left),
-                parseExpr5(addExpr.right));
+    private EasyScriptExprNode parseAdditionSubtractionExpr(EasyScriptParser.AddSubtractExpr4Context addSubtractExpr) {
+        EasyScriptExprNode leftSide = this.parseExpr4(addSubtractExpr.left);
+        EasyScriptExprNode rightSide = this.parseExpr5(addSubtractExpr.right);
+        switch (addSubtractExpr.o.getText()) {
+            case "-":
+                return SubtractionExprNodeGen.create(leftSide, rightSide);
+            case "+":
+            default:
+                return AdditionExprNodeGen.create(leftSide, rightSide);
+        }
     }
 
     private NegationExprNode parseUnaryMinusExpr(EasyScriptParser.UnaryMinusExpr4Context unaryMinusExpr) {

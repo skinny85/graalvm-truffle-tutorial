@@ -30,7 +30,7 @@ expr2 : left=expr2 c=('===' | '!==') right=expr3           #EqNotEqExpr2
 expr3 : left=expr3 c=('<' | '<=' | '>' | '>=') right=expr4 #ComparisonExpr3
       | expr4                                              #PrecedenceFourExpr3
       ;
-expr4 : left=expr4 '+' right=expr5                         #AddExpr4
+expr4 : left=expr4 o=('+' | '-') right=expr5               #AddSubtractExpr4
       | '-' expr5                                          #UnaryMinusExpr4
       | expr5                                              #PrecedenceFiveExpr4
       ;
