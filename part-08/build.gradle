@@ -1,7 +1,7 @@
 apply plugin: 'antlr'
 
 dependencies {
-    antlr 'org.antlr:antlr4:4.5.1'
+    antlr "org.antlr:antlr4:$antlr_version"
 }
 
 // required to allow GraalVM to discover our EasyScript language class
