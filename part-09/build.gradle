@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation project(':part-08')
     implementation "org.graalvm.truffle:truffle-sl:$graal_version"
     antlr "org.antlr:antlr4:$antlr_version"
 }
