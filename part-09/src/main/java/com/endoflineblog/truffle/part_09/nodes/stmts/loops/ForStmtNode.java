@@ -14,17 +14,17 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 /**
  * A Node that represents a {@code for} statement.
  */
-public final class ForStmtNode extends com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode {
+public final class ForStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode initStmt;
+    private EasyScriptStmtNode initStmt;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private LoopNode loopNode;
 
-    public ForStmtNode(com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode initStmt, EasyScriptExprNode conditionExpr,
-            EasyScriptExprNode updateExpr, com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode bodyStmt) {
+    public ForStmtNode(EasyScriptStmtNode initStmt, EasyScriptExprNode conditionExpr,
+            EasyScriptExprNode updateExpr, EasyScriptStmtNode bodyStmt) {
         this.initStmt = initStmt;
         this.loopNode = Truffle.getRuntime().createLoopNode(
                 new ForRepeatingNode(conditionExpr, updateExpr, bodyStmt));
@@ -51,7 +51,7 @@ public final class ForStmtNode extends com.endoflineblog.truffle.part_09.nodes.s
 
         @SuppressWarnings("FieldMayBeFinal")
         @Child
-        private com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode bodyStmt;
+        private EasyScriptStmtNode bodyStmt;
 
         public ForRepeatingNode(EasyScriptExprNode conditionExpr, EasyScriptExprNode updateExpr,
                 EasyScriptStmtNode bodyStmt) {

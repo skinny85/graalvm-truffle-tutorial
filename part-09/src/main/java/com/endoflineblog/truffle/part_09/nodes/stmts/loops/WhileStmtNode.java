@@ -14,12 +14,12 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 /**
  * A Node that represents a {@code while} statement.
  */
-public final class WhileStmtNode extends com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode {
+public final class WhileStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private LoopNode loopNode;
 
-    public WhileStmtNode(EasyScriptExprNode conditionExpr, com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode bodyStmt) {
+    public WhileStmtNode(EasyScriptExprNode conditionExpr, EasyScriptStmtNode bodyStmt) {
         this.loopNode = Truffle.getRuntime().createLoopNode(new WhileRepeatingNode(conditionExpr, bodyStmt));
     }
 
@@ -36,7 +36,7 @@ public final class WhileStmtNode extends com.endoflineblog.truffle.part_09.nodes
 
         @SuppressWarnings("FieldMayBeFinal")
         @Child
-        private com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode bodyStmt;
+        private EasyScriptStmtNode bodyStmt;
 
         public WhileRepeatingNode(EasyScriptExprNode conditionExpr, EasyScriptStmtNode bodyStmt) {
             this.conditionExpr = conditionExpr;

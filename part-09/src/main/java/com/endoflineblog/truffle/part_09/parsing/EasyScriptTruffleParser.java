@@ -140,7 +140,7 @@ public final class EasyScriptTruffleParser {
                         var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
                         FrameSlot frameSlot = this.frameDescriptor.addFrameSlot(frameSlotId, declarationKind, FrameSlotKind.Object);
                         if (this.localScopes.peek().putIfAbsent(variableId, frameSlot) != null) {
-                            throw new com.endoflineblog.truffle.part_09.exceptions.EasyScriptException("Identifier '" + variableId + "' has already been declared");
+                            throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
                         varDecls.add(new LocalVarDeclStmtNode(frameSlot));
                     }
@@ -181,7 +181,7 @@ public final class EasyScriptTruffleParser {
                     EasyScriptExprNode initializerExpr;
                     if (bindingExpr == null) {
                         if (declarationKind == DeclarationKind.CONST) {
-                            throw new com.endoflineblog.truffle.part_09.exceptions.EasyScriptException("Missing initializer in const declaration '" + variableId + "'");
+                            throw new EasyScriptException("Missing initializer in const declaration '" + variableId + "'");
                         }
                         // if a 'let' or 'var' declaration is missing an initializer,
                         // it means it will be initialized with 'undefined'
@@ -215,7 +215,7 @@ public final class EasyScriptTruffleParser {
 
     private ReturnStmtNode parseReturnStmt(EasyScriptParser.ReturnStmtContext returnStmt) {
         if (this.state != ParserState.FUNC_DEF) {
-            throw new com.endoflineblog.truffle.part_09.exceptions.EasyScriptException("return statement is not allowed outside functions");
+            throw new EasyScriptException("return statement is not allowed outside functions");
         }
         return new ReturnStmtNode(returnStmt.expr1() == null
                 ? new UndefinedLiteralExprNode()
@@ -299,7 +299,7 @@ public final class EasyScriptTruffleParser {
     private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
         if (this.state == ParserState.FUNC_DEF) {
             // we do not allow nested functions (yet 😉)
-            throw new com.endoflineblog.truffle.part_09.exceptions.EasyScriptException("nested functions are not supported in EasyScript yet");
+            throw new EasyScriptException("nested functions are not supported in EasyScript yet");
         }
 
         // save the current state of the parser (before entering the function)

@@ -10,12 +10,12 @@ import com.oracle.truffle.api.nodes.Node;
  */
 public abstract class EasyScriptNode extends Node {
     /** Allows retrieving the current language context from within a Node. */
-    protected final com.endoflineblog.truffle.part_09.EasyScriptTruffleLanguage currentTruffleLanguage() {
+    protected final EasyScriptTruffleLanguage currentTruffleLanguage() {
         return EasyScriptTruffleLanguage.get(this);
     }
 
     /** Allows retrieving the current Truffle language instance from within a Node. */
-    protected final com.endoflineblog.truffle.part_09.EasyScriptLanguageContext currentLanguageContext() {
+    protected final EasyScriptLanguageContext currentLanguageContext() {
         return EasyScriptLanguageContext.get(this);
     }
 }

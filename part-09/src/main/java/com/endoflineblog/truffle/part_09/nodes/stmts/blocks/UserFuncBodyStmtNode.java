@@ -10,14 +10,14 @@ import java.util.List;
 
 /**
  * A Node for representing the statement blocks of a user-defined function in EasyScript.
- * Returns its value by catching {@link com.endoflineblog.truffle.part_09.exceptions.ReturnException}.
+ * Returns its value by catching {@link ReturnException}.
  */
-public final class UserFuncBodyStmtNode extends com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode {
+public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
     @Children
-    private final com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode[] stmts;
+    private final EasyScriptStmtNode[] stmts;
 
-    public UserFuncBodyStmtNode(List<com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode> stmts) {
-        this.stmts = stmts.toArray(new com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode[]{});
+    public UserFuncBodyStmtNode(List<EasyScriptStmtNode> stmts) {
+        this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
     }
 
     /**

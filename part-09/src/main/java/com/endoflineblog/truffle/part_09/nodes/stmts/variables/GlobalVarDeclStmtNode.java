@@ -14,7 +14,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     private final String variableId;
-    private final com.endoflineblog.truffle.part_09.common.DeclarationKind declarationKind;
+    private final DeclarationKind declarationKind;
 
     public GlobalVarDeclStmtNode(String variableId, DeclarationKind declarationKind) {
         this.variableId = variableId;

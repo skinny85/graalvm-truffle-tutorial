@@ -11,19 +11,19 @@ import java.util.List;
  * for example {@code Math.pow(2, 3)}.
  * Identical to the class with the same name from part 7.
  */
-public final class FunctionCallExprNode extends com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode {
+public final class FunctionCallExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode targetFunction;
+    private EasyScriptExprNode targetFunction;
 
     @Children
-    private final com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode[] callArguments;
+    private final EasyScriptExprNode[] callArguments;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private FunctionDispatchNode dispatchNode;
 
-    public FunctionCallExprNode(com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode targetFunction, List<com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode> callArguments) {
+    public FunctionCallExprNode(EasyScriptExprNode targetFunction, List<EasyScriptExprNode> callArguments) {
         super();
         this.targetFunction = targetFunction;
         this.callArguments = callArguments.toArray(new EasyScriptExprNode[]{});

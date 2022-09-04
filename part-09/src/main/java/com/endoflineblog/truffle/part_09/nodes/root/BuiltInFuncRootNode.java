@@ -13,7 +13,7 @@ import com.oracle.truffle.api.nodes.RootNode;
 public final class BuiltInFuncRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private com.endoflineblog.truffle.part_09.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode functionBodyExpr;
+    private BuiltInFunctionBodyExprNode functionBodyExpr;
 
     public BuiltInFuncRootNode(EasyScriptTruffleLanguage truffleLanguage,
             BuiltInFunctionBodyExprNode functionBodyExpr) {

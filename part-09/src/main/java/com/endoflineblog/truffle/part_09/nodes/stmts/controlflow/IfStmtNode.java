@@ -9,19 +9,19 @@ import com.oracle.truffle.api.profiles.ConditionProfile;
 /**
  * A Node that represents an {@code if} statement.
  */
-public final class IfStmtNode extends com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode {
+public final class IfStmtNode extends EasyScriptStmtNode {
     @Child
     private EasyScriptExprNode conditionExpr;
 
     @Child
-    private com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode thenStmt;
+    private EasyScriptStmtNode thenStmt;
 
     @Child
-    private com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode elseStmt;
+    private EasyScriptStmtNode elseStmt;
 
     private final ConditionProfile condition = ConditionProfile.createCountingProfile();
 
-    public IfStmtNode(EasyScriptExprNode conditionExpr, com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode thenStmt, EasyScriptStmtNode elseStmt) {
+    public IfStmtNode(EasyScriptExprNode conditionExpr, EasyScriptStmtNode thenStmt, EasyScriptStmtNode elseStmt) {
         this.conditionExpr = conditionExpr;
         this.thenStmt = thenStmt;
         this.elseStmt = elseStmt;

@@ -20,7 +20,7 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private com.endoflineblog.truffle.part_09.nodes.stmts.blocks.UserFuncBodyStmtNode funcBody;
+    private UserFuncBodyStmtNode funcBody;
 
     public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, UserFuncBodyStmtNode funcBody, int argumentCount) {
         this.funcName = funcName;

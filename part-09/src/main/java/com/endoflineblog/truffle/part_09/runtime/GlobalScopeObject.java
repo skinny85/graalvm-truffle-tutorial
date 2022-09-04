@@ -67,7 +67,7 @@ public final class GlobalScopeObject implements TruffleObject {
             return true;
         }
         if (this.constants.contains(name)) {
-            throw new com.endoflineblog.truffle.part_09.exceptions.EasyScriptException("Assignment to constant variable '" + name + "'");
+            throw new EasyScriptException("Assignment to constant variable '" + name + "'");
         }
         return existingValue != null;
     }

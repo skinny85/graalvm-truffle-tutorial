@@ -14,12 +14,12 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 /**
  * A Node that represents a {@code do-while} statement.
  */
-public final class DoWhileStmtNode extends com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode {
+public final class DoWhileStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private LoopNode loopNode;
 
-    public DoWhileStmtNode(EasyScriptExprNode conditionExpr, com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode bodyStmt) {
+    public DoWhileStmtNode(EasyScriptExprNode conditionExpr, EasyScriptStmtNode bodyStmt) {
         this.loopNode = Truffle.getRuntime().createLoopNode(new DoWhileRepeatingNode(conditionExpr, bodyStmt));
     }
 
@@ -36,7 +36,7 @@ public final class DoWhileStmtNode extends com.endoflineblog.truffle.part_09.nod
 
         @SuppressWarnings("FieldMayBeFinal")
         @Child
-        private com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode bodyStmt;
+        private EasyScriptStmtNode bodyStmt;
 
         public DoWhileRepeatingNode(EasyScriptExprNode conditionExpr, EasyScriptStmtNode bodyStmt) {
             this.conditionExpr = conditionExpr;

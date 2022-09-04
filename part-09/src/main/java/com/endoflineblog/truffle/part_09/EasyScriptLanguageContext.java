@@ -6,7 +6,7 @@ import com.oracle.truffle.api.nodes.Node;
 
 /**
  * The class of the context for the
- * {@link com.endoflineblog.truffle.part_09.EasyScriptTruffleLanguage TruffleLanguage implementaton in this part of the series}.
+ * {@link EasyScriptTruffleLanguage TruffleLanguage implementaton in this part of the series}.
  * Identical to the class with the same name from part 7.
  */
 public final class EasyScriptLanguageContext {

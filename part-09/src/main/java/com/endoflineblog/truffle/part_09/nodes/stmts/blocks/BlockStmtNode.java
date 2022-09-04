@@ -15,12 +15,12 @@ import java.util.List;
  * which is represented by {@link UserFuncBodyStmtNode}).
  * Identical to the class with the same name from part 7.
  */
-public final class BlockStmtNode extends com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode {
+public final class BlockStmtNode extends EasyScriptStmtNode {
     @Children
-    private final com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode[] stmts;
+    private final EasyScriptStmtNode[] stmts;
 
-    public BlockStmtNode(List<com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode> stmts) {
-        this.stmts = stmts.toArray(new com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode[]{});
+    public BlockStmtNode(List<EasyScriptStmtNode> stmts) {
+        this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
     }
 
     /**

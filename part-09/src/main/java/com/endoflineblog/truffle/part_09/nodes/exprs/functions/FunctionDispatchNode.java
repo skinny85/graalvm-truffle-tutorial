@@ -13,7 +13,7 @@ import com.oracle.truffle.api.nodes.Node;
 /**
  * A helper Node that contains specialization for functions calls.
  * Used by {@link FunctionCallExprNode},
- * and by {@link com.endoflineblog.truffle.part_09.runtime.FunctionObject}.
+ * and by {@link FunctionObject}.
  * Identical to the class with the same name from part 7.
  */
 public abstract class FunctionDispatchNode extends Node {
@@ -27,7 +27,7 @@ public abstract class FunctionDispatchNode extends Node {
      */
     @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()", limit = "2")
     protected static Object dispatchDirectly(
-            @SuppressWarnings("unused") com.endoflineblog.truffle.part_09.runtime.FunctionObject function,
+            @SuppressWarnings("unused") FunctionObject function,
             Object[] arguments,
             @Cached("create(function.callTarget)") DirectCallNode directCallNode) {
         return directCallNode.call(extendArguments(arguments, function));
@@ -44,7 +44,7 @@ public abstract class FunctionDispatchNode extends Node {
      */
     @Specialization(replaces = "dispatchDirectly")
     protected static Object dispatchIndirectly(
-            com.endoflineblog.truffle.part_09.runtime.FunctionObject function,
+            FunctionObject function,
             Object[] arguments,
             @Cached IndirectCallNode indirectCallNode) {
         return indirectCallNode.call(function.callTarget, extendArguments(arguments, function));
