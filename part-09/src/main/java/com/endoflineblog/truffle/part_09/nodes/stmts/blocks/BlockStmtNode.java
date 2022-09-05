@@ -30,10 +30,18 @@ public final class BlockStmtNode extends EasyScriptStmtNode {
     @Override
     @ExplodeLoop
     public Object executeStatement(VirtualFrame frame) {
-        Object ret = Undefined.INSTANCE;
-        for (EasyScriptStmtNode stmt : this.stmts) {
-            ret = stmt.executeStatement(frame);
+        // this is the simple implementation of this method from the other parts:
+//         Object ret = Undefined.INSTANCE;
+//         for (EasyScriptStmtNode stmt : this.stmts) {
+//             ret = stmt.executeStatement(frame);
+//         }
+//         return ret;
+
+        // this is the implementation that results in a 3x speedup in the Fibonacci benchmark
+        int stmtsMinusOne = this.stmts.length - 1;
+        for (int i = 0; i < stmtsMinusOne; i++) {
+            this.stmts[i].executeStatement(frame);
         }
-        return ret;
+        return stmtsMinusOne < 0 ? Undefined.INSTANCE : this.stmts[stmtsMinusOne].executeStatement(frame);
     }
 }
