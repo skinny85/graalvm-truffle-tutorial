@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_09.runtime;
 import com.endoflineblog.truffle.part_09.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_09.common.DeclarationKind;
 import com.endoflineblog.truffle.part_09.exceptions.EasyScriptException;
+import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.InvalidArrayIndexException;
@@ -55,9 +56,17 @@ public final class GlobalScopeObject implements TruffleObject {
         return existingValue == null;
     }
 
-    public void newFunction(String name, FunctionObject func) {
+    public void registerFunction(String funcName, CallTarget callTarget, int argumentCount) {
         // we allow overwriting functions
-        this.variables.put(name, func);
+        Object existingVariable = this.variables.get(funcName);
+        // instanceof returns 'false' for null,
+        // so this also covers the case when we're seeing this variable for the first time
+        if (existingVariable instanceof FunctionObject) {
+            FunctionObject existingFunction = (FunctionObject) existingVariable;
+            existingFunction.redefine(callTarget, argumentCount);
+        } else {
+            this.variables.put(funcName, new FunctionObject(funcName, callTarget, argumentCount));
+        }
     }
 
     public boolean updateVariable(String name, Object value) {

@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_09.nodes.exprs.functions;
 import com.endoflineblog.truffle.part_09.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_09.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_09.runtime.Undefined;
+import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -25,11 +26,16 @@ public abstract class FunctionDispatchNode extends Node {
      * used when the target of a call stays the same during the execution of the program,
      * like in {@code Math.abs(-3)}.
      */
-    @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()", limit = "2")
+    @Specialization(
+            guards = "function.getCallTarget() == directCallNode.getCallTarget()",
+            limit = "2",
+            assumptions = "functionWasNotRedefined"
+    )
     protected static Object dispatchDirectly(
             @SuppressWarnings("unused") FunctionObject function,
             Object[] arguments,
-            @Cached("create(function.callTarget)") DirectCallNode directCallNode) {
+            @SuppressWarnings("unused") @Cached("function.getFunctionWasNotRedefinedAssumption()") Assumption functionWasNotRedefined,
+            @Cached("create(function.getCallTarget())") DirectCallNode directCallNode) {
         return directCallNode.call(extendArguments(arguments, function));
     }
 
@@ -47,7 +53,7 @@ public abstract class FunctionDispatchNode extends Node {
             FunctionObject function,
             Object[] arguments,
             @Cached IndirectCallNode indirectCallNode) {
-        return indirectCallNode.call(function.callTarget, extendArguments(arguments, function));
+        return indirectCallNode.call(function.getCallTarget(), extendArguments(arguments, function));
     }
 
     /**
@@ -62,11 +68,11 @@ public abstract class FunctionDispatchNode extends Node {
     }
 
     private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
-        if (arguments.length >= function.argumentCount) {
+        if (arguments.length >= function.getArgumentCount()) {
             return arguments;
         }
-        Object[] ret = new Object[function.argumentCount];
-        for (int i = 0; i < function.argumentCount; i++) {
+        Object[] ret = new Object[function.getArgumentCount()];
+        for (int i = 0; i < function.getArgumentCount(); i++) {
             ret[i] = i < arguments.length
                     ? arguments[i]
                     : Undefined.INSTANCE;

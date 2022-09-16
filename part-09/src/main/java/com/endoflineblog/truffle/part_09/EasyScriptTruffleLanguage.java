@@ -8,7 +8,6 @@ import com.endoflineblog.truffle.part_09.nodes.root.BuiltInFuncRootNode;
 import com.endoflineblog.truffle.part_09.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_09.parsing.EasyScriptTruffleParser;
 import com.endoflineblog.truffle.part_09.parsing.ParsingResult;
-import com.endoflineblog.truffle.part_09.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -63,10 +62,10 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
-        context.globalScopeObject.newFunction(name,
-                new FunctionObject(
-                        Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
-                                nodeFactory.createNode((Object) functionArguments))),
-                        argumentCount));
+        context.globalScopeObject.registerFunction(
+                name,
+                Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
+                        nodeFactory.createNode((Object) functionArguments))),
+                argumentCount);
     }
 }
