@@ -32,7 +32,7 @@ public abstract class FunctionDispatchNode extends Node {
             assumptions = "functionWasNotRedefined"
     )
     protected static Object dispatchDirectly(
-            @SuppressWarnings("unused") FunctionObject function,
+            FunctionObject function,
             Object[] arguments,
             @SuppressWarnings("unused") @Cached("function.getFunctionWasNotRedefinedAssumption()") Assumption functionWasNotRedefined,
             @Cached("create(function.getCallTarget())") DirectCallNode directCallNode) {
