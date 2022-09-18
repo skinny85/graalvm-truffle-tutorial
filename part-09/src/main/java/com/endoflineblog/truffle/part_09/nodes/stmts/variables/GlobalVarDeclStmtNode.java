@@ -5,6 +5,8 @@ import com.endoflineblog.truffle.part_09.common.DeclarationKind;
 import com.endoflineblog.truffle.part_09.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_09.runtime.Undefined;
+import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
@@ -16,16 +18,26 @@ public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     private final String variableId;
     private final DeclarationKind declarationKind;
 
+    @CompilationFinal
+    private boolean checkVariableExists;
+
     public GlobalVarDeclStmtNode(String variableId, DeclarationKind declarationKind) {
         this.variableId = variableId;
         this.declarationKind = declarationKind;
+        this.checkVariableExists = true;
     }
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
         EasyScriptLanguageContext context = this.currentLanguageContext();
-        if (!context.globalScopeObject.newVariable(this.variableId, this.declarationKind)) {
-            throw new EasyScriptException(this, "Identifier '" + this.variableId + "' has already been declared");
+        boolean variableAlreadyExists = !context.globalScopeObject.newVariable(this.variableId, this.declarationKind, !this.checkVariableExists);
+        if (this.checkVariableExists) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            this.checkVariableExists = false;
+
+            if (variableAlreadyExists) {
+                throw new EasyScriptException(this, "Identifier '" + this.variableId + "' has already been declared");
+            }
         }
         // we return 'undefined' for statements that declare variables
         return Undefined.INSTANCE;

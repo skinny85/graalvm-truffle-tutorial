@@ -40,23 +40,22 @@ public final class GlobalScopeObject implements TruffleObject {
     private final Map<String, Object> variables = new HashMap<>();
     private final Set<String> constants = new HashSet<>();
 
-    public boolean newVariable(String name, DeclarationKind declarationKind) {
-        // We allow overwriting variables, because some things
-        // (like functions) can be overwritten.
-        // If it shouldn't be allowed, the caller of this method can check the return value,
-        // and react appropriately (most likely, by throwing).
-        Object existingValue = this.variables.put(name, declarationKind == DeclarationKind.VAR
+    public boolean newVariable(String name, DeclarationKind declarationKind, boolean overwriteIfExists) {
+        Object newVariableValue = declarationKind == DeclarationKind.VAR
                 // the default value for 'var' is 'undefined'
                 ? Undefined.INSTANCE
                 // for 'const' and 'let', we write a "dummy" value that we treat specially
-                : DUMMY);
+                : DUMMY;
+        Object existingValue = overwriteIfExists
+                ? this.variables.put(name, newVariableValue)
+                : this.variables.putIfAbsent(name, newVariableValue);
         if (declarationKind == DeclarationKind.CONST) {
             this.constants.add(name);
         }
         return existingValue == null;
     }
 
-    public void registerFunction(String funcName, CallTarget callTarget, int argumentCount) {
+    public FunctionObject registerFunction(String funcName, CallTarget callTarget, int argumentCount) {
         // we allow overwriting functions
         Object existingVariable = this.variables.get(funcName);
         // instanceof returns 'false' for null,
@@ -64,8 +63,11 @@ public final class GlobalScopeObject implements TruffleObject {
         if (existingVariable instanceof FunctionObject) {
             FunctionObject existingFunction = (FunctionObject) existingVariable;
             existingFunction.redefine(callTarget, argumentCount);
+            return existingFunction;
         } else {
-            this.variables.put(funcName, new FunctionObject(funcName, callTarget, argumentCount));
+            FunctionObject newFunction = new FunctionObject(funcName, callTarget, argumentCount);
+            this.variables.put(funcName, newFunction);
+            return newFunction;
         }
     }
 

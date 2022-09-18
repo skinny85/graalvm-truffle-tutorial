@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_09.nodes.stmts.variables;
 import com.endoflineblog.truffle.part_09.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_09.nodes.stmts.blocks.UserFuncBodyStmtNode;
+import com.endoflineblog.truffle.part_09.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_09.runtime.Undefined;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -25,30 +26,34 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     private UserFuncBodyStmtNode funcBody;
 
     @CompilationFinal
-    private boolean executed;
+    private CallTarget cachedCallTarget;
+
+    @CompilationFinal
+    private FunctionObject cachedFunction;
 
     public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, UserFuncBodyStmtNode funcBody, int argumentCount) {
         this.funcName = funcName;
         this.frameDescriptor = frameDescriptor;
         this.funcBody = funcBody;
         this.argumentCount = argumentCount;
-        this.executed = false;
+        this.cachedCallTarget = null;
+        this.cachedFunction = null;
     }
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
-        if (!this.executed) {
+        if (this.cachedCallTarget == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            this.executed = true;
 
             var truffleLanguage = this.currentTruffleLanguage();
             var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.frameDescriptor, this.funcBody);
-            CallTarget funcCallTarget = Truffle.getRuntime().createCallTarget(funcRootNode);
+            this.cachedCallTarget = Truffle.getRuntime().createCallTarget(funcRootNode);
             var context = this.currentLanguageContext();
             // we allow functions to be redefined, to comply with JavaScript semantics
-            context.globalScopeObject.registerFunction(this.funcName, funcCallTarget, this.argumentCount);
+            this.cachedFunction = context.globalScopeObject.registerFunction(this.funcName, this.cachedCallTarget, this.argumentCount);
         }
 
+        this.cachedFunction.redefine(this.cachedCallTarget, this.argumentCount);
         // we return 'undefined' for statements that declare functions
         return Undefined.INSTANCE;
     }

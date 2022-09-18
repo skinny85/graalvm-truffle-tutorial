@@ -236,4 +236,26 @@ public class ControlFlowTest {
         Value fibProgramValue = this.context.parse(fibProgram);
         assertEquals(6765, fibProgramValue.execute().asInt());
     }
+
+    @Test
+    public void functions_are_redefined_on_subsequent_evals() {
+        String program = "" +
+                "function f() { " +
+                "    return 5; " +
+                "} " +
+                "var sum = 0; " +
+                "for (let i = 0; i <= 3; i = i + 1) { " +
+                "    if (i === 3) { " +
+                "        function f() { return 1; } " +
+                "    } " +
+                "    sum = sum + f(); " +
+                "} " +
+                "sum";
+
+        Value firstEvalResult = this.context.eval("ezs", program);
+        assertEquals(16, firstEvalResult.asInt());
+
+        Value secondEvalResult = this.context.eval("ezs", program);
+        assertEquals(16, secondEvalResult.asInt());
+    }
 }
