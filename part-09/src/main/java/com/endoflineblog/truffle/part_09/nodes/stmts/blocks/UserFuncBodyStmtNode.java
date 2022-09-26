@@ -5,7 +5,6 @@ import com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_09.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.profiles.BranchProfile;
 
 import java.util.List;
 
@@ -16,13 +15,9 @@ import java.util.List;
 public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
     @Children
     private final EasyScriptStmtNode[] stmts;
-    private final BranchProfile explicitReturn;
-    private final BranchProfile implicitReturn;
 
     public UserFuncBodyStmtNode(List<EasyScriptStmtNode> stmts) {
         this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
-        explicitReturn = BranchProfile.create();
-        implicitReturn = BranchProfile.create();
     }
 
     /**
@@ -36,13 +31,11 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
             try {
                 stmt.executeStatement(frame);
             } catch (ReturnException e) {
-                this.explicitReturn.enter();
                 return e.returnValue;
             }
         }
         // if there was no return statement,
         // then we return 'undefined'
-        this.implicitReturn.enter();
         return Undefined.INSTANCE;
     }
 }
