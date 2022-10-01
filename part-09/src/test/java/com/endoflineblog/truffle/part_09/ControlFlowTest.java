@@ -19,9 +19,7 @@ public class ControlFlowTest {
 
     @Before
     public void setUp() {
-        this.context = Context.newBuilder("ezs")
-                .environment("A", "B")
-                .build();
+        this.context = Context.create();
     }
 
     @After
