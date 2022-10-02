@@ -62,3 +62,4 @@ $ ./gradlew build
 * [Part 6 - static function calls](part-06)
 * [Part 7 - function definitions](part-07)
 * [Part 8 - conditionals, loops, control flow](part-08)
+* [Part 9 - performance benchmarking](part-09)
