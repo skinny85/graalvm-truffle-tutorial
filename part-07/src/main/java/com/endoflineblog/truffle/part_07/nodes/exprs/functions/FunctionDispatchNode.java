@@ -32,7 +32,7 @@ public abstract class FunctionDispatchNode extends Node {
      */
     @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()", limit = "2")
     protected static Object dispatchDirectly(
-            @SuppressWarnings("unused") FunctionObject function,
+            FunctionObject function,
             Object[] arguments,
             @Cached("create(function.callTarget)") DirectCallNode directCallNode) {
         return directCallNode.call(extendArguments(arguments, function));

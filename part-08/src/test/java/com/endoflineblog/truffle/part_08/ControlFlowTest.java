@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_08;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
+import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 import org.junit.After;
 import org.junit.Before;
@@ -203,5 +204,20 @@ public class ControlFlowTest {
             assertFalse(e.isInternalError());
             assertEquals("return statement is not allowed outside functions", e.getMessage());
         }
+    }
+
+    @Test
+    public void test_parsing_source() {
+        Source fibProgram = Source.create("ezs", "" +
+                "function fib(n) { " +
+                "    if (n > -2) { " +
+                "        return Math.abs(n); " +
+                "    } " +
+                "    return fib(n + 1) + fib(n + 2); " +
+                "} " +
+                "fib(-20) " +
+                "");
+        Value fibProgramValue = this.context.parse(fibProgram);
+        assertEquals(6765, fibProgramValue.execute().asInt());
     }
 }

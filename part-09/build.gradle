@@ -1,0 +1,14 @@
+plugins {
+    id 'antlr'
+    id 'me.champeau.jmh' version '0.6.6'
+}
+
+dependencies {
+    implementation "org.graalvm.truffle:truffle-sl:$graal_version"
+    antlr "org.antlr:antlr4:$antlr_version"
+}
+
+// required to allow GraalVM to discover our EasyScript language class
+test {
+    jvmArgs '-Dgraalvm.locatorDisabled=true'
+}
