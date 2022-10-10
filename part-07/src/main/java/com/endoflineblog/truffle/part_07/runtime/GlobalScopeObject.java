@@ -19,13 +19,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This is the Truffle interop object that represents the global-level scope
- * that contains all global variables.
- * Basically identical to the class with the same name from part 6,
- * the only differences being that we allow overriding members
- * (as functions can be overridden in JavaScript),
- * and that we have a "magical" default value for 'const' and 'let'
- * variables that throws if it's read before those variables are initialized.
+ * This is the Truffle interop object that represents the global-level scope that contains all global variables.
+ * Very similar to the class with the same name from part 6, with two small differences.
+ * The first is that we add a method for registering user-defined functions, {@link #newFunction}.
+ * The second is that the {@link #newVariable}
+ * method no longer takes the value the global variable has been initialized with,
+ * as we split the variable into declaration
+ * and {@link com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNode assignment}
+ * (as now we support user-defined functions,
+ * which can access a global variable before its initializer had a chance to run).
+ * Instead, for "const" and "let" declarations,
+ * we save a special "dummy" value that is then checked for in the {@link #getVariable} method
+ * (we save {@link Undefined} for "var" declarations, according to JavaScript semantics).
+ * Because of that, we pass the kind of declaration as the second argument of {@link #newVariable},
+ * and so we also got rid of the {@code newConstant} utility method.
+ *
+ * @see #newVariable
+ * @see #newFunction
  */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject implements TruffleObject {
@@ -40,10 +50,6 @@ public final class GlobalScopeObject implements TruffleObject {
     private final Set<String> constants = new HashSet<>();
 
     public boolean newVariable(String name, DeclarationKind declarationKind) {
-        // We allow overwriting variables, because some things
-        // (like functions) can be overwritten.
-        // If it shouldn't be allowed, the caller of this method can check the return value,
-        // and react appropriately (most likely, by throwing).
         Object existingValue = this.variables.put(name, declarationKind == DeclarationKind.VAR
                 // the default value for 'var' is 'undefined'
                 ? Undefined.INSTANCE

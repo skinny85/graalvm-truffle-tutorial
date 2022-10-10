@@ -21,11 +21,7 @@ import java.util.Set;
 /**
  * This is the Truffle interop object that represents the global-level scope
  * that contains all global variables.
- * Basically identical to the class with the same name from part 6,
- * the only differences being that we allow overriding members
- * (as functions can be overridden in JavaScript),
- * and that we have a "magical" default value for 'const' and 'let'
- * variables that throws if it's read before those variables are initialized.
+ * Identical to the class with the same name from part 7.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject implements TruffleObject {
@@ -40,10 +36,6 @@ public final class GlobalScopeObject implements TruffleObject {
     private final Set<String> constants = new HashSet<>();
 
     public boolean newVariable(String name, DeclarationKind declarationKind) {
-        // We allow overwriting variables, because some things
-        // (like functions) can be overwritten.
-        // If it shouldn't be allowed, the caller of this method can check the return value,
-        // and react appropriately (most likely, by throwing).
         Object existingValue = this.variables.put(name, declarationKind == DeclarationKind.VAR
                 // the default value for 'var' is 'undefined'
                 ? Undefined.INSTANCE
@@ -128,7 +120,7 @@ public final class GlobalScopeObject implements TruffleObject {
 /**
  * The class that implements the collection of member names of the global scope.
  * Used in the {@link GlobalScopeObject#getMembers} method.
- * Identical to the class with the same name from part 6.
+ * Identical to the class with the same name from part 7.
  */
 @ExportLibrary(InteropLibrary.class)
 final class GlobalVariableNamesObject implements TruffleObject {
