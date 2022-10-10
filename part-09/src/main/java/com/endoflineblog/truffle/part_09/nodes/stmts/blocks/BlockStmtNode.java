@@ -13,7 +13,12 @@ import java.util.List;
  * for example those used as the branch of an {@code if} statement
  * (with the exception of the block for a user-defined function's body,
  * which is represented by {@link UserFuncBodyStmtNode}).
- * Identical to the class with the same name from part 7.
+ * Almost identical to the class with the same name from part 8,
+ * the only difference is that we refactor the implementation of the
+ * {@link #executeStatement} method to avoid performing redundant assignments,
+ * which results in a 3x speedup in the Fibonacci benchmark.
+ *
+ * @see #executeStatement
  */
 public final class BlockStmtNode extends EasyScriptStmtNode {
     @Children
@@ -30,14 +35,8 @@ public final class BlockStmtNode extends EasyScriptStmtNode {
     @Override
     @ExplodeLoop
     public Object executeStatement(VirtualFrame frame) {
-        // this is the simple implementation of this method from the other parts:
-//         Object ret = Undefined.INSTANCE;
-//         for (EasyScriptStmtNode stmt : this.stmts) {
-//             ret = stmt.executeStatement(frame);
-//         }
-//         return ret;
-
-        // this is the implementation that results in a 3x speedup in the Fibonacci benchmark
+        // this implementation results in a 3x improvement in the Fibonacci benchmark,
+        // compared to the implementation from part 8
         int stmtsMinusOne = this.stmts.length - 1;
         for (int i = 0; i < stmtsMinusOne; i++) {
             this.stmts[i].executeStatement(frame);

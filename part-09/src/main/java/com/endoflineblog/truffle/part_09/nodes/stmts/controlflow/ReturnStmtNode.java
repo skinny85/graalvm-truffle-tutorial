@@ -5,7 +5,10 @@ import com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-/** A Node representing the {@code return} statement. */
+/**
+ * A Node representing the {@code return} statement.
+ * Identical to the class with the same name from part 8.
+ */
 public final class ReturnStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child

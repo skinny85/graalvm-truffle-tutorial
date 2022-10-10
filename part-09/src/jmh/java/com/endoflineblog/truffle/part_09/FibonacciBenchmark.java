@@ -3,6 +3,18 @@ package com.endoflineblog.truffle.part_09;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 
+/**
+ * A benchmark that uses the naive implementation of the Fibonacci function.
+ * The code calculates the 20th Fibonacci number.
+ * The measurements are done for EasyScript,
+ * but also for the JavaScript implementation built-in into GraalVM,
+ * for Java, and also for SimpleLanguage.
+ *
+ * @see #recursive_ezs_eval
+ * @see #recursive_js_eval
+ * @see #recursive_java
+ * @see #recursive_sl_eval
+ */
 public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_FUNCTION = "" +
             "function fib(n) { " +

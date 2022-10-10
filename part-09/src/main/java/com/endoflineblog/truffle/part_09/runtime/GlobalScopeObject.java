@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_09.runtime;
 import com.endoflineblog.truffle.part_09.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_09.common.DeclarationKind;
 import com.endoflineblog.truffle.part_09.exceptions.EasyScriptException;
+import com.endoflineblog.truffle.part_09.nodes.stmts.variables.FuncDeclStmtNode;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -22,11 +23,14 @@ import java.util.Set;
 /**
  * This is the Truffle interop object that represents the global-level scope
  * that contains all global variables.
- * Basically identical to the class with the same name from part 6,
- * the only differences being that we allow overriding members
- * (as functions can be overridden in JavaScript),
- * and that we have a "magical" default value for 'const' and 'let'
- * variables that throws if it's read before those variables are initialized.
+ * Very similar to the class with the same name from part 8,
+ * the only difference is the method that was called {@code newFunction} in previous parts
+ * is now called {@link #registerFunction}, and has a slightly different API,
+ * to accommodate {@link FunctionObject} becoming mutable.
+ * This method is called from the {@link FuncDeclStmtNode} class.
+ *
+ * @see FunctionObject#redefine
+ * @see FuncDeclStmtNode#executeStatement
  */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject implements TruffleObject {
@@ -40,15 +44,12 @@ public final class GlobalScopeObject implements TruffleObject {
     private final Map<String, Object> variables = new HashMap<>();
     private final Set<String> constants = new HashSet<>();
 
-    public boolean newVariable(String name, DeclarationKind declarationKind, boolean overwriteIfExists) {
-        Object newVariableValue = declarationKind == DeclarationKind.VAR
+    public boolean newVariable(String name, DeclarationKind declarationKind) {
+        Object existingValue = this.variables.put(name, declarationKind == DeclarationKind.VAR
                 // the default value for 'var' is 'undefined'
                 ? Undefined.INSTANCE
                 // for 'const' and 'let', we write a "dummy" value that we treat specially
-                : DUMMY;
-        Object existingValue = overwriteIfExists
-                ? this.variables.put(name, newVariableValue)
-                : this.variables.putIfAbsent(name, newVariableValue);
+                : DUMMY);
         if (declarationKind == DeclarationKind.CONST) {
             this.constants.add(name);
         }
@@ -139,7 +140,7 @@ public final class GlobalScopeObject implements TruffleObject {
 /**
  * The class that implements the collection of member names of the global scope.
  * Used in the {@link GlobalScopeObject#getMembers} method.
- * Identical to the class with the same name from part 6.
+ * Identical to the class with the same name from part 8.
  */
 @ExportLibrary(InteropLibrary.class)
 final class GlobalVariableNamesObject implements TruffleObject {

@@ -12,7 +12,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 /**
  * A Node that represents the declaration of a global
  * (as opposed to local to a function) variable or constant in EasyScript.
- * Identical to the class with the same name from part 7.
+ * Very similar to the class from the same name from part 8,
+ * the main difference is that we check whether a given global variable already exists
+ * only the first time the Node is executed,
+ * to correctly handle the same Truffle AST being executed multiple times
+ * (which happens when you {@link org.graalvm.polyglot.Context#eval} the same program multiple times,
+ * to save on the cost of parsing).
  */
 public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     private final String variableId;
@@ -29,13 +34,12 @@ public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
-        EasyScriptLanguageContext context = this.currentLanguageContext();
-        boolean variableAlreadyExists = !context.globalScopeObject.newVariable(this.variableId, this.declarationKind, !this.checkVariableExists);
         if (this.checkVariableExists) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             this.checkVariableExists = false;
 
-            if (variableAlreadyExists) {
+            EasyScriptLanguageContext context = this.currentLanguageContext();
+            if (!context.globalScopeObject.newVariable(this.variableId, this.declarationKind)) {
                 throw new EasyScriptException(this, "Identifier '" + this.variableId + "' has already been declared");
             }
         }

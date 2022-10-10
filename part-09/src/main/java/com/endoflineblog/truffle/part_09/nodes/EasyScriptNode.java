@@ -6,7 +6,7 @@ import com.oracle.truffle.api.nodes.Node;
 
 /**
  * The abstract common ancestor of all EasyScript AST Truffle Nodes.
- * Identical to the class with the same name from part 7.
+ * Identical to the class with the same name from part 8.
  */
 public abstract class EasyScriptNode extends Node {
     /** Allows retrieving the current language context from within a Node. */

@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 
 /**
  * A Node that represents a {@code while} statement.
+ * Identical to the class with the same name from part 8.
  */
 public final class WhileStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")

@@ -14,7 +14,13 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
- * Identical to the class with the same name from part 7.
+ * Similar to the class with the same name from part 8,
+ * the only difference is that we add caching to the {@link CallTarget}
+ * that is produced from the statements of the function body.
+ * Additionally, since {@link FunctionObject} is now mutable,
+ * we also cache the instance of {@link FunctionObject} that we get from the
+ * {@link com.endoflineblog.truffle.part_09.runtime.GlobalScopeObject},
+ * and also call {@link FunctionObject#redefine}.
  */
 public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     private final String funcName;

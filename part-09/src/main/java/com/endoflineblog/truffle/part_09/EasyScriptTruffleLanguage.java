@@ -18,10 +18,9 @@ import java.util.stream.IntStream;
 
 /**
  * The {@link TruffleLanguage} implementation for this part of the article series.
- * Basically identical to the class with the same name from part 7,
- * the only difference is creating the main {@link com.oracle.truffle.api.nodes.RootNode}
- * with a {@link com.oracle.truffle.api.frame.FrameDescriptor}
- * returned by {@link EasyScriptTruffleParser#parse}.
+ * Basically identical to the class with the same name from part 8,
+ * the only difference is adjusting the code that creates the built-in functions
+ * to account for changes in the API of {@link com.endoflineblog.truffle.part_09.runtime.GlobalScopeObject#registerFunction}.
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {

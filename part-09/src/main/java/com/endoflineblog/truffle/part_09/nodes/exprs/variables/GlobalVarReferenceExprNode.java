@@ -10,12 +10,15 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * A Node that represents the expression of referencing a global variable in EasyScript.
- * Identical to the class with the same name from part 7.
+ * Very similar to the class with the same name from part 8,
+ * the only difference is, since {@link FunctionObject} is now mutable,
+ * we add caching references to variables that resolve to functions.
  */
 @NodeField(name = "name", type = String.class)
 public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
+    /** The cached reference to a function that is used if this variable refers to a function. */
     @CompilationFinal
     private FunctionObject cachedFunction = null;
 

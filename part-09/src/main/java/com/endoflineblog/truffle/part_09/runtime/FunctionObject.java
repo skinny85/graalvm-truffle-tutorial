@@ -14,10 +14,15 @@ import com.oracle.truffle.api.utilities.CyclicAssumption;
 
 /**
  * The object that represents a function in EasyScript.
- * Almost identical to the class with the same name from part 6,
- * except we save the number of arguments the function takes.
+ * The big difference between this, and the class with the same name from part 8,
+ * is that this class is mutable -
+ * the {@link CallTarget} it wraps can be changed using the
+ * {@link #redefine} method.
+ * We add an {@link Assumption} that tracks whether a function was redefined,
+ * and we check that assumption in {@link FunctionDispatchNode}.
  *
- * @see #argumentCount
+ * @see #redefine
+ * @see #getFunctionWasNotRedefinedAssumption
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject implements TruffleObject {
@@ -35,7 +40,6 @@ public final class FunctionObject implements TruffleObject {
      */
     private int argumentCount;
 
-
     public FunctionObject(String functionName, CallTarget callTarget, int argumentCount) {
         this.functionName = functionName;
         this.functionWasNotRedefinedCyclicAssumption = new CyclicAssumption(this.functionName);
@@ -44,6 +48,13 @@ public final class FunctionObject implements TruffleObject {
         this.argumentCount = argumentCount;
     }
 
+    /**
+     * Change the {@link CallTarget} this {@link FunctionObject} wraps,
+     * if it's different than the one currently being wrapped.
+     * Invalidates the last {@link Assumption} returned by
+     * {@link #getFunctionWasNotRedefinedAssumption()},
+     * and creates a new one that will now be returned from that method.
+     */
     public void redefine(CallTarget callTarget, int argumentCount) {
         if (this.callTarget != callTarget) {
             this.callTarget = callTarget;
@@ -52,6 +63,11 @@ public final class FunctionObject implements TruffleObject {
         }
     }
 
+    /**
+     * Return an Assumption that becomes invalidated after {@link #redefine}
+     * is called (for a different {@link CallTarget} than the current one)
+     * after this method has been.
+     */
     public Assumption getFunctionWasNotRedefinedAssumption() {
         return this.functionWasNotRedefinedCyclicAssumption.getAssumption();
     }

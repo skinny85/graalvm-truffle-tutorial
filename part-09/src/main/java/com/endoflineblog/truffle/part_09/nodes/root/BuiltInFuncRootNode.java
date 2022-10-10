@@ -8,7 +8,7 @@ import com.oracle.truffle.api.nodes.RootNode;
 /**
  * The {@link RootNode} for our built-in functions.
  * Simply wraps the expression Node representing the body of the function.
- * Identical to the class with the same name from part 7.
+ * Identical to the class with the same name from part 8.
  */
 public final class BuiltInFuncRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
