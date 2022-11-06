@@ -1,0 +1,12 @@
+plugins {
+    id 'antlr'
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:$antlr_version"
+}
+
+// required to allow GraalVM to discover our EasyScript language class
+test {
+    jvmArgs '-Dgraalvm.locatorDisabled=true'
+}
