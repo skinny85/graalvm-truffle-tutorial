@@ -9,6 +9,7 @@ import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.AdditionExprNode
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.SubtractionExprNodeGen;
+import com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayLiteralExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.comparisons.EqualityExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.comparisons.GreaterExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.comparisons.GreaterOrEqualExprNodeGen;
@@ -45,6 +46,7 @@ import com.endoflineblog.truffle.part_10.parsing.antlr.EasyScriptParser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import com.oracle.truffle.api.object.Shape;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -68,7 +70,7 @@ import java.util.stream.Collectors;
  * @see #parse
  */
 public final class EasyScriptTruffleParser {
-    public static ParsingResult parse(Reader program) throws IOException {
+    public static ParsingResult parse(Reader program, Shape arrayShape) throws IOException {
         var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
         // remove the default console error listener
         lexer.removeErrorListeners();
@@ -77,12 +79,14 @@ public final class EasyScriptTruffleParser {
         parser.removeErrorListeners();
         // throw an exception when a parsing error is encountered
         parser.setErrorHandler(new BailErrorStrategy());
-        var easyScriptTruffleParser = new EasyScriptTruffleParser();
+        var easyScriptTruffleParser = new EasyScriptTruffleParser(arrayShape);
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
         return new ParsingResult(
                 new BlockStmtNode(stmts),
                 easyScriptTruffleParser.frameDescriptor);
     }
+
+    private final Shape arrayShape;
 
     private enum ParserState { TOP_LEVEL, NESTED_SCOPE_IN_TOP_LEVEL, FUNC_DEF }
 
@@ -109,7 +113,8 @@ public final class EasyScriptTruffleParser {
      */
     private int localVariablesCounter;
 
-    private EasyScriptTruffleParser() {
+    private EasyScriptTruffleParser(Shape arrayShape) {
+        this.arrayShape = arrayShape;
         this.state = ParserState.TOP_LEVEL;
         this.frameDescriptor = new FrameDescriptor();
         this.localScopes = new Stack<>();
@@ -433,6 +438,8 @@ public final class EasyScriptTruffleParser {
             return parseReference(complexRef.ID().stream()
                     .map(id -> id.getText())
                     .collect(Collectors.joining(".")));
+        } else if (expr5 instanceof EasyScriptParser.ArrayExpr5Context) {
+            return parseArrayExpr((EasyScriptParser.ArrayExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
             return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
         } else {
@@ -468,6 +475,12 @@ public final class EasyScriptTruffleParser {
                     // this means this is a local variable
                     : LocalVarReferenceExprNodeGen.create((FrameSlot) paramIndexOrFrameSlot);
         }
+    }
+
+    private ArrayLiteralExprNode parseArrayExpr(EasyScriptParser.ArrayExpr5Context arrayExpr) {
+        return new ArrayLiteralExprNode(this.arrayShape, arrayExpr.expr1().stream()
+                .map(arrayElExpr -> this.parseExpr1(arrayElExpr))
+                .collect(Collectors.toList()));
     }
 
     private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr5Context callExpr) {

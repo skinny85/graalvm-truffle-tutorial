@@ -14,6 +14,7 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.object.Shape;
 
 import java.util.stream.IntStream;
 
@@ -33,9 +34,12 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return REF.get(node);
     }
 
+    private final Shape arrayShape = Shape.newBuilder().build();
+
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
-        ParsingResult parsingResult = EasyScriptTruffleParser.parse(request.getSource().getReader());
+        ParsingResult parsingResult = EasyScriptTruffleParser.parse(
+                request.getSource().getReader(), this.arrayShape);
         var programRootNode = new StmtBlockRootNode(this, parsingResult.topLevelFrameDescriptor,
                 parsingResult.programStmtBlock);
         return Truffle.getRuntime().createCallTarget(programRootNode);
