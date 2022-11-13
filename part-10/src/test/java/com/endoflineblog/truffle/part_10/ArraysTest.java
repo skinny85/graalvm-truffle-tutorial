@@ -32,4 +32,12 @@ public class ArraysTest {
         assertEquals(1, result.getArraySize());
         assertEquals(11, result.getArrayElement(0).asInt());
     }
+
+    @Test
+    public void array_can_be_indexed() {
+        Value result = this.context.eval("ezs",
+                "[1, 9][1]"
+        );
+        assertEquals(9, result.asInt());
+    }
 }

@@ -9,6 +9,7 @@ import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.AdditionExprNode
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.SubtractionExprNodeGen;
+import com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayIndexingExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayLiteralExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.comparisons.EqualityExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.comparisons.GreaterExprNodeGen;
@@ -344,9 +345,13 @@ public final class EasyScriptTruffleParser {
         if (expr1 == null) {
             return null;
         }
-        return expr1 instanceof EasyScriptParser.AssignmentExpr1Context
-                ? parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1)
-                : parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
+        if (expr1 instanceof EasyScriptParser.AssignmentExpr1Context) {
+            return parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1);
+        } else if (expr1 instanceof EasyScriptParser.ArrayIndexingExpr1Context) {
+            return this.parseArrayIndexingExpr((EasyScriptParser.ArrayIndexingExpr1Context) expr1);
+        } else {
+            return parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
+        }
     }
 
     private EasyScriptExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
@@ -366,6 +371,12 @@ public final class EasyScriptTruffleParser {
                 return LocalVarAssignmentExprNodeGen.create(initializerExpr, frameSlot);
             }
         }
+    }
+
+    private EasyScriptExprNode parseArrayIndexingExpr(EasyScriptParser.ArrayIndexingExpr1Context arrayIndexingExpr) {
+        return ArrayIndexingExprNodeGen.create(
+                this.parseExpr1(arrayIndexingExpr.arr),
+                this.parseExpr1(arrayIndexingExpr.index));
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
