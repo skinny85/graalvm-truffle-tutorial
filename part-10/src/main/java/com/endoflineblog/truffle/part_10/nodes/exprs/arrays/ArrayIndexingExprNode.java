@@ -20,12 +20,12 @@ public abstract class ArrayIndexingExprNode extends EasyScriptExprNode {
         try {
             return arraysInteropLibrary.readArrayElement(array, index);
         } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
-            throw new EasyScriptException(e.getMessage());
+            throw new EasyScriptException(this, e.getMessage());
         }
     }
 
     @Fallback
-    protected Object readNonIntIndexOrNonArray(@SuppressWarnings("unused") Object array,
+    protected Object readNonArrayOrNonIntIndex(@SuppressWarnings("unused") Object array,
             @SuppressWarnings("unused") Object index) {
         return Undefined.INSTANCE;
     }

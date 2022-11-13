@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_10.runtime;
 
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
@@ -28,16 +27,15 @@ public final class ArrayObject extends DynamicObject {
 
     @ExportMessage
     boolean isArrayElementReadable(long index) {
-        // ToDo this should probably return 'true' always
-        return index >= 0 && index < this.arrayElements.length;
+        // in JavaScript, it's legal to take any index of an array -
+        // indexes out of bounds simply return 'undefined'
+        return true;
     }
 
     @ExportMessage
-    Object readArrayElement(long index) throws InvalidArrayIndexException {
-        if (!this.isArrayElementReadable(index)) {
-            // ToDo this should return 'undefined'
-            throw InvalidArrayIndexException.create(index);
-        }
-        return this.arrayElements[(int) index];
+    Object readArrayElement(long index) {
+        return index >= 0 && index < this.arrayElements.length
+                ? this.arrayElements[(int) index]
+                : Undefined.INSTANCE;
     }
 }
