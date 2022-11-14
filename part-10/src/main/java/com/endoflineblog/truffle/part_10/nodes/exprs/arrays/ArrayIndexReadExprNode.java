@@ -13,12 +13,12 @@ import com.oracle.truffle.api.library.CachedLibrary;
 
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
-public abstract class ArrayIndexingExprNode extends EasyScriptExprNode {
-    @Specialization(guards = "arraysInteropLibrary.hasArrayElements(array)", limit = "3")
+public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
+    @Specialization(guards = "arrayInteropLibrary.hasArrayElements(array)", limit = "3")
     protected Object readIntIndex(Object array, int index,
-            @CachedLibrary("array") InteropLibrary arraysInteropLibrary) {
+            @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
         try {
-            return arraysInteropLibrary.readArrayElement(array, index);
+            return arrayInteropLibrary.readArrayElement(array, index);
         } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
             throw new EasyScriptException(this, e.getMessage());
         }
