@@ -14,7 +14,7 @@ import com.oracle.truffle.api.library.CachedLibrary;
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
 public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
-    @Specialization(guards = "arrayInteropLibrary.hasArrayElements(array)", limit = "3")
+    @Specialization(guards = "arrayInteropLibrary.isArrayElementReadable(array, index)", limit = "3")
     protected Object readIntIndex(Object array, int index,
             @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
         try {
