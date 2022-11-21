@@ -23,6 +23,7 @@ func_args : (ID (',' ID)* )? ;
 
 expr1 : ID '=' expr1                                       #AssignmentExpr1
       | arr=expr5 '[' index=expr1 ']'                      #ArrayIndexReadExpr1
+      | arr=expr5 '[' index=expr1 ']' '=' rvalue=expr1     #ArrayIndexWriteExpr1
       | expr2                                              #PrecedenceTwoExpr1
       ;
 expr2 : left=expr2 c=('===' | '!==') right=expr3           #EqNotEqExpr2

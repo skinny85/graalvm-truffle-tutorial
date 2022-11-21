@@ -9,7 +9,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/** This is a set of unit tests for testing support for arrays in EasyScript. */
+/**
+ * This is a set of unit tests for testing support for arrays in EasyScript.
+ */
 public class ArraysTest {
     private Context context;
 
@@ -66,5 +68,47 @@ public class ArraysTest {
         );
         assertTrue(result.isNull());
         assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    public void index_in_array_can_be_overwritten() {
+        Value result = this.context.eval("ezs", "" +
+                "let a = [9]; " +
+                "a[0] = 45; " +
+                "a[0]"
+        );
+        assertEquals(45, result.asInt());
+    }
+
+    @Test
+    public void index_beyond_array_size_can_be_assigned_and_fills_array_with_undefined() {
+        Value array = this.context.eval("ezs", "" +
+                "let a = [9]; " +
+                "a[2] = 45; " +
+                "a"
+        );
+
+        assertEquals(9, array.getArrayElement(0).asInt());
+
+        Value valueAtIndex1 = array.getArrayElement(1);
+        assertTrue(valueAtIndex1.isNull());
+        assertEquals("undefined", valueAtIndex1.toString());
+
+        assertEquals(45, array.getArrayElement(2).asInt());
+
+        assertEquals(3, array.getArraySize());
+    }
+
+    @Test
+    public void non_int_indexes_are_ignored_on_write() {
+        Value result = this.context.eval("ezs", "" +
+                "let a = [9]; " +
+                "a[Math.abs] = 45; "
+        );
+
+        assertEquals(45, result.asInt());
+
+        Value array = this.context.getBindings("ezs").getMember("a");
+        assertEquals(1, array.getArraySize());
     }
 }

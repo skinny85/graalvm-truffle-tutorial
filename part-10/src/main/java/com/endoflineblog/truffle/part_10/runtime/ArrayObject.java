@@ -8,7 +8,7 @@ import com.oracle.truffle.api.object.Shape;
 
 @ExportLibrary(InteropLibrary.class)
 public final class ArrayObject extends DynamicObject {
-    private final Object[] arrayElements;
+    private Object[] arrayElements;
 
     public ArrayObject(Shape arrayShape, Object[] arrayElements) {
         super(arrayShape);
@@ -27,9 +27,12 @@ public final class ArrayObject extends DynamicObject {
 
     @ExportMessage
     boolean isArrayElementReadable(long index) {
-        // in JavaScript, it's legal to take any index of an array -
-        // indexes out of bounds simply return 'undefined'
-        return true;
+        // In JavaScript, it's legal to take any index of an array -
+        // indexes out of bounds simply return 'undefined'.
+        // However, in GraalVM interop,
+        // the same index cannot be both readable and insertable,
+        // so we consider elements readable that are in the array
+        return index >= 0 && index < this.arrayElements.length;
     }
 
     @ExportMessage
@@ -37,5 +40,31 @@ public final class ArrayObject extends DynamicObject {
         return index >= 0 && index < this.arrayElements.length
                 ? this.arrayElements[(int) index]
                 : Undefined.INSTANCE;
+    }
+
+    @ExportMessage
+    boolean isArrayElementModifiable(long index) {
+        return this.isArrayElementReadable(index);
+    }
+
+    @ExportMessage
+    boolean isArrayElementInsertable(long index) {
+        return index >= this.arrayElements.length;
+    }
+
+    @ExportMessage
+    void writeArrayElement(long index, Object value) {
+        if (this.isArrayElementModifiable(index)) {
+            this.arrayElements[(int) index] = value;
+        } else {
+            Object[] newArrayElements = new Object[(int) index + 1];
+            for (int i = 0; i < index; i++) {
+                newArrayElements[i] = i < this.arrayElements.length
+                        ? this.arrayElements[i]
+                        : Undefined.INSTANCE;
+            }
+            newArrayElements[(int) index] = value;
+            this.arrayElements = newArrayElements;
+        }
     }
 }

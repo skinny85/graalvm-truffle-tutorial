@@ -10,6 +10,7 @@ import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNode
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.SubtractionExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayIndexReadExprNodeGen;
+import com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayIndexWriteExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayLiteralExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.comparisons.EqualityExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.comparisons.GreaterExprNodeGen;
@@ -349,6 +350,8 @@ public final class EasyScriptTruffleParser {
             return parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1);
         } else if (expr1 instanceof EasyScriptParser.ArrayIndexReadExpr1Context) {
             return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr1Context) expr1);
+        } else if (expr1 instanceof EasyScriptParser.ArrayIndexWriteExpr1Context) {
+            return this.parseArrayIndexWriteExpr((EasyScriptParser.ArrayIndexWriteExpr1Context) expr1);
         } else {
             return parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
         }
@@ -377,6 +380,13 @@ public final class EasyScriptTruffleParser {
         return ArrayIndexReadExprNodeGen.create(
                 this.parseExpr5(arrayIndexReadExpr.arr),
                 this.parseExpr1(arrayIndexReadExpr.index));
+    }
+
+    private EasyScriptExprNode parseArrayIndexWriteExpr(EasyScriptParser.ArrayIndexWriteExpr1Context arrayIndexWriteExpr) {
+        return ArrayIndexWriteExprNodeGen.create(
+                this.parseExpr5(arrayIndexWriteExpr.arr),
+                this.parseExpr1(arrayIndexWriteExpr.index),
+                this.parseExpr1(arrayIndexWriteExpr.rvalue));
     }
 
     private EasyScriptExprNode parseExpr2(EasyScriptParser.Expr2Context expr2) {
