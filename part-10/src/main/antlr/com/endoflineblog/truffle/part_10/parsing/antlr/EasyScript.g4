@@ -22,7 +22,6 @@ binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;
 
 expr1 : ID '=' expr1                                       #AssignmentExpr1
-      | arr=expr5 '[' index=expr1 ']'                      #ArrayIndexReadExpr1
       | arr=expr5 '[' index=expr1 ']' '=' rvalue=expr1     #ArrayIndexWriteExpr1
       | expr2                                              #PrecedenceTwoExpr1
       ;
@@ -40,6 +39,7 @@ expr5 : literal                                            #LiteralExpr5
       | ID                                                 #SimpleReferenceExpr5
       | ID '.' ID                                          #ComplexReferenceExpr5
       | '[' (expr1 (',' expr1)*)? ']'                      #ArrayExpr5
+      | arr=expr5 '[' index=expr1 ']'                      #ArrayIndexReadExpr5
       | expr5 '(' (expr1 (',' expr1)*)? ')'                #CallExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;

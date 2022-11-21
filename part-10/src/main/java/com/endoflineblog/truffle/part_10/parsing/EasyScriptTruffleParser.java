@@ -348,8 +348,6 @@ public final class EasyScriptTruffleParser {
         }
         if (expr1 instanceof EasyScriptParser.AssignmentExpr1Context) {
             return parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1);
-        } else if (expr1 instanceof EasyScriptParser.ArrayIndexReadExpr1Context) {
-            return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr1Context) expr1);
         } else if (expr1 instanceof EasyScriptParser.ArrayIndexWriteExpr1Context) {
             return this.parseArrayIndexWriteExpr((EasyScriptParser.ArrayIndexWriteExpr1Context) expr1);
         } else {
@@ -374,12 +372,6 @@ public final class EasyScriptTruffleParser {
                 return LocalVarAssignmentExprNodeGen.create(initializerExpr, frameSlot);
             }
         }
-    }
-
-    private EasyScriptExprNode parseArrayIndexReadExpr(EasyScriptParser.ArrayIndexReadExpr1Context arrayIndexReadExpr) {
-        return ArrayIndexReadExprNodeGen.create(
-                this.parseExpr5(arrayIndexReadExpr.arr),
-                this.parseExpr1(arrayIndexReadExpr.index));
     }
 
     private EasyScriptExprNode parseArrayIndexWriteExpr(EasyScriptParser.ArrayIndexWriteExpr1Context arrayIndexWriteExpr) {
@@ -461,6 +453,8 @@ public final class EasyScriptTruffleParser {
                     .collect(Collectors.joining(".")));
         } else if (expr5 instanceof EasyScriptParser.ArrayExpr5Context) {
             return parseArrayExpr((EasyScriptParser.ArrayExpr5Context) expr5);
+        } else if (expr5 instanceof EasyScriptParser.ArrayIndexReadExpr5Context) {
+            return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
             return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
         } else {
@@ -502,6 +496,12 @@ public final class EasyScriptTruffleParser {
         return new ArrayLiteralExprNode(this.arrayShape, arrayExpr.expr1().stream()
                 .map(arrayElExpr -> this.parseExpr1(arrayElExpr))
                 .collect(Collectors.toList()));
+    }
+
+    private EasyScriptExprNode parseArrayIndexReadExpr(EasyScriptParser.ArrayIndexReadExpr5Context arrayIndexReadExpr) {
+        return ArrayIndexReadExprNodeGen.create(
+                this.parseExpr5(arrayIndexReadExpr.arr),
+                this.parseExpr1(arrayIndexReadExpr.index));
     }
 
     private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr5Context callExpr) {

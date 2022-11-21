@@ -37,14 +37,15 @@ public class ArraysTest {
 
     @Test
     public void array_can_be_indexed() {
-        Value result = this.context.eval("ezs",
-                "[1, 9][1]"
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [3, 6]; " +
+                "arr[0] + arr[1]"
         );
         assertEquals(9, result.asInt());
     }
 
     @Test
-    public void accessing_an_out_of_bound_array_index_returns_undefined() {
+    public void reading_an_out_of_bound_array_index_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "[1, 9][2]"
         );
@@ -53,9 +54,27 @@ public class ArraysTest {
     }
 
     @Test
-    public void using_a_double_array_index_returns_undefined() {
+    public void reading_a_double_array_index_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "[1, 9][0.5]"
+        );
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    public void reading_a_negative_array_index_returns_undefined() {
+        Value result = this.context.eval("ezs",
+                "[1, 9][-3]"
+        );
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    public void reading_a_non_number_array_index_returns_undefined() {
+        Value result = this.context.eval("ezs",
+                "[1, 9][Math.pow]"
         );
         assertTrue(result.isNull());
         assertEquals("undefined", result.toString());
@@ -71,7 +90,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void index_in_array_can_be_overwritten() {
+    public void index_in_array_can_be_written_to() {
         Value result = this.context.eval("ezs", "" +
                 "let a = [9]; " +
                 "a[0] = 45; " +
@@ -101,14 +120,22 @@ public class ArraysTest {
 
     @Test
     public void non_int_indexes_are_ignored_on_write() {
-        Value result = this.context.eval("ezs", "" +
-                "let a = [9]; " +
-                "a[Math.abs] = 45; "
+        Value result = this.context.eval("ezs",
+                "[1][Math.abs] = 45; "
         );
 
         assertEquals(45, result.asInt());
+    }
 
-        Value array = this.context.getBindings("ezs").getMember("a");
+    @Test
+    public void negative_indexes_are_ignored_on_write() {
+        Value array = this.context.eval("ezs", "" +
+                "let a = [9]; " +
+                "a[-1] = 45; " +
+                "a"
+        );
+
         assertEquals(1, array.getArraySize());
+        assertEquals(9, array.getArrayElement(0).asInt());
     }
 }
