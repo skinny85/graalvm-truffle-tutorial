@@ -3,8 +3,6 @@ package com.endoflineblog.truffle.part_10.nodes.exprs.variables;
 import com.endoflineblog.truffle.part_10.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_10.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
-import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 
@@ -19,15 +17,15 @@ public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
     /** The cached reference to a function that is used if this variable refers to a function. */
-    @CompilationFinal
-    private FunctionObject cachedFunction = null;
+//    @CompilationFinal
+//    private FunctionObject cachedFunction = null;
 
     @Specialization
     protected Object readVariable() {
         // consult the cache ("fast path" if it's populated)
-        if (this.cachedFunction != null) {
-            return this.cachedFunction;
-        }
+//        if (this.cachedFunction != null) {
+//            return this.cachedFunction;
+//        }
 
         // look up the variable in the global scope map ("slow path")...
         String variableId = this.getName();
@@ -38,10 +36,10 @@ public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
         }
 
         // ...and populate the cache if it's a function
-        if (value instanceof FunctionObject) {
-            CompilerDirectives.transferToInterpreterAndInvalidate();
-            this.cachedFunction = (FunctionObject) value;
-        }
+//        if (value instanceof FunctionObject) {
+//            CompilerDirectives.transferToInterpreterAndInvalidate();
+//            this.cachedFunction = (FunctionObject) value;
+//        }
 
         return value;
     }
