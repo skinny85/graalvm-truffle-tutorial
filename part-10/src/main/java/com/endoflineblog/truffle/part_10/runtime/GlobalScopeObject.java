@@ -44,6 +44,11 @@ public final class GlobalScopeObject implements TruffleObject {
     private final Map<String, Object> variables = new HashMap<>();
     private final Set<String> constants = new HashSet<>();
 
+    public void newBuiltInConstant(String name, Object value) {
+        this.variables.put(name, value);
+        this.constants.add(name);
+    }
+
     public boolean newVariable(String name, DeclarationKind declarationKind) {
         Object existingValue = this.variables.put(name, declarationKind == DeclarationKind.VAR
                 // the default value for 'var' is 'undefined'

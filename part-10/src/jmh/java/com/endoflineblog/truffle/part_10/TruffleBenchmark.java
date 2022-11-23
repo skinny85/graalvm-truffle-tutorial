@@ -25,7 +25,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Warmup(iterations = 5, time = 1)
 @Measurement(iterations = 5, time = 1)
-@Fork(value = 1, jvmArgsAppend = "-Dgraalvm.locatorDisabled=true")
+@Fork(value = 1, jvmArgsAppend = {
+        "-Dgraalvm.locatorDisabled=true",
+        "--add-exports",
+        "org.graalvm.truffle/com.oracle.truffle.api.staticobject=ALL-UNNAMED"
+})
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Benchmark)

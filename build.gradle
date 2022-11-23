@@ -19,7 +19,9 @@ subprojects {
                 '--add-exports',
                     'org.graalvm.truffle/com.oracle.truffle.api.nodes=ALL-UNNAMED',
                 '--add-exports',
-                    'org.graalvm.truffle/com.oracle.truffle.api.dsl=ALL-UNNAMED'
+                    'org.graalvm.truffle/com.oracle.truffle.api.dsl=ALL-UNNAMED',
+                '--add-exports',
+                    'org.graalvm.truffle/com.oracle.truffle.api.staticobject=ALL-UNNAMED'
 
         testLogging {
             events 'failed'

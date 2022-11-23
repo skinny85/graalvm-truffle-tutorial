@@ -8,7 +8,9 @@ import com.endoflineblog.truffle.part_10.nodes.root.BuiltInFuncRootNode;
 import com.endoflineblog.truffle.part_10.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_10.parsing.EasyScriptTruffleParser;
 import com.endoflineblog.truffle.part_10.parsing.ParsingResult;
+import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject;
+import com.endoflineblog.truffle.part_10.runtime.MathObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -49,8 +51,9 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     protected EasyScriptLanguageContext createContext(Env env) {
         var context = new EasyScriptLanguageContext();
 
-        this.defineBuiltInFunction(context, "Math.abs", AbsFunctionBodyExprNodeFactory.getInstance());
-        this.defineBuiltInFunction(context, "Math.pow", PowFunctionBodyExprNodeFactory.getInstance());
+        context.globalScopeObject.newBuiltInConstant("Math", MathObject.create(this,
+                this.defineBuiltInFunction("abs", AbsFunctionBodyExprNodeFactory.getInstance()),
+                this.defineBuiltInFunction("pow", PowFunctionBodyExprNodeFactory.getInstance())));
 
         return context;
     }
@@ -60,13 +63,13 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return context.globalScopeObject;
     }
 
-    private void defineBuiltInFunction(EasyScriptLanguageContext context, String name,
+    private FunctionObject defineBuiltInFunction(String name,
             NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         int argumentCount = nodeFactory.getExecutionSignature().size();
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
-        context.globalScopeObject.registerFunction(
+        return new FunctionObject(
                 name,
                 Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
                         nodeFactory.createNode((Object) functionArguments))),

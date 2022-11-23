@@ -25,6 +25,7 @@ import com.endoflineblog.truffle.part_10.nodes.exprs.literals.BoolLiteralExprNod
 import com.endoflineblog.truffle.part_10.nodes.exprs.literals.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.literals.IntLiteralExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.literals.UndefinedLiteralExprNode;
+import com.endoflineblog.truffle.part_10.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.variables.LocalVarAssignmentExprNodeGen;
@@ -444,13 +445,10 @@ public final class EasyScriptTruffleParser {
     private EasyScriptExprNode parseExpr5(EasyScriptParser.Expr5Context expr5) {
         if (expr5 instanceof EasyScriptParser.LiteralExpr5Context) {
             return parseLiteralExpr((EasyScriptParser.LiteralExpr5Context) expr5);
-        } else if (expr5 instanceof EasyScriptParser.SimpleReferenceExpr5Context) {
-            return parseReference(((EasyScriptParser.SimpleReferenceExpr5Context) expr5).ID().getText());
-        } else if (expr5 instanceof EasyScriptParser.ComplexReferenceExpr5Context) {
-            var complexRef = (EasyScriptParser.ComplexReferenceExpr5Context) expr5;
-            return parseReference(complexRef.ID().stream()
-                    .map(id -> id.getText())
-                    .collect(Collectors.joining(".")));
+        } else if (expr5 instanceof EasyScriptParser.ReferenceExpr5Context) {
+            return parseReference(((EasyScriptParser.ReferenceExpr5Context) expr5).ID().getText());
+        } else if (expr5 instanceof EasyScriptParser.PropertyReadExpr5Context) {
+            return this.parsePropertyReadExpr((EasyScriptParser.PropertyReadExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.ArrayExpr5Context) {
             return parseArrayExpr((EasyScriptParser.ArrayExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.ArrayIndexReadExpr5Context) {
@@ -490,6 +488,12 @@ public final class EasyScriptTruffleParser {
                     // this means this is a local variable
                     : LocalVarReferenceExprNodeGen.create((FrameSlot) paramIndexOrFrameSlot);
         }
+    }
+
+    private EasyScriptExprNode parsePropertyReadExpr(EasyScriptParser.PropertyReadExpr5Context propertyReadExpr) {
+        return PropertyReadExprNodeGen.create(
+                this.parseExpr5(propertyReadExpr.expr5()),
+                propertyReadExpr.ID().getText());
     }
 
     private ArrayLiteralExprNode parseArrayExpr(EasyScriptParser.ArrayExpr5Context arrayExpr) {

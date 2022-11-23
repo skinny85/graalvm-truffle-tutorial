@@ -176,27 +176,27 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void Math_cannot_be_referenced_by_itself() {
+    public void Math_can_be_referenced_by_itself() {
+        Value result = this.context.eval("ezs",
+                "Math"
+        );
+
+        assertTrue(result.hasMembers());
+        assertEquals(2, result.getMemberKeys().size()); // 'abs' and 'pow' functions
+    }
+
+    @Test
+    public void Math_is_not_a_legal_variable_name() {
         try {
             this.context.eval("ezs",
-                    "Math"
+                    "let Math = -5;"
             );
             fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
-            assertEquals("'Math' is not defined", e.getMessage());
+            assertEquals("Identifier 'Math' has already been declared", e.getMessage());
         }
-    }
-
-    @Test
-    public void Math_is_a_legal_variable_name() {
-        Value result = this.context.eval("ezs",
-                "let Math = -5; " +
-                "Math.abs(Math)"
-        );
-
-        assertEquals(5, result.asInt());
     }
 
     @Test
