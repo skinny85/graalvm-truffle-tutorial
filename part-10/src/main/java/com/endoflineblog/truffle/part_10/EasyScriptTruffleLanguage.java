@@ -9,22 +9,20 @@ import com.endoflineblog.truffle.part_10.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_10.parsing.EasyScriptTruffleParser;
 import com.endoflineblog.truffle.part_10.parsing.ParsingResult;
 import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
-import com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject;
 import com.endoflineblog.truffle.part_10.runtime.MathObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 import java.util.stream.IntStream;
 
 /**
  * The {@link TruffleLanguage} implementation for this part of the article series.
- * Basically identical to the class with the same name from part 8,
- * the only difference is adjusting the code that creates the built-in functions
- * to account for changes in the API of {@link GlobalScopeObject#registerFunction}.
+ * Basically identical to the class with the same name from part 8.
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
@@ -37,6 +35,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     }
 
     private final Shape arrayShape = Shape.newBuilder().build();
+    private final Shape globalScopeShape = Shape.newBuilder().build();
 
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
@@ -49,11 +48,14 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var context = new EasyScriptLanguageContext();
+        var context = new EasyScriptLanguageContext(this.globalScopeShape);
+        var globalScopeObject = context.globalScopeObject;
 
-        context.globalScopeObject.newBuiltInConstant("Math", MathObject.create(this,
-                this.defineBuiltInFunction("abs", AbsFunctionBodyExprNodeFactory.getInstance()),
-                this.defineBuiltInFunction("pow", PowFunctionBodyExprNodeFactory.getInstance())));
+        var objectLibrary = DynamicObjectLibrary.getUncached();
+        // the 1 flag indicates Math is a constant, and cannot be reassigned
+        objectLibrary.putConstant(globalScopeObject, "Math", MathObject.create(this,
+            this.defineBuiltInFunction("abs", AbsFunctionBodyExprNodeFactory.getInstance()),
+            this.defineBuiltInFunction("pow", PowFunctionBodyExprNodeFactory.getInstance())), 1);
 
         return context;
     }

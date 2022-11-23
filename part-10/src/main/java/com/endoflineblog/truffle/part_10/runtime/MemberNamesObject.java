@@ -6,22 +6,16 @@ import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
-import java.util.Collection;
-
 /**
  * The class that implements the collection of member names of a {@link TruffleObject}.
  * Used in the {@link GlobalScopeObject#getMembers} and {@link MathObject#getMembers} methods.
  */
 @ExportLibrary(InteropLibrary.class)
 final class MemberNamesObject implements TruffleObject {
-    private final String[] names;
+    private final Object[] names;
 
-    MemberNamesObject(String[] names) {
+    MemberNamesObject(Object[] names) {
         this.names = names;
-    }
-
-    MemberNamesObject(Collection<String> names) {
-        this.names = names.toArray(new String[0]);
     }
 
     @ExportMessage

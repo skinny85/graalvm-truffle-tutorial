@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_10.common.DeclarationKind;
 import com.endoflineblog.truffle.part_10.common.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_10.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_10.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_10.nodes.exprs.GlobalScopeObjectExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.AdditionExprNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.arithmetic.NegationExprNodeGen;
@@ -42,7 +43,8 @@ import com.endoflineblog.truffle.part_10.nodes.stmts.loops.DoWhileStmtNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.loops.ForStmtNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.loops.WhileStmtNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.variables.FuncDeclStmtNode;
-import com.endoflineblog.truffle.part_10.nodes.stmts.variables.GlobalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_10.nodes.stmts.variables.FuncDeclStmtNodeGen;
+import com.endoflineblog.truffle.part_10.nodes.stmts.variables.GlobalVarDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_10.nodes.stmts.variables.LocalVarDeclStmtNode;
 import com.endoflineblog.truffle.part_10.parsing.antlr.EasyScriptLexer;
 import com.endoflineblog.truffle.part_10.parsing.antlr.EasyScriptParser;
@@ -142,7 +144,7 @@ public final class EasyScriptTruffleParser {
                     String variableId = varBinding.ID().getText();
                     if (this.state == ParserState.TOP_LEVEL) {
                         // this is a global variable
-                        varDecls.add(new GlobalVarDeclStmtNode(variableId, declarationKind));
+                        varDecls.add(GlobalVarDeclStmtNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId, declarationKind));
                     } else {
                         // this is a local variable (either of a function, or on the top-level)
                         var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
@@ -198,7 +200,7 @@ public final class EasyScriptTruffleParser {
                         initializerExpr = this.parseExpr1(bindingExpr);
                     }
                     EasyScriptExprNode assignmentExpr = this.state == ParserState.TOP_LEVEL
-                            ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
+                            ? GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId)
                             :  LocalVarAssignmentExprNodeGen.create(initializerExpr,
                                 (FrameSlot) this.localScopes.peek().get(variableId));
                     nonDeclStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
@@ -339,7 +341,8 @@ public final class EasyScriptTruffleParser {
         this.state = previousParserState;
         this.localScopes = previousLocalScopes;
 
-        return new FuncDeclStmtNode(funcDeclStmt.name.getText(),
+        return FuncDeclStmtNodeGen.create(GlobalScopeObjectExprNodeGen.create(),
+                funcDeclStmt.name.getText(),
                 frameDescriptor, new UserFuncBodyStmtNode(funcStmts), argumentCount);
     }
 
@@ -361,7 +364,7 @@ public final class EasyScriptTruffleParser {
         Object paramIndexOrFrameSlot = this.findLocalVariable(variableId);
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
         if (paramIndexOrFrameSlot == null) {
-            return GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId);
+            return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
         } else {
             if (paramIndexOrFrameSlot instanceof Integer) {
                 return new WriteFunctionArgExprNode((Integer) paramIndexOrFrameSlot, initializerExpr);
@@ -480,7 +483,7 @@ public final class EasyScriptTruffleParser {
         Object paramIndexOrFrameSlot = this.findLocalVariable(variableId);
         if (paramIndexOrFrameSlot == null) {
             // we know for sure this is a reference to a global variable
-            return GlobalVarReferenceExprNodeGen.create(variableId);
+            return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
         } else {
             return paramIndexOrFrameSlot instanceof Integer
                     // an int means this is a function parameter

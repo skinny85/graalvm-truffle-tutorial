@@ -200,6 +200,20 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
+    public void Math_cannot_be_reassigned() {
+        try {
+            this.context.eval("ezs",
+                    "Math = -5;"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Assignment to constant variable 'Math'", e.getMessage());
+        }
+    }
+
+    @Test
     public void parsing_a_large_integer_fall_backs_to_double() {
         // this is 12,345,678,901
         Value result = this.context.eval("ezs", "12345678901");

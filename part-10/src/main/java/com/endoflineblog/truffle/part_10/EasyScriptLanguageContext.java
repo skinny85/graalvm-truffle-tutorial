@@ -3,6 +3,8 @@ package com.endoflineblog.truffle.part_10;
 import com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.object.DynamicObject;
+import com.oracle.truffle.api.object.Shape;
 
 /**
  * The class of the context for the
@@ -18,9 +20,9 @@ public final class EasyScriptLanguageContext {
         return REF.get(node);
     }
 
-    public final GlobalScopeObject globalScopeObject;
+    public final DynamicObject globalScopeObject;
 
-    public EasyScriptLanguageContext() {
-        this.globalScopeObject = new GlobalScopeObject();
+    public EasyScriptLanguageContext(Shape globalScopeShape) {
+        this.globalScopeObject = new GlobalScopeObject(globalScopeShape);
     }
 }

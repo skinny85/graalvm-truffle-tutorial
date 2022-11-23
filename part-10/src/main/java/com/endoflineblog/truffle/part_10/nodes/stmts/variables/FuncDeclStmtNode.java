@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_10.nodes.stmts.variables;
 
+import com.endoflineblog.truffle.part_10.nodes.exprs.GlobalScopeObjectExprNode;
 import com.endoflineblog.truffle.part_10.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.blocks.UserFuncBodyStmtNode;
@@ -10,8 +11,13 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.Truffle;
+import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.NodeField;
+import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameDescriptor;
-import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
@@ -23,14 +29,16 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * {@link GlobalScopeObject},
  * and also call {@link FunctionObject#redefine}.
  */
-public final class FuncDeclStmtNode extends EasyScriptStmtNode {
-    private final String funcName;
-    private final FrameDescriptor frameDescriptor;
-    private final int argumentCount;
-
-    @SuppressWarnings("FieldMayBeFinal")
-    @Child
-    private UserFuncBodyStmtNode funcBody;
+@NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
+@NodeField(name = "funcName", type = String.class)
+@NodeField(name = "frameDescriptor", type = FrameDescriptor.class)
+@NodeField(name = "funcBody", type = UserFuncBodyStmtNode.class)
+@NodeField(name = "argumentCount", type = int.class)
+public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
+    protected abstract String getFuncName();
+    protected abstract FrameDescriptor getFrameDescriptor();
+    protected abstract UserFuncBodyStmtNode getFuncBody();
+    protected abstract int getArgumentCount();
 
     @CompilationFinal
     private CallTarget cachedCallTarget;
@@ -38,29 +46,35 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     @CompilationFinal
     private FunctionObject cachedFunction;
 
-    public FuncDeclStmtNode(String funcName, FrameDescriptor frameDescriptor, UserFuncBodyStmtNode funcBody, int argumentCount) {
-        this.funcName = funcName;
-        this.frameDescriptor = frameDescriptor;
-        this.funcBody = funcBody;
-        this.argumentCount = argumentCount;
-        this.cachedCallTarget = null;
-        this.cachedFunction = null;
-    }
+    @Specialization(limit = "1")
+    protected Object declareFunction(DynamicObject globalScopeObject,
+            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
+        int argumentCount = this.getArgumentCount();
 
-    @Override
-    public Object executeStatement(VirtualFrame frame) {
         if (this.cachedCallTarget == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
 
             var truffleLanguage = this.currentTruffleLanguage();
-            var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.frameDescriptor, this.funcBody);
+            var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.getFrameDescriptor(), this.getFuncBody());
             this.cachedCallTarget = Truffle.getRuntime().createCallTarget(funcRootNode);
-            var context = this.currentLanguageContext();
+
             // we allow functions to be redefined, to comply with JavaScript semantics
-            this.cachedFunction = context.globalScopeObject.registerFunction(this.funcName, this.cachedCallTarget, this.argumentCount);
+            var funcName = this.getFuncName();
+            Object existingVariable = objectLibrary.getOrDefault(globalScopeObject, funcName, null);
+            // instanceof returns 'false' for null,
+            // so this also covers the case when we're seeing this variable for the first time
+            if (existingVariable instanceof FunctionObject) {
+                FunctionObject existingFunction = (FunctionObject) existingVariable;
+                existingFunction.redefine(this.cachedCallTarget, argumentCount);
+                this.cachedFunction = existingFunction;
+            } else {
+                FunctionObject newFunction = new FunctionObject(funcName, this.cachedCallTarget, argumentCount);
+                objectLibrary.putConstant(globalScopeObject, funcName, newFunction, 1);
+                this.cachedFunction = newFunction;
+            }
         }
 
-        this.cachedFunction.redefine(this.cachedCallTarget, this.argumentCount);
+        this.cachedFunction.redefine(this.cachedCallTarget, argumentCount);
         // we return 'undefined' for statements that declare functions
         return Undefined.INSTANCE;
     }
