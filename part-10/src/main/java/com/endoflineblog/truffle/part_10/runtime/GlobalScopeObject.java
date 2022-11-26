@@ -7,16 +7,13 @@ import com.endoflineblog.truffle.part_10.nodes.stmts.variables.FuncDeclStmtNode;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -109,7 +106,7 @@ public final class GlobalScopeObject implements TruffleObject {
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
-        return new GlobalVariableNamesObject(this.variables.keySet());
+        return new MemberNamesObject(this.variables.keySet());
     }
 
     @ExportMessage
@@ -139,42 +136,5 @@ public final class GlobalScopeObject implements TruffleObject {
     @ExportMessage
     Class<? extends TruffleLanguage<?>> getLanguage() {
         return EasyScriptTruffleLanguage.class;
-    }
-}
-
-/**
- * The class that implements the collection of member names of the global scope.
- * Used in the {@link GlobalScopeObject#getMembers} method.
- * Identical to the class with the same name from part 8.
- */
-@ExportLibrary(InteropLibrary.class)
-final class GlobalVariableNamesObject implements TruffleObject {
-    private final List<String> names;
-
-    GlobalVariableNamesObject(Set<String> names) {
-        this.names = new ArrayList<>(names);
-    }
-
-    @ExportMessage
-    boolean hasArrayElements() {
-        return true;
-    }
-
-    @ExportMessage
-    long getArraySize() {
-        return this.names.size();
-    }
-
-    @ExportMessage
-    boolean isArrayElementReadable(long index) {
-        return index >= 0 && index < this.names.size();
-    }
-
-    @ExportMessage
-    Object readArrayElement(long index) throws InvalidArrayIndexException {
-        if (!this.isArrayElementReadable(index)) {
-            throw InvalidArrayIndexException.create(index);
-        }
-        return this.names.get((int) index);
     }
 }

@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_10.runtime;
 
 import com.endoflineblog.truffle.part_10.EasyScriptTruffleLanguage;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.ExportLibrary;
@@ -59,38 +58,6 @@ public final class MathObject implements TruffleObject {
 
     @ExportMessage
     Object getMembers(boolean includeInternal) {
-        return new MathNamesObject(new String[]{"abs", "pow"});
-    }
-}
-
-@ExportLibrary(InteropLibrary.class)
-final class MathNamesObject implements TruffleObject {
-    private final String[] names;
-
-    MathNamesObject(String[] names) {
-        this.names = names;
-    }
-
-    @ExportMessage
-    boolean hasArrayElements() {
-        return true;
-    }
-
-    @ExportMessage
-    long getArraySize() {
-        return this.names.length;
-    }
-
-    @ExportMessage
-    boolean isArrayElementReadable(long index) {
-        return index >= 0 && index < this.names.length;
-    }
-
-    @ExportMessage
-    Object readArrayElement(long index) throws InvalidArrayIndexException {
-        if (!this.isArrayElementReadable(index)) {
-            throw InvalidArrayIndexException.create(index);
-        }
-        return this.names[(int) index];
+        return new MemberNamesObject(new String[]{"abs", "pow"});
     }
 }
