@@ -58,6 +58,11 @@ public final class GlobalScopeObject implements TruffleObject {
 
     public FunctionObject registerFunction(String funcName, CallTarget callTarget, int argumentCount) {
         // we allow overwriting functions
+        // but we add them to the constants set,
+        // so that they can't be changed to a non-function value with assignment
+        // (as that would break the caching assumption in GlobalVarReferenceExprNode)
+        this.constants.add(funcName);
+
         Object existingVariable = this.variables.get(funcName);
         // instanceof returns 'false' for null,
         // so this also covers the case when we're seeing this variable for the first time

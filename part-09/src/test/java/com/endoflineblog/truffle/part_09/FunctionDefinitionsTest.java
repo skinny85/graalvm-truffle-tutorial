@@ -262,4 +262,20 @@ public class FunctionDefinitionsTest {
             assertEquals("nested functions are not supported in EasyScript yet", e.getMessage());
         }
     }
+
+    @Test
+    public void functions_cannot_be_reassigned_as_simple_values() {
+        try {
+            this.context.eval("ezs", "" +
+                    "function f() { " +
+                    "} " +
+                    "f = 1; "
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Assignment to constant variable 'f'", e.getMessage());
+        }
+    }
 }
