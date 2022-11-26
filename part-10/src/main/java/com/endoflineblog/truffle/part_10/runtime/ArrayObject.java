@@ -37,7 +37,7 @@ public final class ArrayObject extends DynamicObject {
 
     @ExportMessage
     Object readArrayElement(long index) {
-        return index >= 0 && index < this.arrayElements.length
+        return this.isArrayElementReadable(index)
                 ? this.arrayElements[(int) index]
                 : Undefined.INSTANCE;
     }
