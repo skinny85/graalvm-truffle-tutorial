@@ -194,6 +194,15 @@ public class GlobalVariablesTest {
     }
 
     @Test
+    public void const_variables_can_be_re_evaluated() {
+        String program = "const a = 3; a";
+        this.context.eval("ezs", program);
+        Value result = this.context.eval("ezs", program);
+
+        assertEquals(3, result.asInt());
+    }
+
+    @Test
     public void parsing_a_large_integer_fall_backs_to_double() {
         // this is 12,345,678,901
         Value result = this.context.eval("ezs", "12345678901");

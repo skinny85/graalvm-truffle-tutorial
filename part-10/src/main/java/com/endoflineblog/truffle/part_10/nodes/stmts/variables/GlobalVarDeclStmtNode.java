@@ -45,24 +45,26 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     @Specialization(limit = "1")
     protected Object declareVariable(DynamicObject globalScopeObject,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
+        var variableId = this.getVariableId();
+
         if (this.checkVariableExists) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             this.checkVariableExists = false;
 
-            var variableId = this.getVariableId();
             if (objectLibrary.containsKey(globalScopeObject, variableId)) {
                 throw new EasyScriptException(this, "Identifier '" + variableId + "' has already been declared");
             }
-
-            var declarationKind = this.getDeclarationKind();
-            Object initialValue = declarationKind == DeclarationKind.VAR
-                    // the default value for 'var' is 'undefined'
-                    ? Undefined.INSTANCE
-                    // for 'const' and 'let', we write a "dummy" value that we treat specially
-                    : DUMMY;
-            int flags = declarationKind == DeclarationKind.CONST ? 1 : 0;
-            objectLibrary.putConstant(globalScopeObject, variableId, initialValue, flags);
         }
+
+        var declarationKind = this.getDeclarationKind();
+        Object initialValue = declarationKind == DeclarationKind.VAR
+                // the default value for 'var' is 'undefined'
+                ? Undefined.INSTANCE
+                // for 'const' and 'let', we write a "dummy" value that we treat specially
+                : DUMMY;
+        int flags = declarationKind == DeclarationKind.CONST ? 1 : 0;
+        objectLibrary.putConstant(globalScopeObject, variableId, initialValue, flags);
+
         // we return 'undefined' for statements that declare variables
         return Undefined.INSTANCE;
     }
