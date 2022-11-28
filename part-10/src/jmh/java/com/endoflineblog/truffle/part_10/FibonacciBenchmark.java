@@ -13,12 +13,13 @@ import org.openjdk.jmh.annotations.Fork;
  * @see #recursive_ezs_eval
  * @see #recursive_js_eval
  * @see #recursive_java
+ * @see #recursive_sl_eval
  */
 public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_FUNCTION = "" +
             "function fib(n) { " +
             "    if (n < 2) { " +
-            "        return Math.abs(n); " +
+            "        return 1; " +
             "    } " +
             "    return fib(n - 1) + fib(n - 2); " +
             "} ";
@@ -36,13 +37,21 @@ public class FibonacciBenchmark extends TruffleBenchmark {
     }
 
     @Benchmark
+    public int recursive_sl_eval() {
+        return this.truffleContext.eval("sl", FIBONACCI_JS_FUNCTION +
+                "function main() { " +
+                "    return fib(20); " +
+                "} ").asInt();
+    }
+
+    @Benchmark
     public int recursive_java() {
         return fibonacciRecursive(20);
     }
 
     public static int fibonacciRecursive(int n) {
         return n < 2
-                ? Math.abs(n)
+                ? 1
                 : fibonacciRecursive(n - 1) + fibonacciRecursive(n - 2);
     }
 }

@@ -54,8 +54,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         var objectLibrary = DynamicObjectLibrary.getUncached();
         // the 1 flag indicates Math is a constant, and cannot be reassigned
         objectLibrary.putConstant(globalScopeObject, "Math", MathObject.create(this,
-            this.defineBuiltInFunction("abs", AbsFunctionBodyExprNodeFactory.getInstance()),
-            this.defineBuiltInFunction("pow", PowFunctionBodyExprNodeFactory.getInstance())), 1);
+            this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
+            this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance())), 1);
 
         return context;
     }
@@ -65,14 +65,12 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return context.globalScopeObject;
     }
 
-    private FunctionObject defineBuiltInFunction(String name,
-            NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
+    private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         int argumentCount = nodeFactory.getExecutionSignature().size();
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
         return new FunctionObject(
-                name,
                 Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
                         nodeFactory.createNode((Object) functionArguments))),
                 argumentCount);

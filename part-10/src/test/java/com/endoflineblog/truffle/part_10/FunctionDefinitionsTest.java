@@ -262,4 +262,16 @@ public class FunctionDefinitionsTest {
             assertEquals("nested functions are not supported in EasyScript yet", e.getMessage());
         }
     }
+
+    @Test
+    public void functions_can_be_reassigned_as_simple_values() {
+        Value result = this.context.eval("ezs", "" +
+                "function f() { " +
+                "} " +
+                "f = 4; " +
+                "f"
+        );
+
+        assertEquals(4, result.asInt());
+    }
 }

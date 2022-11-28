@@ -23,33 +23,17 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
-    /** The cached reference to a function that is used if this variable refers to a function. */
-//    @CompilationFinal
-//    private FunctionObject cachedFunction = null;
-
     @Specialization(limit = "1")
     protected Object readVariable(DynamicObject globalScopeObject,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
-        // consult the cache ("fast path" if it's populated)
-//        if (this.cachedFunction != null) {
-//            return this.cachedFunction;
-//        }
-
-        // look up the variable in the global scope map ("slow path")...
         String variableId = this.getName();
         var value = objectLibrary.getOrDefault(globalScopeObject, variableId, null);
         if (value == null) {
             throw new EasyScriptException(this, "'" + variableId + "' is not defined");
         } else if (value == GlobalVarDeclStmtNode.DUMMY) {
             throw new EasyScriptException("Cannot access '" + variableId + "' before initialization");
+        } else {
+            return value;
         }
-
-        // ...and populate the cache if it's a function
-//        if (value instanceof FunctionObject) {
-//            CompilerDirectives.transferToInterpreterAndInvalidate();
-//            this.cachedFunction = (FunctionObject) value;
-//        }
-
-        return value;
     }
 }

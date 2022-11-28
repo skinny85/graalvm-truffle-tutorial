@@ -32,15 +32,13 @@ public abstract class FunctionDispatchNode extends Node {
      * like in {@code Math.abs(-3)}.
      */
     @Specialization(
-            guards = "function.getCallTarget() == directCallNode.getCallTarget()",
-            limit = "2",
-            assumptions = "functionWasNotRedefined"
+            guards = "function.callTarget == directCallNode.getCallTarget()",
+            limit = "2"
     )
     protected static Object dispatchDirectly(
             FunctionObject function,
             Object[] arguments,
-            @SuppressWarnings("unused") @Cached("function.getFunctionWasNotRedefinedAssumption()") Assumption functionWasNotRedefined,
-            @Cached("create(function.getCallTarget())") DirectCallNode directCallNode) {
+            @Cached("create(function.callTarget)") DirectCallNode directCallNode) {
         return directCallNode.call(extendArguments(arguments, function));
     }
 
@@ -58,7 +56,7 @@ public abstract class FunctionDispatchNode extends Node {
             FunctionObject function,
             Object[] arguments,
             @Cached IndirectCallNode indirectCallNode) {
-        return indirectCallNode.call(function.getCallTarget(), extendArguments(arguments, function));
+        return indirectCallNode.call(function.callTarget, extendArguments(arguments, function));
     }
 
     /**
@@ -73,11 +71,11 @@ public abstract class FunctionDispatchNode extends Node {
     }
 
     private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
-        if (arguments.length >= function.getArgumentCount()) {
+        if (arguments.length >= function.argumentCount) {
             return arguments;
         }
-        Object[] ret = new Object[function.getArgumentCount()];
-        for (int i = 0; i < function.getArgumentCount(); i++) {
+        Object[] ret = new Object[function.argumentCount];
+        for (int i = 0; i < function.argumentCount; i++) {
             ret[i] = i < arguments.length
                     ? arguments[i]
                     : Undefined.INSTANCE;
