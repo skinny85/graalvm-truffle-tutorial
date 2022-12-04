@@ -112,6 +112,18 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void function_arguments_shadow_globals() {
+        Value result = this.context.eval("ezs", "" +
+                "const a = 33; " +
+                "function f(a) { " +
+                "    return a;" +
+                "} " +
+                "f(22)"
+        );
+        assertEquals(22, result.asInt());
+    }
+
+    @Test
     public void function_parameters_can_be_reassigned() {
         Value result = this.context.eval("ezs",
                 "let a = 222; " +
