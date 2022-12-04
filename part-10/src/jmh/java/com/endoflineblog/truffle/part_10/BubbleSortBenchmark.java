@@ -22,8 +22,8 @@ public class BubbleSortBenchmark extends TruffleBenchmark {
                 "    const array = " + Arrays.stream(descendinglySortedArray)
                 .mapToObj(String::valueOf)
                 .collect(Collectors.joining(", ", "[", "]")) + "; " +
-                "    for (var i = 0; i < " + arraySize + " - 1; i = i + 1) { " +
-                "        for (var j = 0; j < " + arraySize + " - 1 - i; j = j + 1) { " +
+                "    for (var i = 0; i < array.length - 1; i = i + 1) { " +
+                "        for (var j = 0; j < array.length - 1 - i; j = j + 1) { " +
                 "            if (array[j] > array[j + 1]) { " +
                 "                var tmp = array[j]; " +
                 "                array[j] = array[j + 1]; " +

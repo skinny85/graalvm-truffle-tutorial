@@ -8,6 +8,7 @@ import com.endoflineblog.truffle.part_10.nodes.root.BuiltInFuncRootNode;
 import com.endoflineblog.truffle.part_10.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_10.parsing.EasyScriptTruffleParser;
 import com.endoflineblog.truffle.part_10.parsing.ParsingResult;
+import com.endoflineblog.truffle.part_10.runtime.ArrayObject;
 import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_10.runtime.MathObject;
 import com.oracle.truffle.api.CallTarget;
@@ -34,7 +35,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return REF.get(node);
     }
 
-    private final Shape arrayShape = Shape.newBuilder().build();
+    private final Shape arrayShape = Shape.newBuilder().layout(ArrayObject.class).build();
     private final Shape globalScopeShape = Shape.newBuilder().build();
 
     @Override
