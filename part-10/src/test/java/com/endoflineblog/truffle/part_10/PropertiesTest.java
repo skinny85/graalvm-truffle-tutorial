@@ -1,12 +1,16 @@
 package com.endoflineblog.truffle.part_10;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a set of unit tests for testing support for (read-only)
@@ -56,5 +60,37 @@ public class PropertiesTest {
         assertEquals(2, result.getArrayElement(1).asInt());
         assertEquals(3, result.getArrayElement(2).asInt());
         assertEquals(4, result.getArrayElement(3).asInt());
+    }
+
+    @Test
+    public void reading_a_property_of_undefined_is_an_error() {
+        try {
+            this.context.eval("ezs",
+                    "undefined.abc;"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Cannot read properties of undefined (reading 'abc')", e.getMessage());
+        }
+    }
+
+    @Test
+    public void non_existent_array_property_returns_undefined() {
+        Value result = this.context.eval("ezs",
+                "[1, 2, 3].abc"
+        );
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    public void any_property_of_integer_returns_undefined() {
+        Value result = this.context.eval("ezs",
+                "1.toString"
+        );
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
     }
 }

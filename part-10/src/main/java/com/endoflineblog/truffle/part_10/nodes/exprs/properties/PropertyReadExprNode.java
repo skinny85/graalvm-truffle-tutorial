@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_10.nodes.exprs.properties;
 import com.endoflineblog.truffle.part_10.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_10.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
+import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -17,7 +18,7 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract String getPropertyName();
 
     @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "3")
-    public Object readProperty(Object target,
+    protected Object readProperty(Object target,
             @CachedLibrary("target") InteropLibrary interopLibrary) {
         try {
             return interopLibrary.readMember(target, this.getPropertyName());
@@ -26,5 +27,16 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
         } catch (UnsupportedMessageException e) {
             throw new EasyScriptException(this, e.getMessage());
         }
+    }
+
+    @Specialization(guards = "interopLibrary.isNull(target)", limit = "3")
+    protected Object readPropertyOfUndefined(@SuppressWarnings("unused") Object target,
+            @CachedLibrary("target") InteropLibrary interopLibrary) {
+        throw new EasyScriptException("Cannot read properties of undefined (reading '" + this.getPropertyName() + "')");
+    }
+
+    @Fallback
+    protected Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target) {
+        return Undefined.INSTANCE;
     }
 }
