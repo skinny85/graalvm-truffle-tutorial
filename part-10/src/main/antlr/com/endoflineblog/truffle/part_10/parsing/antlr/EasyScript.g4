@@ -38,7 +38,7 @@ expr4 : left=expr4 o=('+' | '-') right=expr5               #AddSubtractExpr4
 expr5 : literal                                            #LiteralExpr5
       | ID                                                 #ReferenceExpr5
       | expr5 '.' ID                                       #PropertyReadExpr5
-      | '[' (expr1 (',' expr1)*)? ']'                      #ArrayExpr5
+      | '[' (expr1 (',' expr1)*)? ']'                      #ArrayLiteralExpr5
       | arr=expr5 '[' index=expr1 ']'                      #ArrayIndexReadExpr5
       | expr5 '(' (expr1 (',' expr1)*)? ')'                #CallExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5

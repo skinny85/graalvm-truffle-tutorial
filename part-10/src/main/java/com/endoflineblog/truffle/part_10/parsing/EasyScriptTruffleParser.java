@@ -452,8 +452,8 @@ public final class EasyScriptTruffleParser {
             return parseReference(((EasyScriptParser.ReferenceExpr5Context) expr5).ID().getText());
         } else if (expr5 instanceof EasyScriptParser.PropertyReadExpr5Context) {
             return this.parsePropertyReadExpr((EasyScriptParser.PropertyReadExpr5Context) expr5);
-        } else if (expr5 instanceof EasyScriptParser.ArrayExpr5Context) {
-            return parseArrayExpr((EasyScriptParser.ArrayExpr5Context) expr5);
+        } else if (expr5 instanceof EasyScriptParser.ArrayLiteralExpr5Context) {
+            return parseArrayLiteralExpr((EasyScriptParser.ArrayLiteralExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.ArrayIndexReadExpr5Context) {
             return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
@@ -499,8 +499,8 @@ public final class EasyScriptTruffleParser {
                 propertyReadExpr.ID().getText());
     }
 
-    private ArrayLiteralExprNode parseArrayExpr(EasyScriptParser.ArrayExpr5Context arrayExpr) {
-        return new ArrayLiteralExprNode(this.arrayShape, arrayExpr.expr1().stream()
+    private ArrayLiteralExprNode parseArrayLiteralExpr(EasyScriptParser.ArrayLiteralExpr5Context arrayLiteralExpr) {
+        return new ArrayLiteralExprNode(this.arrayShape, arrayLiteralExpr.expr1().stream()
                 .map(arrayElExpr -> this.parseExpr1(arrayElExpr))
                 .collect(Collectors.toList()));
     }
