@@ -138,4 +138,30 @@ public class ArraysTest {
         assertEquals(1, array.getArraySize());
         assertEquals(9, array.getArrayElement(0).asInt());
     }
+
+    @Test
+    public void non_stable_array_reads_work_correctly() {
+        Value result = this.context.eval("ezs", "" +
+                "function readFirstArrayEl(array) { " +
+                "    return array[0]; " +
+                "} " +
+                "function makeOneElArray() {" +
+                "    return [123]; " +
+                "} " +
+                "readFirstArrayEl(1); " +
+                "readFirstArrayEl(2); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(3); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(makeOneElArray()); " +
+                "readFirstArrayEl(makeOneElArray()); "
+        );
+
+        assertEquals(123, result.asInt());
+    }
 }
