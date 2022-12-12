@@ -1,13 +1,16 @@
 package com.endoflineblog.truffle.part_10;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a set of unit tests for testing support for arrays in EasyScript.
@@ -163,5 +166,19 @@ public class ArraysTest {
         );
 
         assertEquals(123, result.asInt());
+    }
+
+    @Test
+    public void reading_an_index_of_undefined_is_an_error() {
+        try {
+            this.context.eval("ezs",
+                    "undefined[0];"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Cannot read properties of undefined (reading '0')", e.getMessage());
+        }
     }
 }
