@@ -181,4 +181,18 @@ public class ArraysTest {
             assertEquals("Cannot read properties of undefined (reading '0')", e.getMessage());
         }
     }
+
+    @Test
+    public void writing_an_index_of_undefined_is_an_error() {
+        try {
+            this.context.eval("ezs",
+                    "undefined[0] = 3;"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Cannot set properties of undefined (setting '0')", e.getMessage());
+        }
+    }
 }

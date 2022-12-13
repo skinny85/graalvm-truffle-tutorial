@@ -26,6 +26,13 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
         return rvalue;
     }
 
+    @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
+    protected Object indexUndefined(@SuppressWarnings("unused") Object target,
+            Object index, @SuppressWarnings("unused") Object rvalue,
+            @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary) {
+        throw new EasyScriptException("Cannot set properties of undefined (setting '" + index + "')");
+    }
+
     @Fallback
     protected Object writeNonArrayOrNonIntIndex(@SuppressWarnings("unused") Object array,
             @SuppressWarnings("unused") Object index, Object rvalue) {
