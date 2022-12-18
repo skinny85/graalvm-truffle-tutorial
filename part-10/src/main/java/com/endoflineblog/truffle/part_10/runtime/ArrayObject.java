@@ -101,6 +101,6 @@ public final class ArrayObject extends DynamicObject {
 
     private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {
         this.arrayElements = arrayElements;
-        objectLibrary.putConstant(this, "length", arrayElements.length, 1);
+        objectLibrary.putInt(this, "length", arrayElements.length);
     }
 }
