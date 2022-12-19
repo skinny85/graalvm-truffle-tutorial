@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * A Node for representing the statement blocks of a user-defined function in EasyScript.
  * Returns its value by catching {@link ReturnException}.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
     @Node.Children

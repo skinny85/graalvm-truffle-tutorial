@@ -9,6 +9,13 @@ import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
+/**
+ * A Truffle {@link DynamicObject} that implements integer-indexed JavaScript arrays.
+ *
+ * @see com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayLiteralExprNode
+ * @see com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayIndexReadExprNode
+ * @see com.endoflineblog.truffle.part_10.nodes.exprs.arrays.ArrayIndexWriteExprNode
+ */
 @ExportLibrary(InteropLibrary.class)
 public final class ArrayObject extends DynamicObject {
     @DynamicField
@@ -95,7 +102,7 @@ public final class ArrayObject extends DynamicObject {
     }
 
     @ExportMessage
-    Object getMembers(boolean includeInternal) {
+    Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
         return new MemberNamesObject(new String[]{"length"});
     }
 

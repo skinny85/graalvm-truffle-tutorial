@@ -12,7 +12,7 @@ import com.oracle.truffle.api.nodes.RootNode;
  * A {@link RootNode} that represents the execution of a block of statements.
  * Used as the {@link RootNode} for the entire EasyScript program,
  * and also for user-defined functions.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class StmtBlockRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")

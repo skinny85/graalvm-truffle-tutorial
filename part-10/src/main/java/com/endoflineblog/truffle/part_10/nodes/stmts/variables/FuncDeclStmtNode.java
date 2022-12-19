@@ -19,7 +19,11 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
- * Similar to the class with the same name from part 9.
+ * Similar to the class with the same name from part 9,
+ * the main difference is that we now save the resulting {@link FunctionObject}
+ * directly in the {@link com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject}
+ * (for getting a reference to which we use the {@link GlobalScopeObjectExprNode}),
+ * since {@link FunctionObject} went back to being immutable in this part of the series.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeField(name = "funcName", type = String.class)
@@ -45,10 +49,10 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
             var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.getFrameDescriptor(), this.getFuncBody());
             var callTarget = Truffle.getRuntime().createCallTarget(funcRootNode);
 
-            // we allow functions to be redefined, to comply with JavaScript semantics
             this.cachedFunction = new FunctionObject(callTarget, this.getArgumentCount());
         }
 
+        // we allow functions to be redefined, to comply with JavaScript semantics
         objectLibrary.putConstant(globalScopeObject, this.getFuncName(), this.cachedFunction, 0);
 
         // we return 'undefined' for statements that declare functions

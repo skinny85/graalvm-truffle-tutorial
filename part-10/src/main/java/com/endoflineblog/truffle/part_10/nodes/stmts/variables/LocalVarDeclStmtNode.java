@@ -10,7 +10,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 /**
  * A Node that represents the declaration of a variable local to a function,
  * or to a nested block of the top-level program.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class LocalVarDeclStmtNode extends EasyScriptStmtNode {
     public static final Object DUMMY = new Object() {

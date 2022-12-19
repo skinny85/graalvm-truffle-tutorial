@@ -9,7 +9,7 @@ import com.oracle.truffle.api.object.Shape;
 /**
  * The class of the context for the
  * {@link EasyScriptTruffleLanguage TruffleLanguage implementaton in this part of the series}.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class EasyScriptLanguageContext {
     private static final TruffleLanguage.ContextReference<EasyScriptLanguageContext> REF =

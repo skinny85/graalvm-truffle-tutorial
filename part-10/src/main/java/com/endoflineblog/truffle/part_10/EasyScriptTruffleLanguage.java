@@ -23,7 +23,21 @@ import java.util.stream.IntStream;
 
 /**
  * The {@link TruffleLanguage} implementation for this part of the article series.
- * Basically identical to the class with the same name from part 8.
+ * Very similar to the class with the same name from part 9,
+ * the only differences are to account for changes in the built-in {@link MathObject}
+ * (we no longer have bindings like {@code Math.pow} and {@code Math.abs},
+ * instead {@code Math} is a static object with two properties,
+ * {@code abs} and {@code pow}, that we read from in
+ * {@link com.endoflineblog.truffle.part_10.nodes.exprs.properties.PropertyReadExprNode}),
+ * and caching the root shapes for the {@link ArrayObject}
+ * and {@link com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject}.
+ *
+ * @see MathObject
+ * @see com.endoflineblog.truffle.part_10.nodes.exprs.properties.PropertyReadExprNode
+ * @see #arrayShape
+ * @see #globalScopeShape
+ * @see ArrayObject
+ * @see com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
@@ -35,7 +49,10 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return REF.get(node);
     }
 
+    /** The root {@link Shape} for {@link ArrayObject} */
     private final Shape arrayShape = Shape.newBuilder().layout(ArrayObject.class).build();
+
+    /** The root {@link Shape} for {@link com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject}. */
     private final Shape globalScopeShape = Shape.newBuilder().build();
 
     @Override

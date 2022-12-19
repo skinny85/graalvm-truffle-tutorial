@@ -8,7 +8,7 @@ import com.oracle.truffle.api.profiles.ConditionProfile;
 
 /**
  * A Node that represents an {@code if} statement.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class IfStmtNode extends EasyScriptStmtNode {
     @Child

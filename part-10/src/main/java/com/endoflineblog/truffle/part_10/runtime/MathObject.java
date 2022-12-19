@@ -10,6 +10,12 @@ import com.oracle.truffle.api.staticobject.DefaultStaticProperty;
 import com.oracle.truffle.api.staticobject.StaticProperty;
 import com.oracle.truffle.api.staticobject.StaticShape;
 
+/**
+ * A Truffle static object that implements the built-in
+ * {@code Math} JavaScript object.
+ * Surfaces two properties, {@code abs} and {@code pow},
+ * which are built-in functions that any EasyScript program can call.
+ */
 @ExportLibrary(InteropLibrary.class)
 public final class MathObject implements TruffleObject {
     public static MathObject create(EasyScriptTruffleLanguage language,
@@ -57,7 +63,7 @@ public final class MathObject implements TruffleObject {
     }
 
     @ExportMessage
-    Object getMembers(boolean includeInternal) {
+    Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
         return new MemberNamesObject(new String[]{"abs", "pow"});
     }
 }

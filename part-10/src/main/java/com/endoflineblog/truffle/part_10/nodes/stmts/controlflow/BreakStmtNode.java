@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node representing the {@code break} statement.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class BreakStmtNode extends EasyScriptStmtNode {
     @Override

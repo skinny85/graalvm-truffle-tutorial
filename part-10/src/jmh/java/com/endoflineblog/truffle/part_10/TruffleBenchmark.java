@@ -16,12 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The common superclass of all JMH benchmarks.
- * It specifies the common configuration,
- * and also creates (and closes) a {@link Context GraalVM polyglot API context}
- * using the JMH lifecycle methods ({@link Setup} and {@link TearDown})
- * that the subclasses can use when implementing their own benchmark.
- *
- * @see #truffleContext
+ * Identical to the class with the same name from part 9.
  */
 @Warmup(iterations = 5, time = 1)
 @Measurement(iterations = 5, time = 1)

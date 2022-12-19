@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 /**
  * The class used as the result of parsing in
  * {@link EasyScriptTruffleParser#parse}.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class ParsingResult {
     /** The Node representing the list of statements that the EasyScript program consists of. */

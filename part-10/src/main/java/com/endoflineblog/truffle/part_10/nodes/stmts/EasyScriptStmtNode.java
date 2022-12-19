@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 /**
  * The abstract common ancestor of all AST Nodes that represent statements in EasyScript,
  * like declaring a variable or constant.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public abstract class EasyScriptStmtNode extends EasyScriptNode {
     /**

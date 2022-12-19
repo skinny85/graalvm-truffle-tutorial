@@ -5,7 +5,7 @@ import com.oracle.truffle.api.nodes.ControlFlowException;
 
 /**
  * The exception used to implement the {@code break} statement.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  *
  * @see BreakStmtNode
  */

@@ -18,12 +18,11 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 /**
  * A Node that represents the declaration of a global
  * (as opposed to local to a function) variable or constant in EasyScript.
- * Very similar to the class from the same name from part 8,
- * the main difference is that we check whether a given global variable already exists
- * only the first time the Node is executed,
- * to correctly handle the same Truffle AST being executed multiple times
- * (which happens when you {@link org.graalvm.polyglot.Context#eval} the same program multiple times,
- * to save on the cost of parsing).
+ * Very similar to the class with the same name from part 9,
+ * the main difference is that we save the initial value of the variable
+ * directly in the {@link com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject},
+ * (for getting a reference to which we use the {@link GlobalScopeObjectExprNode}),
+ * using {@link DynamicObjectLibrary}.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeField(name = "variableId", type = String.class)

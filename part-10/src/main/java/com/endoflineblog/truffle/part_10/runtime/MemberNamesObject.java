@@ -7,8 +7,14 @@ import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
 /**
- * The class that implements the collection of member names of a {@link TruffleObject}.
- * Used in the {@link GlobalScopeObject#getMembers} and {@link MathObject#getMembers} methods.
+ * The class that implements a simple collection of member names of a {@link TruffleObject}.
+ * Used in {@link GlobalScopeObject#getMembers},
+ * {@link MathObject#getMembers} and
+ * {@link ArrayObject#getMembers} methods.
+ *
+ * @see GlobalScopeObject#getMembers
+ * @see MathObject#getMembers
+ * @see ArrayObject#getMembers
  */
 @ExportLibrary(InteropLibrary.class)
 final class MemberNamesObject implements TruffleObject {
