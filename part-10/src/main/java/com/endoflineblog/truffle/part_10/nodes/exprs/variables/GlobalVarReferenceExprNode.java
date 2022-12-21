@@ -4,7 +4,6 @@ import com.endoflineblog.truffle.part_10.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_10.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_10.nodes.exprs.GlobalScopeObjectExprNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.variables.GlobalVarDeclStmtNode;
-import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -14,9 +13,11 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the expression of referencing a global variable in EasyScript.
- * Very similar to the class with the same name from part 8,
- * the only difference is, since {@link FunctionObject} is now mutable,
- * we add caching references to variables that resolve to functions.
+ * Similar to the class with the same name from part 9,
+ * the main difference is that we read the value of the variable directly from the
+ * {@link com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject}
+ * (for getting a reference to which we use the {@link GlobalScopeObjectExprNode}),
+ * using {@link DynamicObjectLibrary}.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeField(name = "name", type = String.class)

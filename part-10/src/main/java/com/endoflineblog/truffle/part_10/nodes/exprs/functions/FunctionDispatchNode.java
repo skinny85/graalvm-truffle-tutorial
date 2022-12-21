@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_10.nodes.exprs.functions;
 import com.endoflineblog.truffle.part_10.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
-import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -15,12 +14,11 @@ import com.oracle.truffle.api.nodes.Node;
  * A helper Node that contains specialization for functions calls.
  * Used by {@link FunctionCallExprNode},
  * and by {@link FunctionObject}.
- * Very similar to the class with the same name from part 8,
- * the only difference is we check the {@link Assumption}
- * returned from {@link FunctionObject#getFunctionWasNotRedefinedAssumption()}
- * method in the {@link #dispatchDirectly direct function dispatch code}.
- *
- * @see #dispatchDirectly
+ * Identical to the class with the same name from part 8,
+ * and very similar to the {@code FunctionDispatchNode} class from part 9,
+ * the only difference is that we no longer check any Assumptions
+ * of the {@link FunctionObject}, as those have been removed in this part
+ * ({@link FunctionObject} has gone back to being immutable).
  */
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
@@ -31,10 +29,7 @@ public abstract class FunctionDispatchNode extends Node {
      * used when the target of a call stays the same during the execution of the program,
      * like in {@code Math.abs(-3)}.
      */
-    @Specialization(
-            guards = "function.callTarget == directCallNode.getCallTarget()",
-            limit = "2"
-    )
+    @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()", limit = "2")
     protected static Object dispatchDirectly(
             FunctionObject function,
             Object[] arguments,

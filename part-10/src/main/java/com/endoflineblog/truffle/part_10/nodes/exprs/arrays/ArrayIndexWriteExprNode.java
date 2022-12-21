@@ -11,6 +11,10 @@ import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.library.CachedLibrary;
 
+/**
+ * The Node representing writing array indexes
+ * (like {@code a[1] = 3}).
+ */
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
 @NodeChild("rvalueExpr")

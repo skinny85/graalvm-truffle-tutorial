@@ -5,7 +5,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * An expression Node that represents an assignment to a function argument.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class WriteFunctionArgExprNode extends EasyScriptExprNode {
     private final int index;

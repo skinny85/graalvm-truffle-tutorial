@@ -12,6 +12,11 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 
+/**
+ * The Node for reading properties of objects.
+ * Used to implement the {@code length} property of arrays.
+ * Uses the {@link InteropLibrary#readMember} method in its implementation.
+ */
 @NodeChild("target")
 @NodeField(name = "propertyName", type = String.class)
 public abstract class PropertyReadExprNode extends EasyScriptExprNode {
@@ -29,12 +34,21 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
         }
     }
 
+    /**
+     * Reading any property of {@code undefined}
+     * results in an error in JavaScript.
+     */
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
     protected Object readPropertyOfUndefined(@SuppressWarnings("unused") Object target,
             @CachedLibrary("target") InteropLibrary interopLibrary) {
         throw new EasyScriptException("Cannot read properties of undefined (reading '" + this.getPropertyName() + "')");
     }
 
+    /**
+     * Accessing a property of anything that is not {@code undefined}
+     * but doesn't have any members returns simply {@code undefined}
+     * in JavaScript.
+     */
     @Fallback
     protected Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target) {
         return Undefined.INSTANCE;

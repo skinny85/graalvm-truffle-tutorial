@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * Node class representing the greater ({@code >}) operator.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public abstract class GreaterExprNode extends BinaryOperationExprNode {
     @Specialization

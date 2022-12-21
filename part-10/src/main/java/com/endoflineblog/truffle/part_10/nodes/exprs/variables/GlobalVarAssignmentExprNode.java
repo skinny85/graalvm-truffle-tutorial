@@ -14,7 +14,11 @@ import com.oracle.truffle.api.object.Property;
 
 /**
  * A Node that represents the expression of assigning a value to a global variable in EasyScript.
- * Identical to the class with the same name from part 8.
+ * Similar to the class with the same name from part 9,
+ * the main difference is that we save the value of the variable
+ * directly in the {@link com.endoflineblog.truffle.part_10.runtime.GlobalScopeObject}
+ * (for getting a reference to which we use the {@link GlobalScopeObjectExprNode}),
+ * using {@link DynamicObjectLibrary}.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeChild(value = "assignmentExpr")

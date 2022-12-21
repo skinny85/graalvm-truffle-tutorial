@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 /**
  * An expression Node that represents referencing a given argument of a function -
  * either built-in, or user-defined.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
     private final int index;

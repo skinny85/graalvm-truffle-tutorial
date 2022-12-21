@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * Node class representing the strict inequality ({@code !==}) operator.
- * Identical to the class with the same name from part 8.
+ * Identical to the class with the same name from part 9.
  */
 public abstract class InequalityExprNode extends BinaryOperationExprNode {
     @Specialization

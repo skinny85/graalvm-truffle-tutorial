@@ -8,6 +8,10 @@ import com.oracle.truffle.api.object.Shape;
 
 import java.util.List;
 
+/**
+ * The Node representing array literal expressions
+ * (like {@code [1, 2, 3]}).
+ */
 public final class ArrayLiteralExprNode extends EasyScriptExprNode {
     private final Shape arrayShape;
     @Children
