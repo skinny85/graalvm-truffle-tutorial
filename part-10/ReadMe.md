@@ -21,9 +21,9 @@ Accessing of the array elements is performed through a
 [`InteropLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html),
 which we've already seen in previous chapters.
 However, we now use it directly, getting an instance of it with the
-[`@CachedLibrary` annotation](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/library/CachedLibrary.html)
-(note that using `@CachedLibrary` forces you to provide the `limit`
-attribute of the `@Specialization` annotation).
+[`@CachedLibrary` annotation](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/library/CachedLibrary.html).
+Using `@CachedLibrary` forces you to provide the `limit`
+attribute of the `@Specialization` annotation.
 
 The implementations of those Nodes use the
 [`ArrayObject` class](src/main/java/com/endoflineblog/truffle/part_10/runtime/ArrayObject.java).
@@ -53,11 +53,13 @@ we again use the `@CachedLibrary` annotation,
 which can be placed not only on parameters of `@Specialization` methods,
 but also of `@ExportMessage` methods.
 
-We also extract a `TruffleObject` class called `MemberNamesObject`,
+We also extract a `TruffleObject` class
+[called `MemberNamesObject`](src/main/java/com/endoflineblog/truffle/part_10/runtime/MemberNamesObject.java),
 that simply encapsulates an array of property names,
 and we use it to implement the
-[`getMembers()` message](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#getMembers-java.lang.Object-boolean-).
-We will use this class for the same purpose in other `TruffleObject`s.
+[`getMembers()` message](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#getMembers-java.lang.Object-boolean-)
+of `ArrayObject`.
+We will use this class for the same purpose in other `TruffleObject`s below.
 
 There are some
 [unit tests](src/test/java/com/endoflineblog/truffle/part_10/ArraysTest.java)
@@ -93,8 +95,10 @@ The code is in the
 [`MathObject` class](src/main/java/com/endoflineblog/truffle/part_10/runtime/MathObject.java).
 The part dealing with static objects is in the
 `create()` static factory method --
-there, we initialize a `StaticShape` with two
-`StaticProperty` instances,
+there, we initialize
+[a `StaticShape`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/staticobject/StaticShape.html)
+with two
+[`StaticProperty` instances](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/staticobject/StaticProperty.html),
 corresponding to the `abs` and `pow` properties of `Math`.
 Finally, we create a new object from a factory retrieved from the Shape,
 and save it, and the properties,
@@ -129,6 +133,11 @@ This change to `GlobalScopeObject` means we need to adjust the Nodes that intera
 [`GlobalVarReferenceExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/variables/GlobalVarReferenceExprNode.java)
 and [`GlobalVarAssignmentExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/variables/GlobalVarAssignmentExprNode.java).
 
+We use the
+[`flags` parameter](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObjectLibrary.html#putConstant-com.oracle.truffle.api.object.DynamicObject-java.lang.Object-java.lang.Object-int-)
+to save whether a given variable is a constant or not,
+and we check that when performing assignment.
+
 In order to be able to use the `@CachedLibrary` annotation with the `GlobalScopeObject`,
 we create a special Node,
 [`GlobalScopeObjectExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/GlobalScopeObjectExprNode.java),
@@ -139,19 +148,16 @@ We then add `GlobalScopeObjectExprNode` as the first child to of each Node that 
 This way, they can receive the `GlobalScopeObject` instance as the first argument to their `@Specialization` methods,
 and use it in the `@CachedLibrary` annotation.
 
-We use the `flags` attribute to save whether a given variable is a constant,
-or not, and we check that when performing assignment.
-
 ### Performance results
 
 Thanks to these improvements,
 we can roll back the changes made in the
-[last part of the series](../part-09) that made `FunctionObject` mutable,
+[last part of the series](../part-09) that turned `FunctionObject` mutable,
 and remove caching the resolved function we added to `GlobalVarReferenceExprNode`
 (which prevents code like `function f() {}; f = 3` from working correctly).
 
-As it turns out, this simplified code performs better on the Fibonacci benchmark than the complicated one that implemented
-`GlobalScopeObject` with `HashMap` in the previous part of the series:
+As it turns out, this simplified code is twice as fast on the Fibonacci benchmark than the complicated one that implemented
+`GlobalScopeObject` with a `HashMap` in the previous part of the series:
 
 ```
 Benchmark                              Mode  Cnt   Score   Error  Units
