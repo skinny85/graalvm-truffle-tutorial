@@ -11,7 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 /**
  * A Node that represents the declaration of a global
  * (as opposed to local to a function) variable or constant in EasyScript.
- * Very similar to the class from the same name from part 8,
+ * Very similar to the class with the same name from part 8,
  * the main difference is that we check whether a given global variable already exists
  * only the first time the Node is executed,
  * to correctly handle the same Truffle AST being executed multiple times

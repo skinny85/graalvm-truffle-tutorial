@@ -63,3 +63,4 @@ $ ./gradlew build
 * [Part 7 - function definitions](part-07)
 * [Part 8 - conditionals, loops, control flow](part-08)
 * [Part 9 - performance benchmarking](part-09)
+* [Part 10 - arrays, read-only properties](part-10)
