@@ -18,6 +18,12 @@ import com.oracle.truffle.api.object.Shape;
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ArrayObject extends DynamicObject {
+    /**
+     * The field that signifies this {@link DynamicObject}
+     * always has a property called {@code length}.
+     * Used in the array shape created in the
+     * {@link com.endoflineblog.truffle.part_10.EasyScriptTruffleLanguage TruffleLanguage class for this chapter}.
+     */
     @DynamicField
     private long length;
 
@@ -71,6 +77,7 @@ public final class ArrayObject extends DynamicObject {
         if (this.isArrayElementModifiable(index)) {
             this.arrayElements[(int) index] = value;
         } else {
+            // in JavaScript, it's legal to write past the array size
             Object[] newArrayElements = new Object[(int) index + 1];
             for (int i = 0; i < index; i++) {
                 newArrayElements[i] = i < this.arrayElements.length
