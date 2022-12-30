@@ -4,7 +4,6 @@ import com.endoflineblog.truffle.part_03.DoubleLiteralNode;
 import com.endoflineblog.truffle.part_03.EasyScriptNode;
 import com.endoflineblog.truffle.part_03.EasyScriptRootNode;
 import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.Truffle;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Test;
 
@@ -16,7 +15,7 @@ public class ParsingTest {
     public void parses_and_executes_easyscript_code_correctly() {
         EasyScriptNode exprNode = EasyScriptTruffleParser.parse("1 + 2 + 3.0 + 4");
         var rootNode = new EasyScriptRootNode(exprNode);
-        CallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
+        CallTarget callTarget = rootNode.getCallTarget();
 
         var result = callTarget.call();
 

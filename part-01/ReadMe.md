@@ -43,12 +43,16 @@ that it gets passed through the constructor.
 Since the `execute` method in `RootNode` takes a Truffle `VirtualFrame`
 as its argument,
 we need one more class to execute the AST: a `CallTarget`.
-This is an interface, not an abstract class,
-which you create through a static factory method `createCallTarget` of the `TruffleRuntime` class,
-which is a singleton you acquire using the `getRuntime`
+This is an interface, not an abstract class.
+Historically, you created instances of it through a static factory method
+`createCallTarget()` of the `TruffleRuntime` class,
+which is a singleton you acquired using the `getRuntime()`
 method of the `Truffle` class.
-The `createCallTarget` requires passing it a `RootNode`,
-which we do by providing it an instance of our `EasyScriptRootNode`.
+However, since version `22` of GraalVM,
+that API has been removed,
+and now, you acquire `CallTarget`s directly from `RootNode`s,
+by calling their `getCallTarget()` method.
+In our case, the root node is `EasyScriptRootNode`.
 
 With a `CallTarget` reference,
 we can finally invoke its `calll` method with no arguments.

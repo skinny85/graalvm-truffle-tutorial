@@ -8,7 +8,6 @@ import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -47,7 +46,7 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
 
             var truffleLanguage = this.currentTruffleLanguage();
             var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.getFrameDescriptor(), this.getFuncBody());
-            var callTarget = Truffle.getRuntime().createCallTarget(funcRootNode);
+            var callTarget = funcRootNode.getCallTarget();
 
             this.cachedFunction = new FunctionObject(callTarget, this.getArgumentCount());
         }

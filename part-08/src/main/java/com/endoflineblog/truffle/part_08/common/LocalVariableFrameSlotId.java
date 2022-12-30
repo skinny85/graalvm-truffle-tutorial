@@ -3,8 +3,7 @@ package com.endoflineblog.truffle.part_08.common;
 import java.util.Objects;
 
 /**
- * A class that represents the full identifier of a local variable used for a
- * {@link com.oracle.truffle.api.frame.FrameSlot}.
+ * A class that represents the full identifier of a local variable used for a frame slot.
  * Because scopes can be nested in each other,
  * and variable names are only unique within one scope,
  * simply using the name of the variable is not enough to guarantee uniqueness

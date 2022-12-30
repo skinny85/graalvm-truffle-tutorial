@@ -29,4 +29,6 @@ by using the `@TypeSystemReference` annotation
 so this way all EasyScript Nodes will have it without having to repeat it for each class).
 
 Feel free to comment out the `@TypeSystemReference` line from `EasyScriptNode` --
-you should see 2 out of 3 tests in `ExecutesNodeDslTest` fail.
+you should see 2 out of 3 tests in
+[`ExecuteNodesDslTest`](src/test/java/com/endoflineblog/truffle/part_03/ExecuteNodesDslTest.java)
+fail.

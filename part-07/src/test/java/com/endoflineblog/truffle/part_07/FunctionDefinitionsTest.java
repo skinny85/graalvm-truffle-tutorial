@@ -77,6 +77,18 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void functions_can_have_local_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "function addOne(a) { " +
+                "    let res = a + 1; " +
+                "    res; " +
+                "} " +
+                "addOne(4)"
+        );
+        assertEquals(5, result.asInt());
+    }
+
+    @Test
     public void function_parameters_shadow_each_other() {
         Value result = this.context.eval("ezs",
                 "function f(a, a) { " +

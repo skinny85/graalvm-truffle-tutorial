@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_02;
 
 import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.Truffle;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +19,7 @@ public class ExecuteNodesTest {
                 new IntLiteralNode(12),
                 new IntLiteralNode(34));
         var rootNode = new EasyScriptRootNode(exprNode);
-        CallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
+        CallTarget callTarget = rootNode.getCallTarget();
 
         var result = callTarget.call();
 
@@ -36,7 +35,7 @@ public class ExecuteNodesTest {
                 new IntLiteralNode(Integer.MAX_VALUE),
                 new IntLiteralNode(1));
         var rootNode = new EasyScriptRootNode(exprNode);
-        CallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
+        CallTarget callTarget = rootNode.getCallTarget();
 
         var result = callTarget.call();
 
@@ -52,7 +51,7 @@ public class ExecuteNodesTest {
                 new DoubleLiteralNode(2.5),
                 new IntLiteralNode(6));
         var rootNode = new EasyScriptRootNode(exprNode);
-        CallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
+        CallTarget callTarget = rootNode.getCallTarget();
 
         var result = callTarget.call();
 

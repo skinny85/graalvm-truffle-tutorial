@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_09;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Fork;
 
 /**
  * A benchmark that uses the naive implementation of the Fibonacci function.
@@ -30,7 +29,6 @@ public class FibonacciBenchmark extends TruffleBenchmark {
         return this.truffleContext.eval("ezs", FIBONACCI_JS_PROGRAM).asInt();
     }
 
-    @Fork(jvmArgsAppend = "-Dgraalvm.locatorDisabled=false")
     @Benchmark
     public int recursive_js_eval() {
         return this.truffleContext.eval("js", FIBONACCI_JS_PROGRAM).asInt();

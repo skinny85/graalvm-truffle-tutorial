@@ -1,6 +1,5 @@
 package com.endoflineblog.truffle.part_08.nodes.stmts.variables;
 
-import com.endoflineblog.truffle.part_08.EasyScriptLanguageContext;
 import com.endoflineblog.truffle.part_08.common.DeclarationKind;
 import com.endoflineblog.truffle.part_08.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
@@ -23,8 +22,7 @@ public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
-        EasyScriptLanguageContext context = this.currentLanguageContext();
-        if (!context.globalScopeObject.newVariable(this.variableId, this.declarationKind)) {
+        if (!this.currentLanguageContext().globalScopeObject.newVariable(this.variableId, this.declarationKind)) {
             throw new EasyScriptException(this, "Identifier '" + this.variableId + "' has already been declared");
         }
         // we return 'undefined' for statements that declare variables

@@ -5,7 +5,6 @@ import com.endoflineblog.truffle.part_08.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_08.nodes.stmts.blocks.UserFuncBodyStmtNode;
 import com.endoflineblog.truffle.part_08.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
@@ -33,7 +32,7 @@ public final class FuncDeclStmtNode extends EasyScriptStmtNode {
     public Object executeStatement(VirtualFrame frame) {
         var truffleLanguage = this.currentTruffleLanguage();
         var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.frameDescriptor, this.funcBody);
-        var func = new FunctionObject(Truffle.getRuntime().createCallTarget(funcRootNode), this.argumentCount);
+        var func = new FunctionObject(funcRootNode.getCallTarget(), this.argumentCount);
 
         var context = this.currentLanguageContext();
         // we allow functions to be redefined, to comply with JavaScript semantics

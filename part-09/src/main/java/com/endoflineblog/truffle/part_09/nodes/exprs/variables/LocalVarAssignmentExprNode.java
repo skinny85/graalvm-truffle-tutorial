@@ -5,7 +5,6 @@ import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
@@ -14,43 +13,43 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * Identical to the class with the same name from part 8.
  */
 @NodeChild("initializerExpr")
-@NodeField(name = "frameSlot", type = FrameSlot.class)
+@NodeField(name = "frameSlot", type = int.class)
 @ImportStatic(FrameSlotKind.class)
 public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
-    protected abstract FrameSlot getFrameSlot();
+    protected abstract int getFrameSlot();
 
-    @Specialization(guards = "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Illegal || " +
-            "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Int")
+    @Specialization(guards = "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
+            "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Int")
     protected int intAssignment(VirtualFrame frame, int value) {
-        FrameSlot frameSlot = this.getFrameSlot();
-        frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Int);
+        int frameSlot = this.getFrameSlot();
+        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Int);
         frame.setInt(frameSlot, value);
         return value;
     }
 
     @Specialization(replaces = "intAssignment",
-            guards = "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Illegal || " +
-                    "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Double")
+            guards = "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
+                    "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Double")
     protected double doubleAssignment(VirtualFrame frame, double value) {
-        FrameSlot frameSlot = this.getFrameSlot();
-        frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Double);
+        int frameSlot = this.getFrameSlot();
+        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Double);
         frame.setDouble(frameSlot, value);
         return value;
     }
 
-    @Specialization(guards = "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Illegal || " +
-            "frame.getFrameDescriptor().getFrameSlotKind(getFrameSlot()) == Boolean")
+    @Specialization(guards = "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
+            "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Boolean")
     protected boolean boolAssignment(VirtualFrame frame, boolean value) {
-        FrameSlot frameSlot = this.getFrameSlot();
-        frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Boolean);
+        int frameSlot = this.getFrameSlot();
+        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Boolean);
         frame.setBoolean(frameSlot, value);
         return value;
     }
 
     @Specialization(replaces = {"intAssignment", "doubleAssignment", "boolAssignment"})
     protected Object objectAssignment(VirtualFrame frame, Object value) {
-        FrameSlot frameSlot = this.getFrameSlot();
-        frame.getFrameDescriptor().setFrameSlotKind(frameSlot, FrameSlotKind.Object);
+        int frameSlot = this.getFrameSlot();
+        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Object);
         frame.setObject(frameSlot, value);
         return value;
     }

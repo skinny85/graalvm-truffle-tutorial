@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_10.nodes.stmts.variables;
 import com.endoflineblog.truffle.part_10.common.DeclarationKind;
 import com.endoflineblog.truffle.part_10.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
-import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
@@ -20,22 +19,22 @@ public final class LocalVarDeclStmtNode extends EasyScriptStmtNode {
         }
     };
 
-    private final FrameSlot frameSlot;
+    private final int frameSlot;
 
-    public LocalVarDeclStmtNode(FrameSlot frameSlot) {
+    public LocalVarDeclStmtNode(int frameSlot) {
         this.frameSlot = frameSlot;
     }
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
-        frame.setObject(this.frameSlot, this.frameSlot.getInfo() == DeclarationKind.VAR
+        frame.setObject(this.frameSlot, frame.getFrameDescriptor().getSlotInfo(this.frameSlot) == DeclarationKind.VAR
                 // the default value for 'var' is 'undefined'
                 ? Undefined.INSTANCE
                 // for 'const' and 'let', we write a "dummy" value that LocalVarReferenceExprNode treats specially
                 : DUMMY);
         // treat this variable as if it wasn't assigned a value yet,
         // to allow for specializations if its runtime type is 'int', 'double' or 'boolean'
-        frame.getFrameDescriptor().setFrameSlotKind(this.frameSlot, FrameSlotKind.Illegal);
+        frame.getFrameDescriptor().setSlotKind(this.frameSlot, FrameSlotKind.Illegal);
 
         // a definition of a local variable returns undefined,
         // same as a definition of a global variable

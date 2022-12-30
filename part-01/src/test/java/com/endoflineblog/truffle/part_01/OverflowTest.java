@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_01;
 
 import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.Truffle;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -17,7 +16,7 @@ public class OverflowTest {
                 new IntLiteralNode(Integer.MAX_VALUE),
                 new IntLiteralNode(1));
         var rootNode = new EasyScriptRootNode(exprNode);
-        CallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
+        CallTarget callTarget = rootNode.getCallTarget();
 
         var result = callTarget.call();
 

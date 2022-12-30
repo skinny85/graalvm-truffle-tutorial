@@ -1,9 +1,6 @@
 package com.endoflineblog.truffle.part_07.nodes.exprs;
 
 import com.endoflineblog.truffle.part_07.EasyScriptException;
-import com.endoflineblog.truffle.part_07.EasyScriptLanguageContext;
-import com.endoflineblog.truffle.part_07.EasyScriptTruffleLanguage;
-import com.oracle.truffle.api.dsl.CachedContext;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -18,11 +15,9 @@ public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
     @Specialization
-    protected Object assignVariable(
-            Object value,
-            @CachedContext(EasyScriptTruffleLanguage.class) EasyScriptLanguageContext context) {
+    protected Object assignVariable(Object value) {
         String variableId = this.getName();
-        if (!context.globalScopeObject.updateVariable(variableId, value)) {
+        if (!this.currentLanguageContext().globalScopeObject.updateVariable(variableId, value)) {
             throw new EasyScriptException(this, "'" + variableId + "' is not defined");
         }
         return value;

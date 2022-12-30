@@ -9,7 +9,6 @@ import com.endoflineblog.truffle.part_06.nodes.exprs.functions.built_in.PowFunct
 import com.endoflineblog.truffle.part_06.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_06.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 
@@ -31,7 +30,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     protected CallTarget parse(ParsingRequest request) throws Exception {
         List<EasyScriptStmtNode> stmts = EasyScriptTruffleParser.parse(request.getSource().getReader());
         var programRootNode = new ProgramRootNode(this, stmts);
-        return Truffle.getRuntime().createCallTarget(programRootNode);
+        return programRootNode.getCallTarget();
     }
 
     /**
@@ -44,9 +43,10 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         var context = new EasyScriptLanguageContext();
 
         // an example of defining a function directly, without @GenerateNodeFactory
+        var absFuncRootNode = new FunctionRootNode(this,
+                AbsFunctionBodyExprNodeGen.create(new ReadFunctionArgExprNode(0)));
         context.globalScopeObject.newConstant("Math.abs",
-                new FunctionObject(Truffle.getRuntime().createCallTarget(new FunctionRootNode(this,
-                        AbsFunctionBodyExprNodeGen.create(new ReadFunctionArgExprNode(0))))));
+                new FunctionObject(absFuncRootNode.getCallTarget()));
         // an example of using our utility method, possible by annotating the Node class with @GenerateNodeFactory
         this.defineBuiltInFunction(context, "Math.pow", PowFunctionBodyExprNodeFactory.getInstance());
 
@@ -63,8 +63,9 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, nodeFactory.getExecutionSignature().size())
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
+        var builtInFuncRootNode = new FunctionRootNode(this,
+                nodeFactory.createNode((Object) functionArguments));
         context.globalScopeObject.newConstant(name,
-                new FunctionObject(Truffle.getRuntime().createCallTarget(new FunctionRootNode(this,
-                        nodeFactory.createNode((Object) functionArguments)))));
+                new FunctionObject(builtInFuncRootNode.getCallTarget()));
     }
 }

@@ -30,10 +30,19 @@ While the entrypoint will still be a static `parse()` method on the class,
 the implementation will now be stateful --
 we need to record the names of the function arguments and the local variables we encounter inside a function definition.
 We do that in the `functionLocals` field.
+To distinguish between function arguments and local variables of functions,
+we introduce an abstract class, `FrameMember`,
+with two concrete subclasses, `FunctionArgument` and `LocalVariable`.
 
-The `frameDescriptor` field is used to create the `FrameSlot`s
-that actually index inside the `VirtualFrame`.
-We need to provide it to the `RootNode` that we use for functions
+The `frameDescriptor` field is used to create the frame slots for the local variables
+that actually index into the `VirtualFrame`.
+Historically, those indexes were a separate class called `FrameSlot`,
+but starting with GraalVM version `22`,
+that class has been removed,
+and slots are now indexed with integers,
+the same way function arguments are.
+We need to provide the `FrameDescriptor` obtained from
+the Builder in the `frameDescriptor` field to the `RootNode` that we use for functions
 (the [`StmtBlockRootNode` class](src/main/java/com/endoflineblog/truffle/part_07/nodes/StmtBlockRootNode.java))
 in order for the frame created by the `CallTarget` wrapping the `RootNode`
 to have the appropriate size.
@@ -63,20 +72,11 @@ is that we need to write a special "dummy" value that signifies the given variab
 this is a requirement to correctly implement hoisting.
 Those dummy values will then be treated specially by the reference expressions.
 
-The interesting part in `GlobalVarDeclStmtNode`
-is getting a reference to the language's context in a non-specialization method,
-which use `@CachedContext`, as we've seen since [part 5](../part-05).
-Here, we use the `currentLanguageContext()` method from the
-[common superclass of all nodes, `EasyScriptNode`](src/main/java/com/endoflineblog/truffle/part_07/nodes/EasyScriptNode.java),
-which uses a static `ContextReference` field defined in the
-[context class](src/main/java/com/endoflineblog/truffle/part_07/EasyScriptLanguageContext.java),
-and surfaced using the `get` method.
-
 ## Assignment expressions
 
 An assignment to a local variable is implemented by the
 [`LocalVarAssignmentExprNode` class](src/main/java/com/endoflineblog/truffle/part_07/nodes/exprs/LocalVarAssignmentExprNode.java) --
-we note down the type of variable in its `FrameSlot`.
+we note down the type of variable in its frame slot.
 
 The assignment to global variables is implemented by the
 [`GlobalVarAssignmentExprNode` class](src/main/java/com/endoflineblog/truffle/part_07/nodes/exprs/GlobalVarAssignmentExprNode.java),
@@ -87,7 +87,7 @@ An assignment to the parameter of a function is implemented by the
 There's an interesting detail here:
 as we saw in the
 [previous part](../part-06/src/main/java/com/endoflineblog/truffle/part_06/nodes/exprs/functions/ReadFunctionArgExprNode.java),
-it's legal to call a function with JavaScript with less arguments than it declares --
+it's legal to call a function with JavaScript with fewer arguments than it declares --
 the remaining ones are simply passed as `undefined`.
 But how does that work if the function writes to an argument that wasn't passed?
 The `arguments` array in the frame might not have enough space to perform the write.
@@ -107,7 +107,7 @@ even if that argument was never passed.
 A function declaration is implemented by the
 [`FuncDeclStmtNode` class](src/main/java/com/endoflineblog/truffle/part_07/nodes/stmts/FuncDeclStmtNode.java).
 We create a new `StmtBlockRootNode`,
-wrap it in a `CallTarget`,
+get a `CallTarget` from it,
 and finally wrap that in the same `FunctionObject` that we've seen
 [in the last article](../part-06/src/main/java/com/endoflineblog/truffle/part_06/runtime/FunctionObject.java)
 used for the built-in functions --
@@ -118,7 +118,8 @@ if the calling code passed fewer of them than the function declares.
 We need a reference to the `TruffleLanguage`
 instance from an `execute()` method in `FuncDeclStmtNode`
 to create the `RootNode`,
-so we use a similar trick in this class as we employed in `GlobalVarDeclStmtNode`,
+so we use a similar trick in this class as we employed in
+[`GlobalVarDeclStmtNode` in part 5](../part-05/src/main/java/com/endoflineblog/truffle/part_05/nodes/stmts/GlobalVarDeclStmtNode.java),
 but this time using the `currentTruffleLanguage()` method from
 [`EasyScriptNode` class](src/main/java/com/endoflineblog/truffle/part_07/nodes/EasyScriptNode.java)
 which uses the `LanguageReference` static field in the
@@ -129,7 +130,7 @@ which uses the `LanguageReference` static field in the
 A reference to a local variable is implemented by the
 [`LocalVarReferenceExprNode` class](src/main/java/com/endoflineblog/truffle/part_07/nodes/exprs/LocalVarReferenceExprNode.java).
 It uses the types `LocalVarAssignmentExprNode`
-saved in the `FrameSlot` for specializations with the `guards` attribute that we've seen first in the previous chapter.
+saved in the frame slot for specializations with the `guards` attribute that we've seen first in the previous chapter.
 
 Referencing global variables
 [is unchanged](src/main/java/com/endoflineblog/truffle/part_07/nodes/exprs/GlobalVarReferenceExprNode.java)

@@ -2,11 +2,8 @@ package com.endoflineblog.truffle.part_06.nodes.stmts;
 
 import com.endoflineblog.truffle.part_06.DeclarationKind;
 import com.endoflineblog.truffle.part_06.EasyScriptException;
-import com.endoflineblog.truffle.part_06.EasyScriptLanguageContext;
-import com.endoflineblog.truffle.part_06.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_06.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_06.runtime.Undefined;
-import com.oracle.truffle.api.dsl.CachedContext;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -31,12 +28,10 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     public abstract DeclarationKind getDeclarationKind();
 
     @Specialization
-    protected Object createVariable(
-            Object value,
-            @CachedContext(EasyScriptTruffleLanguage.class) EasyScriptLanguageContext context) {
+    protected Object createVariable(Object value) {
         String variableId = this.getName();
         boolean isConst = this.getDeclarationKind() == DeclarationKind.CONST;
-        if (!context.globalScopeObject.newVariable(variableId, value, isConst)) {
+        if (!this.currentLanguageContext().globalScopeObject.newVariable(variableId, value, isConst)) {
             throw new EasyScriptException(this, "Identifier '" + variableId + "' has already been declared");
         }
         // we return 'undefined' for statements that declare variables

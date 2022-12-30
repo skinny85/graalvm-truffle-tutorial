@@ -23,12 +23,13 @@ We will need four fields instead of just two:
 1. Whether we're parsing the top-level scope,
    a nested scope of the top-level,
    or a function.
-2. The `FrameDescriptor` -- in this part, the top-level scope can include local variables too
+2. The `FrameDescriptor.Builder` -- in this part, the top-level scope can include local variables too
    (they are not exclusive to function definitions).
-3. A Stack of Maps that contain the local variables in each scope.
+3. A Stack of Maps that contain the local members
+   (function arguments, and local variables) in each scope.
    When we enter a new scope, we push a new Map onto this Stack;
    when we leave a scope, we pop a Map off the Stack.
-4. A counter that we keep incrementing after every usage that generates unique `FrameSlot`
+4. A counter that we keep incrementing after every usage that generates unique frame slot
    names by combining it with the name of the variable
    (because of nested scopes, variable names are no longer guaranteed to be unique in a given `FrameDescriptor`).
 

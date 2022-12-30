@@ -11,7 +11,6 @@ import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_07.runtime.FunctionObject;
 import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
@@ -42,7 +41,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     protected CallTarget parse(ParsingRequest request) throws Exception {
         List<EasyScriptStmtNode> stmts = EasyScriptTruffleParser.parse(request.getSource().getReader());
         var programRootNode = new StmtBlockRootNode(this, new BlockStmtNode(stmts));
-        return Truffle.getRuntime().createCallTarget(programRootNode);
+        return programRootNode.getCallTarget();
     }
 
     @Override
@@ -66,10 +65,9 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
+        var builtInFuncRootNode = new BuiltInFuncRootNode(this,
+                nodeFactory.createNode((Object) functionArguments));
         context.globalScopeObject.newFunction(name,
-                new FunctionObject(
-                        Truffle.getRuntime().createCallTarget(new BuiltInFuncRootNode(this,
-                                nodeFactory.createNode((Object) functionArguments))),
-                        argumentCount));
+                new FunctionObject(builtInFuncRootNode.getCallTarget(), argumentCount));
     }
 }

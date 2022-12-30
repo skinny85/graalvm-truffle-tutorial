@@ -3,8 +3,7 @@ package com.endoflineblog.truffle.part_09.common;
 import java.util.Objects;
 
 /**
- * A class that represents the full identifier of a local variable used for a
- * {@link com.oracle.truffle.api.frame.FrameSlot}.
+ * A class that represents the full identifier of a local variable used for a frame slot.
  * Identical to the class with the same name from part 8.
  */
 public final class LocalVariableFrameSlotId {

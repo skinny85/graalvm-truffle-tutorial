@@ -17,8 +17,11 @@ and is kept in the [`FibonacciBenchmark` class](src/jmh/java/com/endoflineblog/t
 
 We use a naive implementation of the Fibonacci function as the measured code.
 In addition to EasyScript, we also implement benchmarks for Java,
-the built-in JavaScript Truffle implementation that ships with GraalVM,
-and also [SimpleLanguage](https://www.graalvm.org/22.2/graalvm-as-a-platform/implement-language),
+the GraalVM JavaScript Truffle implementation
+(which used to come bundled with GraalVM,
+but since version `22`, is now a
+[separate library](https://mvnrepository.com/artifact/org.graalvm.js/js)),
+and also [SimpleLanguage](https://www.graalvm.org/latest/graalvm-as-a-platform/implement-language),
 for comparison.
 
 The initial numbers I get on my laptop when executing the benchmark command
@@ -87,7 +90,7 @@ We have achieved almost a 60x speedup compared to the version from [part 8](../p
 ## Using Ideal Graph Visualizer
 
 When diagnosing performance issues,
-the [Ideal Graph Visualizer tool](https://www.graalvm.org/22.2/tools/igv)
+the [Ideal Graph Visualizer tool](https://www.graalvm.org/latest/tools/igv)
 is very helpful.
 It’s a project maintained by the same team that maintains GraalVM and Truffle,
 and allows visualizing as graphs the many debug trees that Truffle and Graal produce in the process of interpreting your language.

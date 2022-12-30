@@ -1,9 +1,9 @@
 package com.endoflineblog.truffle.part_05.nodes.exprs;
 
 import com.endoflineblog.truffle.part_05.EasyScriptTypeSystem;
+import com.endoflineblog.truffle.part_05.nodes.EasyScriptNode;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 /**
@@ -11,7 +11,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
  * Very similar to EasyScriptNode from part 3.
  */
 @TypeSystemReference(EasyScriptTypeSystem.class)
-public abstract class EasyScriptExprNode extends Node {
+public abstract class EasyScriptExprNode extends EasyScriptNode {
     public abstract int executeInt(VirtualFrame frame) throws UnexpectedResultException;
 
     /**

@@ -24,8 +24,6 @@ subprojects {
                 '--add-exports',
                     'org.graalvm.truffle/com.oracle.truffle.api.nodes=ALL-UNNAMED',
                 '--add-exports',
-                    'org.graalvm.truffle/com.oracle.truffle.api.dsl=ALL-UNNAMED',
-                '--add-exports',
                     'org.graalvm.truffle/com.oracle.truffle.api.staticobject=ALL-UNNAMED'
 
         testLogging {
@@ -35,7 +33,7 @@ subprojects {
     }
 
     ext {
-        graal_version = '21.3.1'
+        graal_version = '22.3.0'
         antlr_version = '4.9.2'
     }
 
