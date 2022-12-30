@@ -10,6 +10,11 @@ subprojects {
         mavenCentral()
     }
 
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
     // These arguments are required because of the JVM 11's module system -
     // we grant this module access to the packages from the Truffle API JAR
     test {
