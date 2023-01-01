@@ -46,6 +46,16 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void no_return_in_function_results_in_undefined() {
+        Value result = this.context.eval("ezs", "" +
+                "function f() { 5; }" +
+                "f()"
+        );
+        assertTrue(result.isNull());
+        assertEquals(result.toString(), "undefined");
+    }
+
+    @Test
     public void cycle_between_var_and_function_works() {
         Value result = this.context.eval("ezs",
                 "var v = f();" +

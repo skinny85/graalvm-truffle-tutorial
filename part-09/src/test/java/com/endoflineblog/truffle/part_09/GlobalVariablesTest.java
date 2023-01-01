@@ -203,10 +203,10 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void parsing_a_large_integer_fall_backs_to_double() {
-        // this is 12,345,678,901
-        Value result = this.context.eval("ezs", "12345678901");
+    public void parsing_a_large_integer_falls_back_to_double() {
+        // this is 9,876,543,210
+        Value result = this.context.eval("ezs", "9876543210");
 
-        assertEquals(12_345_678_901D, result.asDouble(), 0.0);
+        assertEquals(9_876_543_210D, result.asDouble(), 0.0);
     }
 }

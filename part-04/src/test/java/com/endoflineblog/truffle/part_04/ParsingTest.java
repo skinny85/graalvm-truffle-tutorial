@@ -28,9 +28,9 @@ public class ParsingTest {
     }
 
     @Test
-    public void parsing_a_large_integer_fall_backs_to_double() {
-        // this is 12,345,678,901
-        String largeInt = "12345678901";
+    public void parsing_a_large_integer_falls_back_to_double() {
+        // this is 9,876,543,210
+        String largeInt = "9876543210";
         EasyScriptNode exprNode = EasyScriptTruffleParser.parse(largeInt);
 
         assertTrue(exprNode instanceof DoubleLiteralNode);

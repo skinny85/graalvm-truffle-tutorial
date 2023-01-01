@@ -1,4 +1,4 @@
-package com.endoflineblog.truffle.part_10;
+package com.endoflineblog.truffle.part_06;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
@@ -189,17 +189,8 @@ public class GlobalVariablesTest {
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
-            assertEquals("Cannot access 'x' before initialization", e.getMessage());
+            assertEquals("'x' is not defined", e.getMessage());
         }
-    }
-
-    @Test
-    public void const_variables_can_be_re_evaluated() {
-        String program = "const a = 3; a";
-        this.context.eval("ezs", program);
-        Value result = this.context.eval("ezs", program);
-
-        assertEquals(3, result.asInt());
     }
 
     @Test

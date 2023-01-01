@@ -114,6 +114,18 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
+    public void function_arguments_shadow_globals() {
+        Value result = this.context.eval("ezs", "" +
+                "const a = 33; " +
+                "function f(a) { " +
+                "    a;" +
+                "} " +
+                "f(22)"
+        );
+        assertEquals(22, result.asInt());
+    }
+
+    @Test
     public void function_parameters_can_be_reassigned() {
         Value result = this.context.eval("ezs",
                 "let a = 222; " +
@@ -263,5 +275,17 @@ public class FunctionDefinitionsTest {
             assertFalse(e.isInternalError());
             assertEquals("nested functions are not supported in EasyScript yet", e.getMessage());
         }
+    }
+
+    @Test
+    public void functions_can_be_reassigned_as_simple_values() {
+        Value result = this.context.eval("ezs", "" +
+                "function f() { " +
+                "} " +
+                "f = 4; " +
+                "f"
+        );
+
+        assertEquals(4, result.asInt());
     }
 }
