@@ -43,8 +43,8 @@ import com.endoflineblog.truffle.part_08.parsing.antlr.EasyScriptLexer;
 import com.endoflineblog.truffle.part_08.parsing.antlr.EasyScriptParser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -67,7 +67,7 @@ import java.util.stream.Collectors;
  */
 public final class EasyScriptTruffleParser {
     public static ParsingResult parse(Reader program) throws IOException {
-        var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
+        var lexer = new EasyScriptLexer(CharStreams.fromReader(program));
         // remove the default console error listener
         lexer.removeErrorListeners();
         var parser = new EasyScriptParser(new CommonTokenStream(lexer));

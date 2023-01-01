@@ -13,8 +13,8 @@ import com.endoflineblog.truffle.part_05.nodes.exprs.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_05.nodes.stmts.GlobalVarDeclStmtNodeGen;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  */
 public final class EasyScriptTruffleParser {
     public static List<EasyScriptStmtNode> parse(Reader program) throws IOException {
-        var lexer = new EasyScriptLexer(new ANTLRInputStream(program));
+        var lexer = new EasyScriptLexer(CharStreams.fromReader(program));
         // remove the default console error listener
         lexer.removeErrorListeners();
         var parser = new EasyScriptParser(new CommonTokenStream(lexer));

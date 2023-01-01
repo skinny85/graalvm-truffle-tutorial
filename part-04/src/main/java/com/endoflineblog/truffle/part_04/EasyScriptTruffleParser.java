@@ -5,9 +5,9 @@ import com.endoflineblog.truffle.part_03.AdditionNodeGen;
 import com.endoflineblog.truffle.part_03.DoubleLiteralNode;
 import com.endoflineblog.truffle.part_03.EasyScriptNode;
 import com.endoflineblog.truffle.part_03.IntLiteralNode;
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -26,11 +26,11 @@ import java.io.Reader;
  */
 public final class EasyScriptTruffleParser {
     public static EasyScriptNode parse(String program) {
-        return parse(new ANTLRInputStream(program));
+        return parse(CharStreams.fromString(program));
     }
 
     public static EasyScriptNode parse(Reader program) throws IOException {
-        return parse(new ANTLRInputStream(program));
+        return parse(CharStreams.fromReader(program));
     }
 
     private static EasyScriptNode parse(CharStream inputStream) {
