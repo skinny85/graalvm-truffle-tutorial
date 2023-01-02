@@ -14,8 +14,7 @@ public final class WriteFunctionArgExprNode extends EasyScriptExprNode {
     @Child
     private EasyScriptExprNode initializerExpr;
 
-    // ToDo switch these arguments around
-    public WriteFunctionArgExprNode(int index, EasyScriptExprNode initializerExpr) {
+    public WriteFunctionArgExprNode(EasyScriptExprNode initializerExpr, int index) {
         this.index = index;
         this.initializerExpr = initializerExpr;
     }

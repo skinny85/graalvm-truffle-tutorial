@@ -366,7 +366,7 @@ public final class EasyScriptTruffleParser {
             return GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId);
         } else {
             if (frameMember instanceof FunctionArgument) {
-                return new WriteFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex, initializerExpr);
+                return new WriteFunctionArgExprNode(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
             } else {
                 var localVariable = (LocalVariable) frameMember;
                 if (localVariable.declarationKind == DeclarationKind.CONST) {
