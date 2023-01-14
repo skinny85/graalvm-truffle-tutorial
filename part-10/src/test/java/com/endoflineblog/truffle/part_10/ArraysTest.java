@@ -169,6 +169,21 @@ public class ArraysTest {
     }
 
     @Test
+    public void an_array_can_be_passed_to_a_function_exec() {
+        this.context.eval("ezs", "" +
+                "let array = [1, 2, 3]; " +
+                "function secondIndex(arr) { " +
+                "    return arr[1]; " +
+                "}"
+        );
+
+        Value globalVariables = this.context.getBindings("ezs");
+        Value array = globalVariables.getMember("array");
+        Value secondIndex = globalVariables.getMember("secondIndex");
+        assertEquals(2, secondIndex.execute(array).asInt());
+    }
+
+    @Test
     public void reading_an_index_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",

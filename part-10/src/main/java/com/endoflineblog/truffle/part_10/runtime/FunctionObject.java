@@ -12,9 +12,11 @@ import com.oracle.truffle.api.library.ExportMessage;
 
 /**
  * The object that represents a function in EasyScript.
- * Identical to the class with the same name from part 8
+ * Almost identical to the class with the same name from part 8
  * (but different from the class with the same name from part 9,
- * as it's no longer mutable).
+ * as it's no longer mutable),
+ * the only difference is adding {@link ArrayObject}
+ * to the list of allowed EasyScript values when calling this function through the GraalVM polyglot API.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject implements TruffleObject {
@@ -51,6 +53,7 @@ public final class FunctionObject implements TruffleObject {
         return EasyScriptTypeSystemGen.isImplicitDouble(argument) ||
                 EasyScriptTypeSystemGen.isBoolean(argument) ||
                 argument == Undefined.INSTANCE ||
+                argument instanceof ArrayObject ||
                 argument instanceof FunctionObject;
     }
 }
