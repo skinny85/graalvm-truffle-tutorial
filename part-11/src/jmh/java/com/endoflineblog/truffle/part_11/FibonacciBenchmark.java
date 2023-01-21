@@ -9,10 +9,13 @@ import org.openjdk.jmh.annotations.Benchmark;
 public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_FUNCTION = "" +
             "function fib(n) { " +
+            "    var ret; " +
             "    if (n < 2) { " +
-            "        return 1; " +
+            "        ret = 1; " +
+            "    } else { " +
+            "        ret = fib(n - 1) + fib(n - 2); " +
             "    } " +
-            "    return fib(n - 1) + fib(n - 2); " +
+            "    return ret; " +
             "} ";
     private static final String FIBONACCI_JS_PROGRAM = FIBONACCI_JS_FUNCTION + "fib(20);";
 
@@ -40,8 +43,12 @@ public class FibonacciBenchmark extends TruffleBenchmark {
     }
 
     public static int fibonacciRecursive(int n) {
-        return n < 2
-                ? 1
-                : fibonacciRecursive(n - 1) + fibonacciRecursive(n - 2);
+        int ret;
+        if (n < 2) {
+            ret = 1;
+        } else {
+            ret = fibonacciRecursive(n - 1) + fibonacciRecursive(n - 2);
+        }
+        return ret;
     }
 }
