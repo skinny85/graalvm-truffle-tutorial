@@ -16,8 +16,7 @@ public final class StringLiteralExprNode extends EasyScriptExprNode {
 
     @Override
     public boolean executeBool(VirtualFrame frame) {
-        // ToDo fix this
-        return true;
+        return !this.value.isEmpty();
     }
 
     @Override

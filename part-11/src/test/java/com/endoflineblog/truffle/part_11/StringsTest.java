@@ -42,4 +42,34 @@ public class StringsTest {
         assertTrue(result.isString());
         assertEquals("'", result.asString());
     }
+
+    @Test
+    public void empty_string_is_falsy() {
+        Value result = this.context.eval("ezs", "" +
+                "let ret; " +
+                "if ('') { " +
+                "    ret = 'empty string is truthy'; " +
+                "} else { " +
+                "    ret = 'empty string is falsy'; " +
+                "} " +
+                "ret"
+        );
+        assertTrue(result.isString());
+        assertEquals("empty string is falsy", result.asString());
+    }
+
+    @Test
+    public void blank_string_is_truthy() {
+        Value result = this.context.eval("ezs", "" +
+                "let ret; " +
+                "if (' ') { " +
+                "    ret = 'blank string is truthy'; " +
+                "} else { " +
+                "    ret = 'blank string is falsy'; " +
+                "} " +
+                "ret"
+        );
+        assertTrue(result.isString());
+        assertEquals("blank string is truthy", result.asString());
+    }
 }
