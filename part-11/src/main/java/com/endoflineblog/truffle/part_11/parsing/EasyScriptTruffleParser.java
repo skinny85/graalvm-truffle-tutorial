@@ -56,6 +56,7 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -495,8 +496,10 @@ public final class EasyScriptTruffleParser {
         TerminalNode stringTerminal = literalExpr.literal().STRING();
         if (stringTerminal != null) {
             String stringLiteral = stringTerminal.getText();
-            // remove the quotes delineating the string literal
-            return new StringLiteralExprNode(stringLiteral.substring(1, stringLiteral.length() - 1));
+            // remove the quotes delineating the string literal,
+            // and unescape the string (meaning, turn \' into ', etc.)
+            return new StringLiteralExprNode(StringEscapeUtils.unescapeJson(
+                    stringLiteral.substring(1, stringLiteral.length() - 1)));
         }
         return new UndefinedLiteralExprNode();
     }

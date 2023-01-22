@@ -54,7 +54,9 @@ DOUBLE : DIGIT+ '.' DIGIT+ ;
 fragment LETTER : [a-zA-Z$_] ;
 ID : LETTER (LETTER | DIGIT)* ;
 
-STRING : '\'' ~[']* '\'' ;
+// see https://stackoverflow.com/questions/24557953/handling-string-literals-which-end-in-an-escaped-quote-in-antlr4
+// for details
+STRING : '\'' (~[\\'\r\n] | '\\' ~[\r\n])* '\'' ;
 
 // skip all whitespace
 WS : (' ' | '\r' | '\t' | '\n' | '\f')+ -> skip ;

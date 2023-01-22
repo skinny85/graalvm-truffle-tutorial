@@ -33,4 +33,13 @@ public class StringsTest {
         assertTrue(result.isString());
         assertEquals("", result.asString());
     }
+
+    @Test
+    public void single_quote_strings_can_contain_a_single_quote_by_escaping_it() {
+        Value result = this.context.eval("ezs",
+                "'\\''"
+        );
+        assertTrue(result.isString());
+        assertEquals("'", result.asString());
+    }
 }
