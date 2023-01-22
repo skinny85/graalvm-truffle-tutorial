@@ -184,6 +184,21 @@ public class ArraysTest {
     }
 
     @Test
+    public void empty_array_is_truthy() {
+        Value result = this.context.eval("ezs", "" +
+                "let ret; " +
+                "if ([]) { " +
+                "    ret = 'empty array is truthy'; " +
+                "} else { " +
+                "    ret = 'empty array is falsy'; " +
+                "} " +
+                "ret"
+        );
+        assertTrue(result.isString());
+        assertEquals("empty array is truthy", result.asString());
+    }
+
+    @Test
     public void reading_an_index_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",
