@@ -62,7 +62,8 @@ public class StringsTest {
     public void blank_string_is_truthy() {
         Value result = this.context.eval("ezs", "" +
                 "let ret; " +
-                "if (' ') { " +
+                "const blankStr = ' '; " +
+                "if (blankStr) { " +
                 "    ret = 'blank string is truthy'; " +
                 "} else { " +
                 "    ret = 'blank string is falsy'; " +
