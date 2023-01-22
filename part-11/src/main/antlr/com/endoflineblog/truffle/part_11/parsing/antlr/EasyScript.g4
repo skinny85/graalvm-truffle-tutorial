@@ -44,7 +44,7 @@ expr5 : literal                                            #LiteralExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;
 
-literal : INT | DOUBLE | 'undefined' | bool_literal ;
+literal : INT | DOUBLE | 'undefined' | bool_literal | STRING ;
 bool_literal : 'true' | 'false' ;
 
 fragment DIGIT : [0-9] ;
@@ -53,6 +53,8 @@ DOUBLE : DIGIT+ '.' DIGIT+ ;
 
 fragment LETTER : [a-zA-Z$_] ;
 ID : LETTER (LETTER | DIGIT)* ;
+
+STRING : '\'' ~[']* '\'' ;
 
 // skip all whitespace
 WS : (' ' | '\r' | '\t' | '\n' | '\f')+ -> skip ;
