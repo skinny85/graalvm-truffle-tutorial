@@ -1,8 +1,8 @@
 package com.endoflineblog.truffle.part_11.nodes.exprs.arithmetic;
 
+import com.endoflineblog.truffle.part_11.EasyScriptTypeSystemGen;
 import com.endoflineblog.truffle.part_11.nodes.exprs.BinaryOperationExprNode;
-import com.endoflineblog.truffle.part_11.runtime.ArrayObject;
-import com.endoflineblog.truffle.part_11.runtime.FunctionObject;
+import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -27,7 +27,7 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
      * if either argument to it is a complex value.
      * Complex values are functions, arrays, strings, and objects (like Math).
      * Numbers and booleans are not complex values,
-     * nor is 'undefined' (and 'null').
+     * and nor is 'undefined' (and 'null', but EasyScript doesn't support that one yet).
      */
     @Specialization(guards = "isComplex(leftValue) || isComplex(rightValue)")
     @TruffleBoundary
@@ -36,10 +36,13 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
     }
 
     protected static boolean isComplex(Object value) {
-        return value instanceof ArrayObject ||
-                value instanceof String ||
-                value instanceof FunctionObject ||
-                value instanceof Math;
+        return !isPrimitive(value);
+    }
+
+    private static boolean isPrimitive(Object value) {
+        return EasyScriptTypeSystemGen.isImplicitDouble(value) ||
+                EasyScriptTypeSystemGen.isBoolean(value) ||
+                value == Undefined.INSTANCE;
     }
 
     /**
