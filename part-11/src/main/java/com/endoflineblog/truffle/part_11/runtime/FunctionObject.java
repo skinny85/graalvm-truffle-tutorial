@@ -30,6 +30,16 @@ public final class FunctionObject implements TruffleObject {
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
     }
 
+    /**
+     * Returns the string representation of a given function.
+     * In JavaScript, this returns the actual code of a given function (!).
+     * We'll simplify in EasyScript, and just return the string {@code "[Function]"}.
+     */
+    @Override
+    public String toString() {
+        return "[Function]";
+     }
+
     @ExportMessage
     boolean isExecutable() {
         return true;

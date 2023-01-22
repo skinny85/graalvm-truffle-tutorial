@@ -97,12 +97,12 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void adding_a_function_returns_NaN() {
+    public void adding_a_function_turns_into_string_concatenation() {
         Value result = this.context.eval("ezs",
                 "Math.abs + 3"
         );
 
-        assertTrue(Double.isNaN(result.asDouble()));
+        assertEquals("[Function]3", result.asString());
     }
 
     @Test

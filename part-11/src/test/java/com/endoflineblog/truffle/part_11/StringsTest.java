@@ -72,4 +72,13 @@ public class StringsTest {
         assertTrue(result.isString());
         assertEquals("blank string is truthy", result.asString());
     }
+
+    @Test
+    public void strings_can_be_concatenated() {
+        Value result = this.context.eval("ezs",
+                "'abc' + '_' + 'def'"
+        );
+        assertTrue(result.isString());
+        assertEquals("abc_def", result.asString());
+    }
 }
