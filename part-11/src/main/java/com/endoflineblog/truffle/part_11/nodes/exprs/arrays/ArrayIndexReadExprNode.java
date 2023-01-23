@@ -2,8 +2,8 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.arrays;
 
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_11.runtime.StringObject;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
-import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -12,7 +12,6 @@ import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The Node representing reading array indexes
@@ -36,11 +35,10 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * if the index is a string.
      */
     @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "1")
-    protected Object readProperty(Object target, TruffleString propertyName,
-            @CachedLibrary("target") InteropLibrary interopLibrary,
-            @Cached TruffleString.ToJavaStringNode toJavaStringNode) {
+    protected Object readProperty(Object target, StringObject propertyName,
+            @CachedLibrary("target") InteropLibrary interopLibrary) {
         try {
-            return interopLibrary.readMember(target, toJavaStringNode.execute(propertyName));
+            return interopLibrary.readMember(target, propertyName.toString());
         } catch (UnknownIdentifierException e) {
             return Undefined.INSTANCE;
         } catch (UnsupportedMessageException e) {

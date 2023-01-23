@@ -25,7 +25,7 @@ import com.endoflineblog.truffle.part_11.nodes.exprs.functions.WriteFunctionArgE
 import com.endoflineblog.truffle.part_11.nodes.exprs.literals.BoolLiteralExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.literals.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.literals.IntLiteralExprNode;
-import com.endoflineblog.truffle.part_11.nodes.exprs.literals.StringLiteralExprNodeGen;
+import com.endoflineblog.truffle.part_11.nodes.exprs.literals.StringLiteralExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.literals.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_11.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
@@ -498,7 +498,7 @@ public final class EasyScriptTruffleParser {
             String stringLiteral = stringTerminal.getText();
             // remove the quotes delineating the string literal,
             // and unescape the string (meaning, turn \' into ', etc.)
-            return StringLiteralExprNodeGen.create(StringEscapeUtils.unescapeJson(
+            return new StringLiteralExprNode(StringEscapeUtils.unescapeJson(
                     stringLiteral.substring(1, stringLiteral.length() - 1)));
         }
         return new UndefinedLiteralExprNode();
