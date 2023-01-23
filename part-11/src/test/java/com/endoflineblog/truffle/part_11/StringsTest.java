@@ -81,4 +81,13 @@ public class StringsTest {
         assertTrue(result.isString());
         assertEquals("abc_def", result.asString());
     }
+
+    @Test
+    public void properties_can_be_accessed_through_indexing() {
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [0, 1, 2]; " +
+                "arr['length']"
+        );
+        assertEquals(3, result.asInt());
+    }
 }
