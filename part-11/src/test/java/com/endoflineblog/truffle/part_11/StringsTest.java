@@ -90,4 +90,15 @@ public class StringsTest {
         );
         assertEquals(3, result.asInt());
     }
+
+    @Test
+    public void property_writes_through_indexing_are_ignored() {
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [0, 1, 2]; " +
+                "const result = arr['length'] = 5;" +
+                "[result, arr.length]"
+        );
+        assertEquals(5, result.getArrayElement(0).asInt());
+        assertEquals(3, result.getArrayElement(1).asInt());
+    }
 }
