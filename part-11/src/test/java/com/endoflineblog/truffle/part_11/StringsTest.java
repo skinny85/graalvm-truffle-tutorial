@@ -101,4 +101,12 @@ public class StringsTest {
         assertEquals(5, result.getArrayElement(0).asInt());
         assertEquals(3, result.getArrayElement(1).asInt());
     }
+
+    @Test
+    public void strings_have_a_length_property() {
+        Value result = this.context.eval("ezs",
+                "'length'.length"
+        );
+        assertEquals(6, result.asInt());
+    }
 }
