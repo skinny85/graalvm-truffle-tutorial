@@ -35,6 +35,29 @@ public final class StringObject implements TruffleObject {
     }
 
     @ExportMessage
+    boolean hasArrayElements() {
+        return true;
+    }
+
+    @ExportMessage
+    long getArraySize() {
+        return this.value.length();
+    }
+
+    @ExportMessage
+    boolean isArrayElementReadable(long index) {
+        return index >= 0 && index < this.getArraySize();
+    }
+
+    @ExportMessage
+    Object readArrayElement(long index) {
+        int i = (int) index;
+        return this.isArrayElementReadable(index)
+                ? new StringObject(this.value.substring(i, i + 1))
+                : Undefined.INSTANCE;
+    }
+
+    @ExportMessage
     boolean isMemberReadable(String member) {
         return "length".equals(member);
     }

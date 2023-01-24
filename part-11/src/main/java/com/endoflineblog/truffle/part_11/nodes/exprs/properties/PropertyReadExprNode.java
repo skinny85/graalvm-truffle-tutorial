@@ -40,7 +40,7 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
      */
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
     protected Object readPropertyOfUndefined(@SuppressWarnings("unused") Object target,
-            @CachedLibrary("target") InteropLibrary interopLibrary) {
+            @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary) {
         throw new EasyScriptException("Cannot read properties of undefined (reading '" + this.getPropertyName() + "')");
     }
 

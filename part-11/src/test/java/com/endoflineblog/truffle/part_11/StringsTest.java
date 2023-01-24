@@ -124,4 +124,12 @@ public class StringsTest {
 
         assertEquals(2, access.execute(str, "length").asInt());
     }
+
+    @Test
+    public void strings_can_be_indexed() {
+        Value result = this.context.eval("ezs",
+                "'abc'[1][0]"
+        );
+        assertEquals("b", result.asString());
+    }
 }
