@@ -109,4 +109,19 @@ public class StringsTest {
         );
         assertEquals(6, result.asInt());
     }
+
+    @Test
+    public void java_strings_can_be_used_for_indexing() {
+        this.context.eval("ezs", "" +
+                "function access(o, propertyName) { " +
+                "    return o[propertyName]; " +
+                "} " +
+                "let str = 'ab'; "
+        );
+        Value ezsBindings = this.context.getBindings("ezs");
+        Value str = ezsBindings.getMember("str");
+        Value access = ezsBindings.getMember("access");
+
+        assertEquals(2, access.execute(str, "length").asInt());
+    }
 }

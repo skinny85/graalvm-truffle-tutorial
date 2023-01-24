@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.arrays;
 
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_11.runtime.StringObject;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
@@ -34,11 +33,16 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * The array index syntax can also be used in JavaScript to read a property of an object
      * if the index is a string.
      */
-    @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "1")
-    protected Object readProperty(Object target, StringObject propertyName,
-            @CachedLibrary("target") InteropLibrary interopLibrary) {
+    @Specialization(guards = {
+            "targetInteropLibrary.hasMembers(target)",
+            "propertyNameInteropLibrary.isString(propertyName)"
+    }, limit = "1")
+    protected Object readProperty(Object target, Object propertyName,
+            @CachedLibrary("target") InteropLibrary targetInteropLibrary,
+            @CachedLibrary("propertyName") InteropLibrary propertyNameInteropLibrary) {
         try {
-            return interopLibrary.readMember(target, propertyName.toString());
+            return targetInteropLibrary.readMember(target,
+                    propertyNameInteropLibrary.asString(propertyName));
         } catch (UnknownIdentifierException e) {
             return Undefined.INSTANCE;
         } catch (UnsupportedMessageException e) {

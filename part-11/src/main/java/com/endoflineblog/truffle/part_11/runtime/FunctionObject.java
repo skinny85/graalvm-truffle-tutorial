@@ -64,6 +64,8 @@ public final class FunctionObject implements TruffleObject {
                 EasyScriptTypeSystemGen.isBoolean(argument) ||
                 argument == Undefined.INSTANCE ||
                 argument instanceof ArrayObject ||
+                argument instanceof StringObject ||
+                argument instanceof String ||
                 argument instanceof FunctionObject;
     }
 }
