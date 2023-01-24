@@ -54,7 +54,6 @@ public class StringsTest {
                 "} " +
                 "ret"
         );
-        assertTrue(result.isString());
         assertEquals("empty string is falsy", result.asString());
     }
 
@@ -69,7 +68,6 @@ public class StringsTest {
                 "} " +
                 "ret"
         );
-        assertTrue(result.isString());
         assertEquals("blank string is truthy", result.asString());
     }
 
@@ -78,7 +76,6 @@ public class StringsTest {
         Value result = this.context.eval("ezs",
                 "'abc' + '_' + 'def'"
         );
-        assertTrue(result.isString());
         assertEquals("abc_def", result.asString());
     }
 
@@ -131,5 +128,16 @@ public class StringsTest {
                 "'abc'[1][0]"
         );
         assertEquals("b", result.asString());
+    }
+
+    @Test
+    public void strings_can_be_compared_for_equality() {
+        Value result = this.context.eval("ezs", "" +
+                "let ret = 'string equality is broken'; " +
+                "if ('abc' === 'a' + 'b' + 'c') " +
+                "    ret = 'string equality works correctly'; " +
+                "ret"
+        );
+        assertEquals("string equality works correctly", result.asString());
     }
 }
