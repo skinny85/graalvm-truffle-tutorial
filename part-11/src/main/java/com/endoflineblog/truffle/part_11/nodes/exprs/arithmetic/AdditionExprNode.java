@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.arithmetic;
 
 import com.endoflineblog.truffle.part_11.EasyScriptTypeSystemGen;
 import com.endoflineblog.truffle.part_11.nodes.exprs.BinaryOperationExprNode;
+import com.endoflineblog.truffle.part_11.runtime.StringObject;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -31,8 +32,8 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
      */
     @Specialization(guards = "isComplex(leftValue) || isComplex(rightValue)")
     @TruffleBoundary
-    protected String concatenateComplexAsStrings(Object leftValue, Object rightValue) {
-        return leftValue.toString() + rightValue.toString();
+    protected StringObject concatenateComplexAsStrings(Object leftValue, Object rightValue) {
+        return new StringObject(leftValue.toString() + rightValue.toString());
     }
 
     protected static boolean isComplex(Object value) {

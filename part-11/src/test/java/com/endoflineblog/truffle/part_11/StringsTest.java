@@ -140,4 +140,12 @@ public class StringsTest {
         );
         assertEquals("string equality works correctly", result.asString());
     }
+
+    @Test
+    public void concatenated_strings_have_a_length_property() {
+        Value result = this.context.eval("ezs",
+                "('abc' + 'def').length"
+        );
+        assertEquals(6, result.asInt());
+    }
 }
