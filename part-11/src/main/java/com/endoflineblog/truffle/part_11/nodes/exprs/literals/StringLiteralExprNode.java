@@ -21,6 +21,6 @@ public final class StringLiteralExprNode extends EasyScriptExprNode {
 
     @Override
     public StringObject executeGeneric(VirtualFrame frame) {
-        return new StringObject(this.value);
+        return new StringObject(this.value, this.currentTruffleLanguage());
     }
 }

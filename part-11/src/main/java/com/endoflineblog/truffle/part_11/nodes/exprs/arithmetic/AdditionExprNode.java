@@ -33,7 +33,7 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
     @Specialization(guards = "isComplex(leftValue) || isComplex(rightValue)")
     @TruffleBoundary
     protected StringObject concatenateComplexAsStrings(Object leftValue, Object rightValue) {
-        return new StringObject(leftValue.toString() + rightValue.toString());
+        return new StringObject(leftValue.toString() + rightValue.toString(), this.currentTruffleLanguage());
     }
 
     protected static boolean isComplex(Object value) {

@@ -148,4 +148,12 @@ public class StringsTest {
         );
         assertEquals(6, result.asInt());
     }
+
+    @Test
+    public void strings_have_a_codeAt_method() {
+        Value result = this.context.eval("ezs",
+                "'abc'.charAt(2)"
+        );
+        assertEquals("c", result.asString());
+    }
 }
