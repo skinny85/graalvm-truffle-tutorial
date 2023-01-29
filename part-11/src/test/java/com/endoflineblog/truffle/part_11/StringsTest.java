@@ -156,4 +156,12 @@ public class StringsTest {
         );
         assertEquals("c", result.asString());
     }
+
+    @Test
+    public void strings_have_a_substring_method() {
+        Value result = this.context.eval("ezs",
+                "'abc'.substring(1, 2)"
+        );
+        assertEquals("b", result.asString());
+    }
 }
