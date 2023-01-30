@@ -158,9 +158,25 @@ public class StringsTest {
     }
 
     @Test
+    public void codeAt_without_argument_defaults_to_0() {
+        Value result = this.context.eval("ezs",
+                "'abc'.charAt()"
+        );
+        assertEquals("a", result.asString());
+    }
+
+    @Test
     public void strings_have_a_substring_method() {
         Value result = this.context.eval("ezs",
                 "'abc'.substring(1, 2)"
+        );
+        assertEquals("b", result.asString());
+    }
+
+    @Test
+    public void methods_ignore_extra_arguments() {
+        Value result = this.context.eval("ezs",
+                "'abc'.substring(1, 2, 99)"
         );
         assertEquals("b", result.asString());
     }

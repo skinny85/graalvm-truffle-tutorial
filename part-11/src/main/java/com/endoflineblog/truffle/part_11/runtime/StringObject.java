@@ -1,51 +1,42 @@
 package com.endoflineblog.truffle.part_11.runtime;
 
-import com.endoflineblog.truffle.part_11.EasyScriptTruffleLanguage;
-import com.endoflineblog.truffle.part_11.nodes.exprs.functions.ReadFunctionArgExprNode;
-import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
-import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods.CharAtMethodBodyExprNodeFactory;
-import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods.SubstringMethodBodyExprNodeFactory;
-import com.endoflineblog.truffle.part_11.nodes.root.BuiltInFuncRootNode;
-import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
-import java.util.stream.IntStream;
-
 @ExportLibrary(InteropLibrary.class)
 public final class StringObject implements TruffleObject {
     private final String value;
-    private final EasyScriptTruffleLanguage easyScriptTruffleLanguage;
     private final FunctionObject charAtMethod;
     private final FunctionObject substringMethod;
+    private final StringPrototype stringPrototype;
 
-    public StringObject(String value, EasyScriptTruffleLanguage easyScriptTruffleLanguage) {
+    public StringObject(String value, StringPrototype stringPrototype) {
         this.value = value;
-        this.easyScriptTruffleLanguage = easyScriptTruffleLanguage;
-        this.charAtMethod = this.createMethod(CharAtMethodBodyExprNodeFactory.getInstance());
-        this.substringMethod = this.createMethod(SubstringMethodBodyExprNodeFactory.getInstance());
+        this.charAtMethod = new FunctionObject(stringPrototype.charAtMethod, 2, this);
+        this.substringMethod = new FunctionObject(stringPrototype.substringMethod, 3, this);
+        this.stringPrototype = stringPrototype;
     }
 
     public StringObject charAt(int index) {
         return new StringObject(index >= 0 && index < this.value.length()
                     ? this.value.substring(index, index + 1)
                     : "",
-                this.easyScriptTruffleLanguage);
+                this.stringPrototype);
     }
 
     public StringObject substring(int start) {
         return new StringObject(
                 this.value.substring(start),
-                this.easyScriptTruffleLanguage);
+                this.stringPrototype);
     }
 
     public StringObject substring(int start, int end) {
         return new StringObject(
                 this.value.substring(start, end),
-                this.easyScriptTruffleLanguage);
+                this.stringPrototype);
     }
 
     @Override
@@ -87,7 +78,7 @@ public final class StringObject implements TruffleObject {
     Object readArrayElement(long index) {
         int i = (int) index;
         return this.isArrayElementReadable(index)
-                ? new StringObject(this.value.substring(i, i + 1), this.easyScriptTruffleLanguage)
+                ? new StringObject(this.value.substring(i, i + 1), this.stringPrototype)
                 : Undefined.INSTANCE;
     }
 
@@ -110,15 +101,5 @@ public final class StringObject implements TruffleObject {
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
         return new MemberNamesObject(new String[]{"length", "charAt", "substring"});
-    }
-
-    private FunctionObject createMethod(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
-        int methodArgNr = nodeFactory.getExecutionSignature().size();
-        ReadFunctionArgExprNode[] methodArguments = IntStream.range(0, methodArgNr)
-                .mapToObj(ReadFunctionArgExprNode::new)
-                .toArray(ReadFunctionArgExprNode[]::new);
-        var charAtBody = nodeFactory.createNode(methodArguments, this);
-        var charAtRootNode = new BuiltInFuncRootNode(this.easyScriptTruffleLanguage, charAtBody);
-        return new FunctionObject(charAtRootNode.getCallTarget(), methodArgNr);
     }
 }

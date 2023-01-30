@@ -4,6 +4,8 @@ import com.endoflineblog.truffle.part_11.nodes.exprs.functions.ReadFunctionArgEx
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
+import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods.CharAtMethodBodyExprNodeFactory;
+import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods.SubstringMethodBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_11.nodes.root.BuiltInFuncRootNode;
 import com.endoflineblog.truffle.part_11.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_11.parsing.EasyScriptTruffleParser;
@@ -11,6 +13,7 @@ import com.endoflineblog.truffle.part_11.parsing.ParsingResult;
 import com.endoflineblog.truffle.part_11.runtime.ArrayObject;
 import com.endoflineblog.truffle.part_11.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_11.runtime.MathObject;
+import com.endoflineblog.truffle.part_11.runtime.StringPrototype;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
@@ -65,7 +68,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var context = new EasyScriptLanguageContext(this.globalScopeShape);
+        var context = new EasyScriptLanguageContext(this.globalScopeShape, this.createStringPrototype());
         var globalScopeObject = context.globalScopeObject;
 
         var objectLibrary = DynamicObjectLibrary.getUncached();
@@ -82,13 +85,24 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return context.globalScopeObject;
     }
 
+    private StringPrototype createStringPrototype() {
+        return new StringPrototype(
+                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance()),
+                this.createCallTarget(SubstringMethodBodyExprNodeFactory.getInstance()));
+    }
+
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
+        return new FunctionObject(this.createCallTarget(nodeFactory),
+                nodeFactory.getNodeSignatures().size());
+    }
+
+    private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         int argumentCount = nodeFactory.getExecutionSignature().size();
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
-        var builtInFuncRootNode = new BuiltInFuncRootNode(this,
+        var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));
-        return new FunctionObject(builtInFuncRootNode.getCallTarget(), argumentCount);
+        return rootNode.getCallTarget();
     }
 }
