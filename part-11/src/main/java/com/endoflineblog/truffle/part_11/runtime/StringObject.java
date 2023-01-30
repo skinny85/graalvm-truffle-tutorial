@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_11.runtime;
 
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -20,6 +21,7 @@ public final class StringObject implements TruffleObject {
         this.stringPrototype = stringPrototype;
     }
 
+    @TruffleBoundary
     public StringObject charAt(int index) {
         return new StringObject(index >= 0 && index < this.value.length()
                     ? this.value.substring(index, index + 1)
@@ -27,12 +29,14 @@ public final class StringObject implements TruffleObject {
                 this.stringPrototype);
     }
 
+    @TruffleBoundary
     public StringObject substring(int start) {
         return new StringObject(
                 this.value.substring(start),
                 this.stringPrototype);
     }
 
+    @TruffleBoundary
     public StringObject substring(int start, int end) {
         return new StringObject(
                 this.value.substring(start, end),
@@ -66,7 +70,7 @@ public final class StringObject implements TruffleObject {
 
     @ExportMessage
     long getArraySize() {
-        return this.value.length();
+        return this.length();
     }
 
     @ExportMessage
@@ -78,7 +82,7 @@ public final class StringObject implements TruffleObject {
     Object readArrayElement(long index) {
         int i = (int) index;
         return this.isArrayElementReadable(index)
-                ? new StringObject(this.value.substring(i, i + 1), this.stringPrototype)
+                ? this.substring(i, i + 1)
                 : Undefined.INSTANCE;
     }
 
@@ -91,7 +95,7 @@ public final class StringObject implements TruffleObject {
     @ExportMessage
     Object readMember(String member) throws UnknownIdentifierException {
         switch (member) {
-            case "length": return this.value.length();
+            case "length": return this.length();
             case "charAt": return this.charAtMethod;
             case "substring": return this.substringMethod;
             default: throw UnknownIdentifierException.create(member);
@@ -101,5 +105,10 @@ public final class StringObject implements TruffleObject {
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
         return new MemberNamesObject(new String[]{"length", "charAt", "substring"});
+    }
+
+    @TruffleBoundary
+    private int length() {
+        return this.value.length();
     }
 }
