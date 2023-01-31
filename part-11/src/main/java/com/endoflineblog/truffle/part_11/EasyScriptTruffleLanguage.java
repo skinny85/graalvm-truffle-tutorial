@@ -93,7 +93,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         return new FunctionObject(this.createCallTarget(nodeFactory),
-                nodeFactory.getNodeSignatures().size());
+                nodeFactory.getExecutionSignature().size());
     }
 
     private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
