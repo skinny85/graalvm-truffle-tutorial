@@ -10,13 +10,13 @@ import com.oracle.truffle.api.dsl.Specialization;
  */
 public abstract class AbsFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
-    protected int intAbs(int argument) {
+    protected int intAbs(@SuppressWarnings("unused") Object self, int argument) {
         // Integer.MIN_VALUE is too big to fit negated into an int
         return argument < 0 ? Math.negateExact(argument) : argument;
     }
 
     @Specialization(replaces = "intAbs")
-    protected double doubleAbs(double argument) {
+    protected double doubleAbs(@SuppressWarnings("unused") Object self, double argument) {
         return Math.abs(argument);
     }
 
@@ -26,7 +26,8 @@ public abstract class AbsFunctionBodyExprNode extends BuiltInFunctionBodyExprNod
      * Simply return NaN in all those cases.
      */
     @Fallback
-    protected double nonNumberAbs(@SuppressWarnings("unused") Object argument) {
+    protected double nonNumberAbs(@SuppressWarnings("unused") Object self,
+            @SuppressWarnings("unused") Object argument) {
         return Double.NaN;
     }
 }

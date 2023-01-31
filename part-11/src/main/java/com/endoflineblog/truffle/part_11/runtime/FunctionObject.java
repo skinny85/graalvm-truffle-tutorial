@@ -26,7 +26,7 @@ public final class FunctionObject implements TruffleObject {
     private final FunctionDispatchNode functionDispatchNode;
 
     public FunctionObject(CallTarget callTarget, int argumentCount) {
-        this(callTarget, argumentCount, null);
+        this(callTarget, argumentCount, Undefined.INSTANCE);
     }
 
     public FunctionObject(CallTarget callTarget, int argumentCount,
@@ -54,14 +54,19 @@ public final class FunctionObject implements TruffleObject {
 
     @ExportMessage
     Object execute(Object[] arguments) {
-        // we have to make sure the given arguments are valid EasyScript values,
-        // as this class can be invoked from other languages, like Java
-        for (Object argument : arguments) {
+        var extendedArguments = new Object[arguments.length + 1];
+        extendedArguments[0] = Undefined.INSTANCE;
+        for (int i = 0; i < arguments.length; i++) {
+            var argument = arguments[i];
+            // we have to make sure the given arguments are valid EasyScript values,
+            // as this class can be invoked from other languages, like Java
             if (!this.isEasyScriptValue(argument)) {
                 throw new EasyScriptException("'" + argument + "' is not an EasyScript value");
+            } else {
+                extendedArguments[i + 1] = argument;
             }
         }
-        return this.functionDispatchNode.executeDispatch(this, arguments);
+        return this.functionDispatchNode.executeDispatch(this, extendedArguments);
     }
 
     private boolean isEasyScriptValue(Object argument) {

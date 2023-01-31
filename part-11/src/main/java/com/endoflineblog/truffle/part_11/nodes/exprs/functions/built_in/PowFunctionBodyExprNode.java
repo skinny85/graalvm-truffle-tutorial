@@ -10,7 +10,8 @@ import com.oracle.truffle.api.dsl.Specialization;
  */
 public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(guards = "exponent >= 0", rewriteOn = ArithmeticException.class)
-    protected int intPow(int base, int exponent) {
+    protected int intPow(@SuppressWarnings("unused") Object self,
+            int base, int exponent) {
         int ret = 1;
         for (int i = 0; i < exponent; i++) {
             ret = Math.multiplyExact(ret, base);
@@ -19,7 +20,8 @@ public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExprNod
     }
 
     @Specialization(replaces = "intPow")
-    protected double doublePow(double base, double exponent) {
+    protected double doublePow(@SuppressWarnings("unused") Object self,
+            double base, double exponent) {
         return Math.pow(base, exponent);
     }
 
@@ -29,7 +31,9 @@ public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExprNod
      * Simply return NaN in all those cases.
      */
     @Fallback
-    protected double nonNumberPow(@SuppressWarnings("unused") Object base, @SuppressWarnings("unused") Object exponent) {
+    protected double nonNumberPow(@SuppressWarnings("unused") Object self,
+            @SuppressWarnings("unused") Object base,
+            @SuppressWarnings("unused") Object exponent) {
         return Double.NaN;
     }
 }

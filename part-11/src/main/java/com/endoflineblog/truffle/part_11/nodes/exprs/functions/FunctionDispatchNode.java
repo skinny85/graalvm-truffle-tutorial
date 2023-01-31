@@ -66,23 +66,15 @@ public abstract class FunctionDispatchNode extends Node {
     }
 
     private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
-        if (arguments.length >= function.argumentCount && function.methodTarget == null) {
+        arguments[0] = function.methodTarget;
+        if (arguments.length >= function.argumentCount) {
             return arguments;
         }
         Object[] ret = new Object[function.argumentCount];
         for (int i = 0; i < function.argumentCount; i++) {
-            int j;
-            if (function.methodTarget == null) {
-                j = i;
-            } else {
-                if (i == 0) {
-                    ret[0] = function.methodTarget;
-                    continue;
-                } else {
-                    j = i - 1;
-                }
-            }
-            ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
+            ret[i] = i < arguments.length
+                    ? arguments[i]
+                    : Undefined.INSTANCE;
         }
         return ret;
     }
