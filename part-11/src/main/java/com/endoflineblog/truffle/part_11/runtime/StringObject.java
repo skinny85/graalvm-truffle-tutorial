@@ -13,12 +13,14 @@ public final class StringObject implements TruffleObject {
     private final FunctionObject charAtMethod;
     private final FunctionObject substringMethod;
     private final StringPrototype stringPrototype;
+    private final int length;
 
     public StringObject(String value, StringPrototype stringPrototype) {
         this.value = value;
         this.charAtMethod = new FunctionObject(stringPrototype.charAtMethod, 2, this);
         this.substringMethod = new FunctionObject(stringPrototype.substringMethod, 3, this);
         this.stringPrototype = stringPrototype;
+        this.length = this.length(value);
     }
 
     @TruffleBoundary
@@ -70,7 +72,7 @@ public final class StringObject implements TruffleObject {
 
     @ExportMessage
     long getArraySize() {
-        return this.length();
+        return this.length;
     }
 
     @ExportMessage
@@ -79,6 +81,7 @@ public final class StringObject implements TruffleObject {
     }
 
     @ExportMessage
+    @TruffleBoundary
     Object readArrayElement(long index) {
         int i = (int) index;
         return this.isArrayElementReadable(index)
@@ -95,7 +98,7 @@ public final class StringObject implements TruffleObject {
     @ExportMessage
     Object readMember(String member) throws UnknownIdentifierException {
         switch (member) {
-            case "length": return this.length();
+            case "length": return this.length;
             case "charAt": return this.charAtMethod;
             case "substring": return this.substringMethod;
             default: throw UnknownIdentifierException.create(member);
@@ -108,7 +111,7 @@ public final class StringObject implements TruffleObject {
     }
 
     @TruffleBoundary
-    private int length() {
-        return this.value.length();
+    private int length(String value) {
+        return value.length();
     }
 }
