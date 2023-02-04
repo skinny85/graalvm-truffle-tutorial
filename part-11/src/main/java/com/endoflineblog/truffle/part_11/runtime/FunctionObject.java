@@ -26,7 +26,7 @@ public final class FunctionObject implements TruffleObject {
     private final FunctionDispatchNode functionDispatchNode;
 
     public FunctionObject(CallTarget callTarget, int argumentCount) {
-        this(callTarget, argumentCount, Undefined.INSTANCE);
+        this(callTarget, argumentCount, null);
     }
 
     public FunctionObject(CallTarget callTarget, int argumentCount,

@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_11.nodes.exprs.functions;
 
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 
@@ -37,7 +36,7 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
         Object function = this.targetFunction.executeGeneric(frame);
 
         var argumentValues = new Object[this.callArguments.length + 1];
-        argumentValues[0] = Undefined.INSTANCE;
+        argumentValues[0] = null;
         for (int i = 0; i < this.callArguments.length; i++) {
             argumentValues[i + 1] = this.callArguments[i].executeGeneric(frame);
         }
