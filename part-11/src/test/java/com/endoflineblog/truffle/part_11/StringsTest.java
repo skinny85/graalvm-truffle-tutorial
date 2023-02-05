@@ -181,13 +181,47 @@ public class StringsTest {
         assertEquals("b", result.asString());
     }
 
+    private final int fastaInput = 1_400_000;
+
     @Test
     public void fasta_repeat_returns_its_input() {
-        int input = 1_400_000;
         Value result = this.context.eval("ezs", "" +
                 FastaCode.FASTA_PROGRAM +
-                "fastaRepeat(" + input + ");"
+                "fastaRepeat(" + fastaInput + ");"
         );
-        assertEquals(input, result.asInt());
+        assertEquals(fastaInput, result.asInt());
+    }
+
+    @Test
+    public void fasta_repeat_no_substring_returns_its_input() {
+        Value result = this.context.eval("ezs", "" +
+                FastaCode.FASTA_PROGRAM_NO_SUBSTRING +
+                "fastaRepeatNoSubstring(" + fastaInput + ");"
+        );
+        assertEquals(fastaInput, result.asInt());
+    }
+
+    @Test
+    public void fasta_repeat_without_length_returns_its_input() {
+        Value result = this.context.eval("ezs", "" +
+                FastaCode.FASTA_PROGRAM_WITHOUT_LENGTH +
+                "fastaRepeatWithoutLength(" + fastaInput + ");"
+        );
+        assertEquals(fastaInput, result.asInt());
+    }
+
+    @Test
+    public void java_fasta_repeat_returns_its_input() {
+        assertEquals(fastaInput, FastaCode.fastaRepeat(fastaInput));
+    }
+
+    @Test
+    public void java_fasta_repeat_no_substring_returns_its_input() {
+        assertEquals(fastaInput, FastaCode.fastaRepeatNoSubstring(fastaInput));
+    }
+
+    @Test
+    public void java_fasta_repeat_without_length_returns_its_input() {
+        assertEquals(fastaInput, FastaCode.fastaRepeatWithoutLength(fastaInput));
     }
 }
