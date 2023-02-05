@@ -180,4 +180,14 @@ public class StringsTest {
         );
         assertEquals("b", result.asString());
     }
+
+    @Test
+    public void fasta_repeat_returns_its_input() {
+        int input = 1_400_000;
+        Value result = this.context.eval("ezs", "" +
+                FastaCode.FASTA_PROGRAM +
+                "fastaRepeat(" + input + ");"
+        );
+        assertEquals(input, result.asInt());
+    }
 }
