@@ -17,7 +17,9 @@ public class StringsTest {
 
     @Before
     public void setUp() {
-        this.context = Context.create();
+        this.context = Context.newBuilder()
+                .option("cpusampler", "true")
+                .build();
     }
 
     @After

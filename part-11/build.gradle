@@ -8,6 +8,7 @@ dependencies {
     implementation "org.graalvm.js:js:$graal_version"
     implementation "org.graalvm.truffle:truffle-sl:$graal_version"
     implementation "org.apache.commons:commons-text:1.10.0"
+    implementation "org.graalvm.tools:profiler:$graal_version"
 }
 
 // required to allow GraalVM to discover our EasyScript language class
