@@ -8,11 +8,13 @@ import static com.endoflineblog.truffle.part_11.FastaCode.COUNT_WHILE_LOOP_PROGR
 import static com.endoflineblog.truffle.part_11.FastaCode.FASTA_PROGRAM;
 import static com.endoflineblog.truffle.part_11.FastaCode.FASTA_PROGRAM_NO_SUBSTRING;
 import static com.endoflineblog.truffle.part_11.FastaCode.FASTA_PROGRAM_WITHOUT_LENGTH;
+import static com.endoflineblog.truffle.part_11.FastaCode.SUM_WHILE_LOOP_PROGRAM;
 import static com.endoflineblog.truffle.part_11.FastaCode.countForLoop;
 import static com.endoflineblog.truffle.part_11.FastaCode.countWhileLoop;
 import static com.endoflineblog.truffle.part_11.FastaCode.fastaRepeat;
 import static com.endoflineblog.truffle.part_11.FastaCode.fastaRepeatNoSubstring;
 import static com.endoflineblog.truffle.part_11.FastaCode.fastaRepeatWithoutLength;
+import static com.endoflineblog.truffle.part_11.FastaCode.sumWhileLoop;
 
 /**
  * Benchmark taken from the
@@ -25,6 +27,7 @@ public class FastaBenchmark extends TruffleBenchmark {
     @Setup
     public void setup() {
         super.setup();
+
         this.truffleContext.eval("ezs", FASTA_PROGRAM);
         this.truffleContext.eval("js", FASTA_PROGRAM);
         this.truffleContext.eval("ezs", FASTA_PROGRAM_NO_SUBSTRING);
@@ -37,6 +40,9 @@ public class FastaBenchmark extends TruffleBenchmark {
 
         this.truffleContext.eval("ezs", COUNT_WHILE_LOOP_PROGRAM);
         this.truffleContext.eval("js", COUNT_WHILE_LOOP_PROGRAM);
+
+        this.truffleContext.eval("ezs", SUM_WHILE_LOOP_PROGRAM);
+        this.truffleContext.eval("js", SUM_WHILE_LOOP_PROGRAM);
     }
 
     @Benchmark
@@ -112,5 +118,20 @@ public class FastaBenchmark extends TruffleBenchmark {
     @Benchmark
     public int count_while_loop_java() {
         return countWhileLoop(fastaInput);
+    }
+
+    @Benchmark
+    public int sum_while_loop_ezs() {
+        return this.truffleContext.eval("ezs", "sumWhileLoop(" + fastaInput + ")").asInt();
+    }
+
+    @Benchmark
+    public int sum_while_loop_js() {
+        return this.truffleContext.eval("js", "sumWhileLoop(" + fastaInput + ")").asInt();
+    }
+
+    @Benchmark
+    public int sum_while_loop_java() {
+        return sumWhileLoop(fastaInput);
     }
 }

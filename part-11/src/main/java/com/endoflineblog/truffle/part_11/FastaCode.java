@@ -216,4 +216,25 @@ public final class FastaCode {
         }
         return ret;
     }
+
+    public static final String SUM_WHILE_LOOP_PROGRAM = "" +
+            "function sumWhileLoop(n) { " +
+            "    var ret = 0; " +
+            "    while (n > 0) { " +
+            "        var tmp = n; " +
+            "        n = n - 1; " +
+            "        ret = ret + tmp - n; " +
+            "    } " +
+            "    return ret; " +
+            "}";
+
+    public static int sumWhileLoop(int n) {
+        int ret = 0;
+        while (n > 0) {
+            int tmp = n;
+            n = n - 1;
+            ret = ret + tmp - n;
+        }
+        return ret;
+    }
 }
