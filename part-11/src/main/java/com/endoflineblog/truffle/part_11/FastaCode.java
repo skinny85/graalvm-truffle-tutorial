@@ -191,7 +191,8 @@ public final class FastaCode {
             "            ret = ret + n; " +
             "            positive = false; " +
             "        } else { " +
-            "            ret = ret - n; " +
+            "            var s = n; " +
+            "            ret = ret - s; " +
             "            positive = true; " +
             "        } " +
             "        n = n - 1; " +
@@ -207,7 +208,8 @@ public final class FastaCode {
                 ret = ret + n;
                 positive = false;
             } else {
-                ret = ret - n;
+                var s = n;
+                ret = ret - s;
                 positive = true;
             }
             n = n - 1;
