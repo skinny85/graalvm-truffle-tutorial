@@ -55,14 +55,14 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
             }
         }
 
-        var declarationKind = this.getDeclarationKind();
-        Object initialValue = declarationKind == DeclarationKind.VAR
-                // the default value for 'var' is 'undefined'
-                ? Undefined.INSTANCE
-                // for 'const' and 'let', we write a "dummy" value that we treat specially
-                : DUMMY;
-        int flags = declarationKind == DeclarationKind.CONST ? 1 : 0;
-        objectLibrary.putWithFlags(globalScopeObject, variableId, initialValue, flags);
+//        var declarationKind = this.getDeclarationKind();
+//        Object initialValue = declarationKind == DeclarationKind.VAR
+//                // the default value for 'var' is 'undefined'
+//                ? Undefined.INSTANCE
+//                // for 'const' and 'let', we write a "dummy" value that we treat specially
+//                : DUMMY;
+//        int flags = declarationKind == DeclarationKind.CONST ? 1 : 0;
+        objectLibrary.put(globalScopeObject, variableId, Undefined.INSTANCE);
 
         // we return 'undefined' for statements that declare variables
         return Undefined.INSTANCE;
