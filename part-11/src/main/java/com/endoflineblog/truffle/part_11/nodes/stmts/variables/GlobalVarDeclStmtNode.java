@@ -62,7 +62,7 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
                 // for 'const' and 'let', we write a "dummy" value that we treat specially
                 : DUMMY;
         int flags = declarationKind == DeclarationKind.CONST ? 1 : 0;
-        objectLibrary.putConstant(globalScopeObject, variableId, initialValue, flags);
+        objectLibrary.putWithFlags(globalScopeObject, variableId, initialValue, flags);
 
         // we return 'undefined' for statements that declare variables
         return Undefined.INSTANCE;
