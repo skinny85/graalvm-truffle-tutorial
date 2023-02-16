@@ -4,6 +4,7 @@ import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.GlobalScopeObjectExprNode;
 import com.endoflineblog.truffle.part_11.nodes.stmts.variables.GlobalVarDeclStmtNode;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -26,15 +27,37 @@ import com.oracle.truffle.api.object.Property;
 public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
-    @Specialization(limit = "1")
-    protected Object assignVariable(DynamicObject globalScopeObject, Object value,
+    @Specialization(limit = "1", guards = "isInt(property)")
+    protected int assignIntVariable(DynamicObject globalScopeObject, int value,
+            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary,
+            @Cached("objectLibrary.getProperty(globalScopeObject, getName())") Property property) {
+        objectLibrary.putInt(globalScopeObject, this.getName(), value);
+        int constFlag = property.getFlags() & GlobalVarDeclStmtNode.CONST_FLAG;
+        objectLibrary.setPropertyFlags(globalScopeObject, this.getName(),
+                constFlag | GlobalVarDeclStmtNode.INT_TYPE_FLAG);
+        return value;
+    }
+
+    @Specialization(limit = "1", guards = "isDouble(property)", replaces = "assignIntVariable")
+    protected double assignDoubleVariable(DynamicObject globalScopeObject, double value,
+            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary,
+            @Cached("objectLibrary.getProperty(globalScopeObject, getName())") Property property) {
+        objectLibrary.putDouble(globalScopeObject, this.getName(), value);
+        int constFlag = property.getFlags() & GlobalVarDeclStmtNode.CONST_FLAG;
+        objectLibrary.setPropertyFlags(globalScopeObject, this.getName(),
+                constFlag | GlobalVarDeclStmtNode.DOUBLE_TYPE_FLAG);
+        return value;
+    }
+
+    @Specialization(limit = "1", replaces = {"assignIntVariable", "assignDoubleVariable"})
+    protected Object assignObjectVariable(DynamicObject globalScopeObject, Object value,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         String variableId = this.getName();
         Property property = objectLibrary.getProperty(globalScopeObject, variableId);
         if (property == null) {
             throw new EasyScriptException(this, "'" + variableId + "' is not defined");
         }
-        if (property.getFlags() == 1) {
+        if ((property.getFlags() & GlobalVarDeclStmtNode.CONST_FLAG) != 0) {
             // this is a constant
             Object existingValue = property.get(globalScopeObject, true);
             if (existingValue != GlobalVarDeclStmtNode.DUMMY) {
@@ -43,6 +66,23 @@ public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
             }
         }
         objectLibrary.put(globalScopeObject, variableId, value);
+        int constFlag = property.getFlags() & GlobalVarDeclStmtNode.CONST_FLAG;
+        objectLibrary.setPropertyFlags(globalScopeObject, this.getName(),
+                constFlag | GlobalVarDeclStmtNode.OBJECT_TYPE_FLAG);
         return value;
+    }
+
+    protected boolean isInt(Property property) {
+        return checkFlag(property, GlobalVarDeclStmtNode.INT_TYPE_FLAG);
+    }
+
+    protected boolean isDouble(Property property) {
+        return checkFlag(property, GlobalVarDeclStmtNode.DOUBLE_TYPE_FLAG);
+    }
+
+    private static boolean checkFlag(Property property, int typeFlag) {
+        return property != null &&
+                (property.getFlags() & GlobalVarDeclStmtNode.CONST_FLAG) == 0 &&
+                (property.getFlags() & typeFlag) != 0;
     }
 }

@@ -35,6 +35,13 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
         }
     };
 
+    public static final int CONST_FLAG = 0b1;
+    public static final int INT_TYPE_FLAG = 0b10;
+    public static final int DOUBLE_TYPE_FLAG = 0b100;
+    public static final int OBJECT_TYPE_FLAG = 0b1000;
+    public static final int INITIAL_TYPE_FLAG = INT_TYPE_FLAG |
+            DOUBLE_TYPE_FLAG | OBJECT_TYPE_FLAG;
+
     protected abstract String getVariableId();
     protected abstract DeclarationKind getDeclarationKind();
 
@@ -61,7 +68,9 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
                 ? Undefined.INSTANCE
                 // for 'const' and 'let', we write a "dummy" value that we treat specially
                 : DUMMY;
-        int flags = declarationKind == DeclarationKind.CONST ? 1 : 0;
+        int flags = declarationKind == DeclarationKind.CONST
+                ? INITIAL_TYPE_FLAG | CONST_FLAG
+                : INITIAL_TYPE_FLAG;
         objectLibrary.putWithFlags(globalScopeObject, variableId, initialValue, flags);
 
         // we return 'undefined' for statements that declare variables
