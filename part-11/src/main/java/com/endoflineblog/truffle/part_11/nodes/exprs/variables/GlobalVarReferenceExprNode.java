@@ -4,7 +4,7 @@ import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.GlobalScopeObjectExprNode;
 import com.endoflineblog.truffle.part_11.nodes.stmts.variables.GlobalVarDeclStmtNode;
-import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -12,7 +12,6 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
-import com.oracle.truffle.api.object.Property;
 
 /**
  * A Node that represents the expression of referencing a global variable in EasyScript.
@@ -27,25 +26,24 @@ import com.oracle.truffle.api.object.Property;
 public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
-    @Specialization(limit = "1", guards = "isInt(property)")
+    @Specialization(limit = "1", guards = "isInt(objectLibrary, globalScopeObject, getName())")
     protected int readIntVariable(DynamicObject globalScopeObject,
-            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary,
-            @Cached("objectLibrary.getProperty(globalScopeObject, getName())") Property property) {
+            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         try {
             return objectLibrary.getIntOrDefault(globalScopeObject, this.getName(), 0);
         } catch (UnexpectedResultException e) {
-            throw new EasyScriptException(e.getMessage());
+            throw CompilerDirectives.shouldNotReachHere();
         }
     }
 
-    @Specialization(limit = "1", guards = "isDouble(property)", replaces = "readIntVariable")
+    @Specialization(limit = "1", guards = "isDouble(objectLibrary, globalScopeObject, getName())",
+            replaces = "readIntVariable")
     protected double readDoubleVariable(DynamicObject globalScopeObject,
-            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary,
-            @Cached("objectLibrary.getProperty(globalScopeObject, getName())") Property property) {
+            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         try {
             return objectLibrary.getDoubleOrDefault(globalScopeObject, this.getName(), 0.0);
         } catch (UnexpectedResultException e) {
-            throw new EasyScriptException(e.getMessage());
+            throw CompilerDirectives.shouldNotReachHere();
         }
     }
 
@@ -63,17 +61,15 @@ public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
         }
     }
 
-    protected boolean isInt(Property property) {
-        return checkFlag(property, GlobalVarDeclStmtNode.INT_TYPE_FLAG);
+    protected boolean isInt(DynamicObjectLibrary objectLibrary, DynamicObject globalScopeObject,
+            String name) {
+        return (objectLibrary.getPropertyFlagsOrDefault(globalScopeObject, name, 0) &
+                GlobalVarDeclStmtNode.INT_TYPE_FLAG) != 0;
     }
 
-    protected boolean isDouble(Property property) {
-        return checkFlag(property, GlobalVarDeclStmtNode.DOUBLE_TYPE_FLAG);
-    }
-
-    private static boolean checkFlag(Property property, int typeFlag) {
-        return property != null &&
-                (property.getFlags() & GlobalVarDeclStmtNode.OBJECT_TYPE_FLAG) == 0 &&
-                (property.getFlags() & typeFlag) != 0;
+    protected boolean isDouble(DynamicObjectLibrary objectLibrary, DynamicObject globalScopeObject,
+            String name) {
+        return (objectLibrary.getPropertyFlagsOrDefault(globalScopeObject, name, 0) &
+                GlobalVarDeclStmtNode.DOUBLE_TYPE_FLAG) != 0;
     }
 }
