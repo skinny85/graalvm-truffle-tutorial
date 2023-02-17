@@ -181,39 +181,4 @@ public final class FastaCode {
         }
         return ret;
     }
-
-    public static final String COUNT_WHILE_LOOP_PROGRAM = "" +
-            "function countWhileLoop(n) { " +
-            "    var ret = 0; " +
-            "    var positive = true; " +
-            "    while (n > 0) { " +
-            "        if (positive) { " +
-            "            ret = ret + n; " +
-            "            positive = false; " +
-            "        } else { " +
-            "            var s = n; " +
-            "            ret = ret - s; " +
-            "            positive = true; " +
-            "        } " +
-            "        n = n - 1; " +
-            "    } " +
-            "    return ret; " +
-            "}";
-
-    public static int countWhileLoop(int n) {
-        int ret = 0;
-        boolean positive = true;
-        while (n > 0) {
-            if (positive) {
-                ret = ret + n;
-                positive = false;
-            } else {
-                var s = n;
-                ret = ret - s;
-                positive = true;
-            }
-            n = n - 1;
-        }
-        return ret;
-    }
 }
