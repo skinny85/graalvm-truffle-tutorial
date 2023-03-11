@@ -9,8 +9,8 @@ public class CountAlternateInWhileLoopBenchmark extends TruffleBenchmark {
     public void setup() {
         super.setup();
 
-        this.truffleContext.eval("ezs", COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_NO_TEMP);
-        this.truffleContext.eval("js", COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_NO_TEMP);
+        this.truffleContext.eval("ezs", COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_NONE_TEMP);
+        this.truffleContext.eval("js", COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_NONE_TEMP);
 
         this.truffleContext.eval("ezs", COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_THEN_TEMP);
         this.truffleContext.eval("js", COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_THEN_TEMP);
@@ -19,8 +19,8 @@ public class CountAlternateInWhileLoopBenchmark extends TruffleBenchmark {
         this.truffleContext.eval("js", COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_ELSE_TEMP);
     }
 
-    public static final String COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_NO_TEMP = "" +
-            "function countAlternateInWhileLoopNoArgNoTemp() { " +
+    public static final String COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_NONE_TEMP = "" +
+            "function countAlternateInWhileLoopNoArgNoneTemp() { " +
             "    var ret = 0, n = " + INPUT + ", positive = true; " +
             "    while (n > 0) { " +
             "        if (positive) { " +
@@ -35,7 +35,7 @@ public class CountAlternateInWhileLoopBenchmark extends TruffleBenchmark {
             "    return ret; " +
             "}";
 
-    public static int countAlternateInWhileLoopNoArgNoTemp() {
+    public static int countAlternateInWhileLoopNoArgNoneTemp() {
         int ret = 0, n = INPUT;
         boolean positive = true;
         while (n > 0) {
@@ -52,18 +52,18 @@ public class CountAlternateInWhileLoopBenchmark extends TruffleBenchmark {
     }
 
     @Benchmark
-    public int count_alternate_in_while_loop_func_no_arg_no_temp_ezs() {
-        return this.truffleContext.eval("ezs", "countAlternateInWhileLoopNoArgNoTemp();").asInt();
+    public int count_alternate_in_while_loop_func_no_arg_none_temp_ezs() {
+        return this.truffleContext.eval("ezs", "countAlternateInWhileLoopNoArgNoneTemp();").asInt();
     }
 
     @Benchmark
-    public int count_alternate_in_while_loop_func_no_arg_no_temp_js() {
-        return this.truffleContext.eval("js", "countAlternateInWhileLoopNoArgNoTemp();").asInt();
+    public int count_alternate_in_while_loop_func_no_arg_none_temp_js() {
+        return this.truffleContext.eval("js", "countAlternateInWhileLoopNoArgNoneTemp();").asInt();
     }
 
     @Benchmark
-    public int count_alternate_in_while_loop_func_no_arg_no_temp_java() {
-        return countAlternateInWhileLoopNoArgNoTemp();
+    public int count_alternate_in_while_loop_func_no_arg_none_temp_java() {
+        return countAlternateInWhileLoopNoArgNoneTemp();
     }
 
     public static final String COUNT_ALTERNATE_WHILE_LOOP_FUNC_NO_ARG_THEN_TEMP = "" +
