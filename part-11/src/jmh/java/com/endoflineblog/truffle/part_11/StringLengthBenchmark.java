@@ -17,11 +17,10 @@ public class StringLengthBenchmark extends TruffleBenchmark {
     }
 
     public static final String COUNT_IN_WHILE_LOOP_FUNC_NO_ARG = "var ALU = '" + FastaCode.ALU + "'; " +
-            "const A = 'a'; " +
             "function countInWhileLoopNoArg() { " +
             "    var ret = 0, n = " + INPUT + "; " +
             "    while (n > 0) { " +
-            "        n = n  - A.length; " +
+            "        n = n - 'A'.length; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
@@ -29,12 +28,10 @@ public class StringLengthBenchmark extends TruffleBenchmark {
 
     static int countInWhileLoopNoArg() {
         int ret = 0, n = INPUT;
-        var A = "a";
         while (n > 0) {
 //            n = n - 1;
 //            n = n - FastaCode.ALU.substring(0, 1).length();
-//            n = n - "a".length();
-            n = n - A.length();
+            n = n - "a".length();
             ret = ret + 1;
         }
         return ret;
@@ -56,11 +53,10 @@ public class StringLengthBenchmark extends TruffleBenchmark {
     }
 
     private static final String COUNT_IN_WHILE_LOOP_FUNC_WITH_ARG = "" +
-            "const B = 'b'; " +
             "function countInWhileLoopWithArg(n) { " +
             "    var ret = 0; " +
             "    while (n > 0) { " +
-            "        n = n  - B.length; " +
+            "        n = n  - 'B'.length; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
@@ -68,12 +64,10 @@ public class StringLengthBenchmark extends TruffleBenchmark {
 
     static int countInWhileLoopWithArg(int n) {
         int ret = 0;
-        var A = "a";
         while (n > 0) {
 //            n = n - 1;
 //            n = n - FastaCode.ALU.substring(0, 1).length();
-//            n = n - "a".length();
-            n = n - A.length();
+            n = n - "a".length();
             ret = ret + 1;
         }
         return ret;

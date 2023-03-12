@@ -2,6 +2,8 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.literals;
 
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_11.runtime.StringObject;
+import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
@@ -9,6 +11,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 public final class StringLiteralExprNode extends EasyScriptExprNode {
     private final String value;
+
+    @CompilationFinal
+    private StringObject cachedLiteral;
 
     public StringLiteralExprNode(String value) {
         this.value = value;
@@ -21,6 +26,10 @@ public final class StringLiteralExprNode extends EasyScriptExprNode {
 
     @Override
     public StringObject executeGeneric(VirtualFrame frame) {
-        return new StringObject(this.value, this.currentLanguageContext().stringPrototype);
+        if (this.cachedLiteral == null) {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            this.cachedLiteral = new StringObject(this.value, this.currentLanguageContext().stringPrototype);
+        }
+        return this.cachedLiteral;
     }
 }
