@@ -1,7 +1,7 @@
 package com.endoflineblog.truffle.part_11;
 
 public final class FastaCode {
-    private static final String ALU = "" +
+    public static final String ALU = "" +
             "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGG" +
             "GAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGA" +
             "CCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAAT" +
