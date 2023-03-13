@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -107,6 +108,23 @@ public class StringsTest {
                 "'length'.length"
         );
         assertEquals(6, result.asInt());
+    }
+
+    @Test
+    public void string_properties_can_be_accessed_through_indexing() {
+        Value result = this.context.eval("ezs", "" +
+                "var l = 'length'; " +
+                "l[l]"
+        );
+        assertEquals(6, result.asInt());
+    }
+
+    @Test
+    public void ezs_strings_in_polyglot_context_have_no_members() {
+        Value result = this.context.eval("ezs", "'a'");
+
+        assertTrue(result.isString());
+        assertFalse(result.hasMembers());
     }
 
     @Test

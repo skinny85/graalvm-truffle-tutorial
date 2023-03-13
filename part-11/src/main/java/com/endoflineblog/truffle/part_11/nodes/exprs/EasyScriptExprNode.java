@@ -3,11 +3,11 @@ package com.endoflineblog.truffle.part_11.nodes.exprs;
 import com.endoflineblog.truffle.part_11.EasyScriptTypeSystem;
 import com.endoflineblog.truffle.part_11.EasyScriptTypeSystemGen;
 import com.endoflineblog.truffle.part_11.nodes.EasyScriptNode;
-import com.endoflineblog.truffle.part_11.runtime.StringObject;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The abstract common ancestor of all expression Nodes in EasyScript.
@@ -34,8 +34,8 @@ public abstract class EasyScriptExprNode extends EasyScriptNode {
         if (value instanceof Double) {
             return (Double) value != 0.0;
         }
-        if (value instanceof StringObject) {
-            return !value.toString().isEmpty();
+        if (value instanceof TruffleString) {
+            return !((TruffleString) value).isEmpty();
         }
         // all other values are truthy
         return true;

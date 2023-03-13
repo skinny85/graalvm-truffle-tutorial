@@ -2,11 +2,12 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.arithmetic;
 
 import com.endoflineblog.truffle.part_11.EasyScriptTypeSystemGen;
 import com.endoflineblog.truffle.part_11.nodes.exprs.BinaryOperationExprNode;
-import com.endoflineblog.truffle.part_11.runtime.StringObject;
+import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
-import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The Node representing number addition.
@@ -24,6 +25,15 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
     }
 
     /**
+     * A "fast" string concatenation specialization.
+     */
+    @Specialization
+    protected TruffleString concatenateTruffleStrings(TruffleString leftValue, TruffleString rightValue,
+            @Cached TruffleString.ConcatNode concatNode) {
+        return EasyScriptTruffleStrings.concat(leftValue, rightValue, concatNode);
+    }
+
+    /**
      * The way addition works in JavaScript is that it turns into string concatenation
      * if either argument to it is a complex value.
      * Complex values are functions, arrays, strings, and objects (like Math).
@@ -31,10 +41,11 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
      * and nor is 'undefined' (and 'null', but EasyScript doesn't support that one yet).
      */
     @Specialization(guards = "isComplex(leftValue) || isComplex(rightValue)")
-    @TruffleBoundary
-    protected StringObject concatenateComplexAsStrings(Object leftValue, Object rightValue) {
-        return new StringObject(leftValue.toString() + rightValue.toString(),
-                this.currentLanguageContext().stringPrototype);
+    protected TruffleString concatenateComplexAsStrings(Object leftValue, Object rightValue,
+            @Cached TruffleString.FromJavaStringNode fromJavaStringNode) {
+        return EasyScriptTruffleStrings.fromJavaString(
+                EasyScriptTruffleStrings.concatJavaStrings(leftValue, rightValue),
+                fromJavaStringNode);
     }
 
     protected static boolean isComplex(Object value) {

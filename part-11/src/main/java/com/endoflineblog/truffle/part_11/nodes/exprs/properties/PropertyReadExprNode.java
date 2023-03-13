@@ -2,8 +2,12 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyExprNode;
+import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -11,6 +15,7 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The Node for reading properties of objects.
@@ -19,8 +24,17 @@ import com.oracle.truffle.api.library.CachedLibrary;
  */
 @NodeChild("target")
 @NodeField(name = "propertyName", type = String.class)
+@ImportStatic(EasyScriptTruffleStrings.class)
 public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract String getPropertyName();
+
+    @Specialization
+    protected Object readPropertyFromTruffleString(TruffleString target,
+            @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode,
+            @Cached("fromJavaString(getPropertyName())") TruffleString propertyName) {
+        return readStringPropertyExprNode.executeReadTruffleStringProperty(
+                target, propertyName);
+    }
 
     @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "1")
     protected Object readProperty(Object target,

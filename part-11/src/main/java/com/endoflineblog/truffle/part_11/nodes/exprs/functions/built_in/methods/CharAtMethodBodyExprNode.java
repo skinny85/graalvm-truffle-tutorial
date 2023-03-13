@@ -1,18 +1,21 @@
 package com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods;
 
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
-import com.endoflineblog.truffle.part_11.runtime.StringObject;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.strings.TruffleString;
 
 public abstract class CharAtMethodBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization
-    protected StringObject charAtInt(StringObject stringObject, int index) {
-        return stringObject.charAt(index);
+    protected TruffleString charAtInt(TruffleString self, int index,
+            @Cached TruffleString.SubstringNode substringNode) {
+        return substringNode.execute(self, index, 1, TruffleString.Encoding.UTF_16, true);
     }
 
     @Specialization
-    protected StringObject charAtNonInt(StringObject stringObject,
-            @SuppressWarnings("unused") Object nonIntIndex) {
-        return stringObject.charAt(0);
+    protected TruffleString charAtNonInt(TruffleString self,
+            @SuppressWarnings("unused") Object nonIntIndex,
+            @Cached TruffleString.SubstringNode substringNode) {
+        return this.charAtInt(self, 0, substringNode);
     }
 }

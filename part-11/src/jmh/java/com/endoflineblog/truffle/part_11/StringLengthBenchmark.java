@@ -16,7 +16,7 @@ public class StringLengthBenchmark extends TruffleBenchmark {
         this.truffleContext.eval("js", COUNT_IN_WHILE_LOOP_FUNC_WITH_ARG);
     }
 
-    public static final String COUNT_IN_WHILE_LOOP_FUNC_NO_ARG = "var ALU = '" + FastaCode.ALU + "'; " +
+    public static final String COUNT_IN_WHILE_LOOP_FUNC_NO_ARG = "" +
             "function countInWhileLoopNoArg() { " +
             "    var ret = 0, n = " + INPUT + "; " +
             "    while (n > 0) { " +

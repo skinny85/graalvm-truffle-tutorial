@@ -9,6 +9,7 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The object that represents a function in EasyScript.
@@ -20,6 +21,11 @@ import com.oracle.truffle.api.library.ExportMessage;
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject implements TruffleObject {
+    public static FunctionObject create(CallTarget callTarget, int argumentCount,
+            Object methodTarget) {
+        return new FunctionObject(callTarget, argumentCount, methodTarget);
+    }
+
     public final CallTarget callTarget;
     public final int argumentCount;
     public final Object methodTarget;
@@ -45,7 +51,7 @@ public final class FunctionObject implements TruffleObject {
     @Override
     public String toString() {
         return "[Function]";
-     }
+    }
 
     @ExportMessage
     boolean isExecutable() {
@@ -76,7 +82,7 @@ public final class FunctionObject implements TruffleObject {
                 EasyScriptTypeSystemGen.isBoolean(argument) ||
                 argument == Undefined.INSTANCE ||
                 argument instanceof ArrayObject ||
-                argument instanceof StringObject ||
+                argument instanceof TruffleString ||
                 argument instanceof String ||
                 argument instanceof FunctionObject;
     }
