@@ -170,22 +170,6 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_have_a_codeAt_method() {
-        Value result = this.context.eval("ezs",
-                "'abc'.charAt(2)"
-        );
-        assertEquals("c", result.asString());
-    }
-
-    @Test
-    public void codeAt_without_argument_defaults_to_0() {
-        Value result = this.context.eval("ezs",
-                "'abc'.charAt()"
-        );
-        assertEquals("a", result.asString());
-    }
-
-    @Test
     public void strings_have_a_substring_method() {
         Value result = this.context.eval("ezs",
                 "'abc'.substring(1, 2)"

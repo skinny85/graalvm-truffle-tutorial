@@ -11,7 +11,6 @@ import com.oracle.truffle.api.strings.TruffleString;
 @ImportStatic(EasyScriptTruffleStrings.class)
 public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     protected static final TruffleString LENGTH_PROP = EasyScriptTruffleStrings.fromJavaString("length");
-    protected static final TruffleString CHAR_AT_PROP = EasyScriptTruffleStrings.fromJavaString("charAt");
     protected static final TruffleString SUBSTRING_PROP = EasyScriptTruffleStrings.fromJavaString("substring");
 
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
@@ -29,14 +28,6 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             @Cached TruffleString.EqualNode equalNode,
             @Cached TruffleString.CodePointLengthNode lengthNode) {
         return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
-    }
-
-    @Specialization(guards = "areEqual(propertyName, CHAR_AT_PROP, equalNode)")
-    protected FunctionObject readCharAtProperty(TruffleString truffleString,
-            @SuppressWarnings("unused") TruffleString propertyName,
-            @Cached TruffleString.EqualNode equalNode,
-            @Cached("create(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString)") FunctionObject charAtMethod) {
-        return charAtMethod;
     }
 
     @Specialization(guards = "areEqual(propertyName, SUBSTRING_PROP, equalNode)")

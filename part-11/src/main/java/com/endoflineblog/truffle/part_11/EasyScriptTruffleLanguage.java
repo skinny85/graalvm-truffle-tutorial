@@ -4,7 +4,6 @@ import com.endoflineblog.truffle.part_11.nodes.exprs.functions.ReadFunctionArgEx
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
-import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods.CharAtMethodBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods.SubstringMethodBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_11.nodes.root.BuiltInFuncRootNode;
 import com.endoflineblog.truffle.part_11.nodes.root.StmtBlockRootNode;
@@ -87,7 +86,6 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     private StringPrototype createStringPrototype() {
         return new StringPrototype(
-                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance()),
                 this.createCallTarget(SubstringMethodBodyExprNodeFactory.getInstance()));
     }
 
