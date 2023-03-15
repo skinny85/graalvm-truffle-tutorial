@@ -10,8 +10,10 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 @ImportStatic(EasyScriptTruffleStrings.class)
 public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
-    protected static final TruffleString LENGTH_PROP = EasyScriptTruffleStrings.fromJavaString("length");
-    protected static final TruffleString SUBSTRING_PROP = EasyScriptTruffleStrings.fromJavaString("substring");
+    protected static final String LENGTH_PROP = "length";
+    protected static final TruffleString LENGTH_PROP_TS = EasyScriptTruffleStrings.fromJavaString(LENGTH_PROP);
+    protected static final String SUBSTRING_PROP = "substring";
+    protected static final TruffleString SUBSTRING_PROP_TS = EasyScriptTruffleStrings.fromJavaString(SUBSTRING_PROP);
 
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
 
@@ -22,7 +24,14 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
         return substringNode.execute(truffleString, index, 1, TruffleString.Encoding.UTF_16, true);
     }
 
-    @Specialization(guards = "areEqual(propertyName, LENGTH_PROP, equalNode)")
+    @Specialization(guards = "LENGTH_PROP.equals(propertyName)")
+    protected int readLengthProperty(TruffleString truffleString,
+            @SuppressWarnings("unused") String propertyName,
+            @Cached TruffleString.CodePointLengthNode lengthNode) {
+        return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
+    }
+
+    @Specialization(guards = "areEqual(propertyName, LENGTH_PROP_TS, equalNode)")
     protected int readLengthProperty(TruffleString truffleString,
             @SuppressWarnings("unused") TruffleString propertyName,
             @Cached TruffleString.EqualNode equalNode,
@@ -30,7 +39,14 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
         return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
     }
 
-    @Specialization(guards = "areEqual(propertyName, SUBSTRING_PROP, equalNode)")
+    @Specialization(guards = "SUBSTRING_PROP.equals(propertyName)")
+    protected FunctionObject readSubstringProperty(TruffleString truffleString,
+            @SuppressWarnings("unused") String propertyName,
+            @Cached("create(currentLanguageContext().stringPrototype.substringMethod, 3, truffleString)") FunctionObject substringMethod) {
+        return substringMethod;
+    }
+
+    @Specialization(guards = "areEqual(propertyName, SUBSTRING_PROP_TS, equalNode)")
     protected FunctionObject readSubstringProperty(TruffleString truffleString,
             @SuppressWarnings("unused") TruffleString propertyName,
             @Cached TruffleString.EqualNode equalNode,
