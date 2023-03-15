@@ -9,11 +9,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * The AST node that represents a string literal expression in EasyScript.
  */
 public final class StringLiteralExprNode extends EasyScriptExprNode {
-//    private final String value;
     private final TruffleString value;
-
-//    @CompilationFinal
-//    private StringObject cachedLiteral;
 
     public StringLiteralExprNode(String value) {
         this.value = EasyScriptTruffleStrings.fromJavaString(value);
@@ -26,11 +22,6 @@ public final class StringLiteralExprNode extends EasyScriptExprNode {
 
     @Override
     public TruffleString executeGeneric(VirtualFrame frame) {
-//        if (this.cachedLiteral == null) {
-//            CompilerDirectives.transferToInterpreterAndInvalidate();
-//            this.cachedLiteral = new StringObject(this.value, this.currentLanguageContext().stringPrototype);
-//        }
-//        return this.cachedLiteral;
         return this.value;
     }
 }
