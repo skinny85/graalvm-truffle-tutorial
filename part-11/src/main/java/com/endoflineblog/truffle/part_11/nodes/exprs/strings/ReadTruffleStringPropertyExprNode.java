@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.strings;
 import com.endoflineblog.truffle.part_11.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_11.runtime.FunctionObject;
+import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -52,5 +53,12 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             @Cached TruffleString.EqualNode equalNode,
             @Cached("create(currentLanguageContext().stringPrototype.substringMethod, 3, truffleString)") FunctionObject substringMethod) {
         return substringMethod;
+    }
+
+    /** Accessing any other string property should return 'undefined'. */
+    @Specialization
+    protected Undefined readUnknownProperty(TruffleString truffleString,
+            Object property) {
+        return Undefined.INSTANCE;
     }
 }

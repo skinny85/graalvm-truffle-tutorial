@@ -185,6 +185,14 @@ public class StringsTest {
         assertEquals("b", result.asString());
     }
 
+    @Test
+    public void unknown_string_property_returns_undefined() {
+        Value result = this.context.eval("ezs", "'a'.someProp");
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
     private final int fastaInput = 1_400_000;
 
     @Test
