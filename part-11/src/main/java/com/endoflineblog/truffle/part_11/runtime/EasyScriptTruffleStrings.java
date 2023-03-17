@@ -15,16 +15,26 @@ public final class EasyScriptTruffleStrings {
         return fromJavaStringNode.execute(value, JAVA_SCRIPT_STRING_ENCODING);
     }
 
-    public static boolean equals(AbstractTruffleString s1, AbstractTruffleString s2, TruffleString.EqualNode equalNode) {
+    public static boolean equals(AbstractTruffleString s1, AbstractTruffleString s2,
+            TruffleString.EqualNode equalNode) {
         return equalNode.execute(s1, s2, JAVA_SCRIPT_STRING_ENCODING);
     }
 
-    public static boolean same(Object o1, Object o2) {
-        return o1 == o2;
+    public static int length(TruffleString truffleString, TruffleString.CodePointLengthNode lengthNode) {
+        return lengthNode.execute(truffleString, JAVA_SCRIPT_STRING_ENCODING);
     }
 
     public static TruffleString concat(TruffleString s1, TruffleString s2, TruffleString.ConcatNode concatNode) {
         return concatNode.execute(s1, s2, JAVA_SCRIPT_STRING_ENCODING, true);
+    }
+
+    public static TruffleString substring(TruffleString truffleString, int index, int length,
+            TruffleString.SubstringNode substringNode) {
+        return substringNode.execute(truffleString, index, length, JAVA_SCRIPT_STRING_ENCODING, true);
+    }
+
+    public static boolean same(Object o1, Object o2) {
+        return o1 == o2;
     }
 
     @TruffleBoundary

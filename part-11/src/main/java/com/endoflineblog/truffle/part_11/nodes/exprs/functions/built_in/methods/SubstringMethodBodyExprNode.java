@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods;
 
 import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
+import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -11,7 +12,7 @@ public abstract class SubstringMethodBodyExprNode extends BuiltInFunctionBodyExp
     protected TruffleString substringWithStartAndEnd(TruffleString self,
             int start, int end,
             @Cached TruffleString.SubstringNode substringNode) {
-        return substringNode.execute(self, start, end - start, TruffleString.Encoding.UTF_16, true);
+        return EasyScriptTruffleStrings.substring(self, start, end - start, substringNode);
     }
 
     @Specialization
@@ -20,7 +21,7 @@ public abstract class SubstringMethodBodyExprNode extends BuiltInFunctionBodyExp
             @Cached TruffleString.SubstringNode substringNode,
             @Cached TruffleString.CodePointLengthNode lengthNode) {
         return this.substringWithStartAndEnd(self, start,
-                lengthNode.execute(self, TruffleString.Encoding.UTF_16),
+                EasyScriptTruffleStrings.length(self, lengthNode),
                 substringNode);
     }
 

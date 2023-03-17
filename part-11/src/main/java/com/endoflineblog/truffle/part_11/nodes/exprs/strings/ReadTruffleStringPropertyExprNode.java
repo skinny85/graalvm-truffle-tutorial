@@ -9,12 +9,14 @@ import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
 
+import static com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings.fromJavaString;
+
 @ImportStatic(EasyScriptTruffleStrings.class)
 public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";
-    protected static final TruffleString LENGTH_PROP_TS = EasyScriptTruffleStrings.fromJavaString(LENGTH_PROP);
+    protected static final TruffleString LENGTH_PROP_TS = fromJavaString(LENGTH_PROP);
     protected static final String SUBSTRING_PROP = "substring";
-    protected static final TruffleString SUBSTRING_PROP_TS = EasyScriptTruffleStrings.fromJavaString(SUBSTRING_PROP);
+    protected static final TruffleString SUBSTRING_PROP_TS = fromJavaString(SUBSTRING_PROP);
 
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
 
@@ -23,7 +25,7 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             TruffleString truffleString,
             int index,
             @Cached TruffleString.SubstringNode substringNode) {
-        return substringNode.execute(truffleString, index, 1, TruffleString.Encoding.UTF_16, true);
+        return EasyScriptTruffleStrings.substring(truffleString, index, 1, substringNode);
     }
 
     @Specialization(guards = "LENGTH_PROP.equals(propertyName)")
@@ -31,7 +33,7 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
             @Cached TruffleString.CodePointLengthNode lengthNode) {
-        return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
+        return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 
     @Specialization(guards = "equals(LENGTH_PROP_TS, propertyName, equalNode)")
@@ -40,7 +42,7 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             @SuppressWarnings("unused") TruffleString propertyName,
             @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
             @Cached TruffleString.CodePointLengthNode lengthNode) {
-        return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
+        return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 
     @Specialization(guards = {
