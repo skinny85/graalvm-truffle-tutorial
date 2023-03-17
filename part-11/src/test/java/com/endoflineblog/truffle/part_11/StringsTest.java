@@ -193,6 +193,18 @@ public class StringsTest {
         assertEquals("undefined", result.toString());
     }
 
+    @Test
+    public void substring_correctly_resolves_its_target() {
+        Value result = this.context.eval("ezs", "" +
+                "function firstChar(str) { " +
+                "    return str.substring(0, 1); " +
+                "} " +
+                "firstChar('A'); " +
+                "firstChar('B'); "
+        );
+        assertEquals("B", result.asString());
+    }
+
     private final int fastaInput = 1_400_000;
 
     @Test

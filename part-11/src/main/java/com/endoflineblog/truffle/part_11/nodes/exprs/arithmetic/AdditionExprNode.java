@@ -44,7 +44,7 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
     protected TruffleString concatenateComplexAsStrings(Object leftValue, Object rightValue,
             @Cached TruffleString.FromJavaStringNode fromJavaStringNode) {
         return EasyScriptTruffleStrings.fromJavaString(
-                EasyScriptTruffleStrings.concatJavaStrings(leftValue, rightValue),
+                EasyScriptTruffleStrings.concatToStrings(leftValue, rightValue),
                 fromJavaStringNode);
     }
 

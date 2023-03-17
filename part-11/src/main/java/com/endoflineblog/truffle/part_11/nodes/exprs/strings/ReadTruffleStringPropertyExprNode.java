@@ -32,7 +32,7 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
         return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
     }
 
-    @Specialization(guards = "areEqual(propertyName, LENGTH_PROP_TS, equalNode)")
+    @Specialization(guards = "equals(propertyName, LENGTH_PROP_TS, equalNode)")
     protected int readLengthProperty(TruffleString truffleString,
             @SuppressWarnings("unused") TruffleString propertyName,
             @Cached TruffleString.EqualNode equalNode,
@@ -40,14 +40,20 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
         return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
     }
 
-    @Specialization(guards = "SUBSTRING_PROP.equals(propertyName)")
+    @Specialization(guards = {
+            "SUBSTRING_PROP.equals(propertyName)",
+            "same(substringMethod.methodTarget, truffleString)"
+    })
     protected FunctionObject readSubstringProperty(TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
             @Cached("create(currentLanguageContext().stringPrototype.substringMethod, 3, truffleString)") FunctionObject substringMethod) {
         return substringMethod;
     }
 
-    @Specialization(guards = "areEqual(propertyName, SUBSTRING_PROP_TS, equalNode)")
+    @Specialization(guards = {
+            "equals(propertyName, SUBSTRING_PROP_TS, equalNode)",
+            "same(substringMethod.methodTarget, truffleString)"
+    })
     protected FunctionObject readSubstringProperty(TruffleString truffleString,
             @SuppressWarnings("unused") TruffleString propertyName,
             @Cached TruffleString.EqualNode equalNode,
