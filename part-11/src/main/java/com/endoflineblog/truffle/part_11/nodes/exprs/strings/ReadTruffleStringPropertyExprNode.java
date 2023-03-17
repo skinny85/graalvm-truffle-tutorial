@@ -19,23 +19,26 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
 
     @Specialization
-    protected TruffleString readArrayIndex(TruffleString truffleString,
+    protected TruffleString readArrayIndex(
+            TruffleString truffleString,
             int index,
             @Cached TruffleString.SubstringNode substringNode) {
         return substringNode.execute(truffleString, index, 1, TruffleString.Encoding.UTF_16, true);
     }
 
     @Specialization(guards = "LENGTH_PROP.equals(propertyName)")
-    protected int readLengthProperty(TruffleString truffleString,
+    protected int readLengthProperty(
+            TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
             @Cached TruffleString.CodePointLengthNode lengthNode) {
         return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
     }
 
-    @Specialization(guards = "equals(propertyName, LENGTH_PROP_TS, equalNode)")
-    protected int readLengthProperty(TruffleString truffleString,
+    @Specialization(guards = "equals(LENGTH_PROP_TS, propertyName, equalNode)")
+    protected int readLengthProperty(
+            TruffleString truffleString,
             @SuppressWarnings("unused") TruffleString propertyName,
-            @Cached TruffleString.EqualNode equalNode,
+            @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
             @Cached TruffleString.CodePointLengthNode lengthNode) {
         return lengthNode.execute(truffleString, TruffleString.Encoding.UTF_16);
     }
@@ -44,27 +47,30 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             "SUBSTRING_PROP.equals(propertyName)",
             "same(substringMethod.methodTarget, truffleString)"
     })
-    protected FunctionObject readSubstringProperty(TruffleString truffleString,
+    protected FunctionObject readSubstringProperty(
+            @SuppressWarnings("unused") TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
             @Cached("create(currentLanguageContext().stringPrototype.substringMethod, 3, truffleString)") FunctionObject substringMethod) {
         return substringMethod;
     }
 
     @Specialization(guards = {
-            "equals(propertyName, SUBSTRING_PROP_TS, equalNode)",
+            "equals(SUBSTRING_PROP_TS, propertyName, equalNode)",
             "same(substringMethod.methodTarget, truffleString)"
     })
-    protected FunctionObject readSubstringProperty(TruffleString truffleString,
+    protected FunctionObject readSubstringProperty(
+            @SuppressWarnings("unused") TruffleString truffleString,
             @SuppressWarnings("unused") TruffleString propertyName,
-            @Cached TruffleString.EqualNode equalNode,
+            @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
             @Cached("create(currentLanguageContext().stringPrototype.substringMethod, 3, truffleString)") FunctionObject substringMethod) {
         return substringMethod;
     }
 
     /** Accessing any other string property should return 'undefined'. */
     @Specialization
-    protected Undefined readUnknownProperty(TruffleString truffleString,
-            Object property) {
+    protected Undefined readUnknownProperty(
+            @SuppressWarnings("unused") TruffleString truffleString,
+            @SuppressWarnings("unused") Object property) {
         return Undefined.INSTANCE;
     }
 }

@@ -20,7 +20,7 @@ public class StringLengthBenchmark extends TruffleBenchmark {
             "function countWhileSubstrLenProp(n) { " +
             "    var ret = 0; " +
             "    while (n > 0) { " +
-            "        n = n - 'ALU'.substring(0, 1).length; " +
+            "        n = n - ('ALU'.substring(0, 1) + 'ALU'.substring(2, 2)).length; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
@@ -29,7 +29,7 @@ public class StringLengthBenchmark extends TruffleBenchmark {
     static int countWhileJava(int n) {
         int ret = 0;
         while (n > 0) {
-            n = n - "ALU".substring(0, 1).length();
+            n = n - ("ALU".substring(0, 1) + "ALU".substring(2, 2)).length();
             ret = ret + 1;
         }
         return ret;
@@ -54,7 +54,7 @@ public class StringLengthBenchmark extends TruffleBenchmark {
             "function countWhileSubstrLenIndex(n) { " +
             "    var ret = 0; " +
             "    while (n > 0) { " +
-            "        n = n - 'ALU'['substring'](0, 1)['length']; " +
+            "        n = n - ('ALU'['substring'](0, 1) + 'ALU'['substring'](2, 2))['length']; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
