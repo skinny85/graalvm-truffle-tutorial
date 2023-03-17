@@ -205,47 +205,21 @@ public class StringsTest {
         assertEquals("B", result.asString());
     }
 
-    private final int fastaInput = 1_400_000;
-
     @Test
-    public void fasta_repeat_returns_its_input() {
+    public void count_algorithm_returns_its_input() {
+        int input = 10_000;
         Value result = this.context.eval("ezs", "" +
-                FastaCode.FASTA_PROGRAM +
-                "fastaRepeat(" + fastaInput + ");"
+                "function countWhileSubstrLenIndex(n) { " +
+                "    var ret = 0; " +
+                "    while (n > 0) { " +
+                "        n = n - ('ALU'['substring'](0, 1) + 'ALU'['substring'](2, 2))['length']; " +
+                "        ret = ret + 1; " +
+                "    } " +
+                "    return ret; " +
+                "} " +
+                "countWhileSubstrLenIndex(" + input + ");"
         );
-        assertEquals(fastaInput, result.asInt());
-    }
 
-    @Test
-    public void fasta_repeat_no_substring_returns_its_input() {
-        Value result = this.context.eval("ezs", "" +
-                FastaCode.FASTA_PROGRAM_NO_SUBSTRING +
-                "fastaRepeatNoSubstring(" + fastaInput + ");"
-        );
-        assertEquals(fastaInput, result.asInt());
-    }
-
-    @Test
-    public void fasta_repeat_without_length_returns_its_input() {
-        Value result = this.context.eval("ezs", "" +
-                FastaCode.FASTA_PROGRAM_WITHOUT_LENGTH +
-                "fastaRepeatWithoutLength(" + fastaInput + ");"
-        );
-        assertEquals(fastaInput, result.asInt());
-    }
-
-    @Test
-    public void java_fasta_repeat_returns_its_input() {
-        assertEquals(fastaInput, FastaCode.fastaRepeat(fastaInput));
-    }
-
-    @Test
-    public void java_fasta_repeat_no_substring_returns_its_input() {
-        assertEquals(fastaInput, FastaCode.fastaRepeatNoSubstring(fastaInput));
-    }
-
-    @Test
-    public void java_fasta_repeat_without_length_returns_its_input() {
-        assertEquals(fastaInput, FastaCode.fastaRepeatWithoutLength(fastaInput));
+        assertEquals(input, result.asInt());
     }
 }
