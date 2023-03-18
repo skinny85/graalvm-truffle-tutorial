@@ -44,7 +44,7 @@ expr5 : literal                                            #LiteralExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;
 
-literal : INT | DOUBLE | 'undefined' | bool_literal | STRING ;
+literal : INT | DOUBLE | 'undefined' | bool_literal | string_literal ;
 bool_literal : 'true' | 'false' ;
 
 fragment DIGIT : [0-9] ;
@@ -54,9 +54,11 @@ DOUBLE : DIGIT+ '.' DIGIT+ ;
 fragment LETTER : [a-zA-Z$_] ;
 ID : LETTER (LETTER | DIGIT)* ;
 
+string_literal: SINGLE_QUOTE_STRING | DOUBLE_QUOTE_STRING ;
 // see https://stackoverflow.com/questions/24557953/handling-string-literals-which-end-in-an-escaped-quote-in-antlr4
 // for details
-STRING : '\'' (~[\\'\r\n] | '\\' ~[\r\n])* '\'' ;
+SINGLE_QUOTE_STRING : '\'' (~[\\'\r\n] | '\\' ~[\r\n])* '\'' ;
+DOUBLE_QUOTE_STRING : '"'  (~[\\"\r\n] | '\\' ~[\r\n])* '"' ;
 
 // skip all whitespace
 WS : (' ' | '\r' | '\t' | '\n' | '\f')+ -> skip ;

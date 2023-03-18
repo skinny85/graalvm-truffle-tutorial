@@ -493,7 +493,7 @@ public final class EasyScriptTruffleParser {
         if (boolLiteral != null) {
             return new BoolLiteralExprNode("true".equals(boolLiteral.getText()));
         }
-        TerminalNode stringTerminal = literalExpr.literal().STRING();
+        EasyScriptParser.String_literalContext stringTerminal = literalExpr.literal().string_literal();
         if (stringTerminal != null) {
             String stringLiteral = stringTerminal.getText();
             // remove the quotes delineating the string literal,

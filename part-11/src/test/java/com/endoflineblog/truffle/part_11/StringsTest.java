@@ -47,6 +47,24 @@ public class StringsTest {
     }
 
     @Test
+    public void strings_can_be_created_with_double_quotes() {
+        Value result = this.context.eval("ezs",
+                "\"\""
+        );
+        assertTrue(result.isString());
+        assertEquals("", result.asString());
+    }
+
+    @Test
+    public void double_quote_strings_can_contain_a_double_quote_by_escaping_it() {
+        Value result = this.context.eval("ezs",
+                "\"\\\"\""
+        );
+        assertTrue(result.isString());
+        assertEquals("\"", result.asString());
+    }
+
+    @Test
     public void empty_string_is_falsy() {
         Value result = this.context.eval("ezs", "" +
                 "let ret; " +
