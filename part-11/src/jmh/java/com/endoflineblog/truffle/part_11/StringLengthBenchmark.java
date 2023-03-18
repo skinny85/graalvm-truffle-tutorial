@@ -20,7 +20,7 @@ public class StringLengthBenchmark extends TruffleBenchmark {
             "function countWhileCharAtProp(n) { " +
             "    var ret = 0; " +
             "    while (n > 0) { " +
-            "        n = n - ('ALU'.charAt(0)).length; " +
+            "        n = n - ('ALU'.charAt(0) + 'ALU'.charAt(15)).length; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
@@ -54,7 +54,7 @@ public class StringLengthBenchmark extends TruffleBenchmark {
             "function countWhileCharAtIndex(n) { " +
             "    var ret = 0; " +
             "    while (n > 0) { " +
-            "        n = n - ('ALU'['charAt'](0))['length']; " +
+            "        n = n - ('ALU'['charAt'](0) + 'ALU'['charAt'](15))['length']; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
