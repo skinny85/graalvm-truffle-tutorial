@@ -17,8 +17,6 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     protected static final TruffleString LENGTH_PROP_TS = fromJavaString(LENGTH_PROP);
     protected static final String CHAR_AT_PROP = "charAt";
     protected static final TruffleString CHAR_AT_PROP_TS = fromJavaString(CHAR_AT_PROP);
-    protected static final String SUBSTRING_PROP = "substring";
-    protected static final TruffleString SUBSTRING_PROP_TS = fromJavaString(SUBSTRING_PROP);
 
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
 
@@ -68,29 +66,6 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
             @Cached("create(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString)") FunctionObject charAtMethod) {
         return charAtMethod;
-    }
-
-    @Specialization(guards = {
-            "SUBSTRING_PROP.equals(propertyName)",
-            "same(substringMethod.methodTarget, truffleString)"
-    })
-    protected FunctionObject readSubstringProperty(
-            @SuppressWarnings("unused") TruffleString truffleString,
-            @SuppressWarnings("unused") String propertyName,
-            @Cached("create(currentLanguageContext().stringPrototype.substringMethod, 3, truffleString)") FunctionObject substringMethod) {
-        return substringMethod;
-    }
-
-    @Specialization(guards = {
-            "equals(SUBSTRING_PROP_TS, propertyName, equalNode)",
-            "same(substringMethod.methodTarget, truffleString)"
-    })
-    protected FunctionObject readSubstringProperty(
-            @SuppressWarnings("unused") TruffleString truffleString,
-            @SuppressWarnings("unused") TruffleString propertyName,
-            @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
-            @Cached("create(currentLanguageContext().stringPrototype.substringMethod, 3, truffleString)") FunctionObject substringMethod) {
-        return substringMethod;
     }
 
     /** Accessing any other string property should return 'undefined'. */

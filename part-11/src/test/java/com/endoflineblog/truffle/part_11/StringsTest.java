@@ -220,17 +220,9 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_have_a_substring_method() {
-        Value result = this.context.eval("ezs",
-                " 'abc'.substring(1, 2)"
-        );
-        assertEquals("b", result.asString());
-    }
-
-    @Test
     public void methods_ignore_extra_arguments() {
         Value result = this.context.eval("ezs",
-                " 'abc'.substring(1, 2, 99)"
+                " 'abc'.charAt(1, 2, 99)"
         );
         assertEquals("b", result.asString());
     }
@@ -244,10 +236,10 @@ public class StringsTest {
     }
 
     @Test
-    public void substring_correctly_resolves_its_target() {
+    public void methods_correctly_resolve_their_targets() {
         Value result = this.context.eval("ezs", "" +
                 "function firstChar(str) { " +
-                "    return str.substring(0, 1); " +
+                "    return str.charAt(0); " +
                 "} " +
                 "firstChar('A'); " +
                 "firstChar('B'); "
@@ -259,15 +251,15 @@ public class StringsTest {
     public void count_algorithm_returns_its_input() {
         int input = 10_000;
         Value result = this.context.eval("ezs", "" +
-                "function countWhileSubstrLenIndex(n) { " +
+                "function countWhileCharAtIndex(n) { " +
                 "    var ret = 0; " +
                 "    while (n > 0) { " +
-                "        n = n - ('ALU'['substring'](0, 1) + 'ALU'['substring'](2, 2))['length']; " +
+                "        n = n - ('ALU'['charAt'](0) + 'ALU'['charAt'](15))['length']; " +
                 "        ret = ret + 1; " +
                 "    } " +
                 "    return ret; " +
-                "} " +
-                "countWhileSubstrLenIndex(" + input + ");"
+                "}" +
+                "countWhileCharAtIndex(" + input + ");"
         );
 
         assertEquals(input, result.asInt());
