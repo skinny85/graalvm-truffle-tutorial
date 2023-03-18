@@ -169,6 +169,15 @@ public class StringsTest {
     }
 
     @Test
+    public void strings_indexed_out_of_range_return_undefined() {
+        Value result = this.context.eval("ezs",
+                " 'abc'[-1] "
+        );
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
     public void strings_can_be_compared_for_equality() {
         Value result = this.context.eval("ezs", "" +
                 "let ret = 'string equality is broken'; " +

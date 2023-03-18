@@ -21,11 +21,14 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
 
     @Specialization
-    protected TruffleString readArrayIndex(
+    protected Object readArrayIndex(
             TruffleString truffleString,
             int index,
+            @Cached TruffleString.CodePointLengthNode lengthNode,
             @Cached TruffleString.SubstringNode substringNode) {
-        return EasyScriptTruffleStrings.substring(truffleString, index, 1, substringNode);
+        return index < 0 || index >= EasyScriptTruffleStrings.length(truffleString, lengthNode)
+                ? Undefined.INSTANCE
+                : EasyScriptTruffleStrings.substring(truffleString, index, 1, substringNode);
     }
 
     @Specialization(guards = "LENGTH_PROP.equals(propertyName)")
