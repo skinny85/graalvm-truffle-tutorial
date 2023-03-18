@@ -6,6 +6,7 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 public final class EasyScriptTruffleStrings {
     private static final TruffleString.Encoding JAVA_SCRIPT_STRING_ENCODING = TruffleString.Encoding.UTF_16;
+    public static final TruffleString EMPTY = JAVA_SCRIPT_STRING_ENCODING.getEmpty();
 
     public static TruffleString fromJavaString(String value) {
         return TruffleString.fromJavaStringUncached(value, JAVA_SCRIPT_STRING_ENCODING);

@@ -212,6 +212,14 @@ public class StringsTest {
     }
 
     @Test
+    public void charAt_outside_range_returns_empty_string() {
+        Value result = this.context.eval("ezs",
+                " 'abc'.charAt(3) + 'abc'.charAt(-1)"
+        );
+        assertEquals("", result.asString());
+    }
+
+    @Test
     public void strings_have_a_substring_method() {
         Value result = this.context.eval("ezs",
                 " 'abc'.substring(1, 2)"
