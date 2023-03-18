@@ -24,8 +24,9 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     protected Object readArrayIndex(
             TruffleString truffleString,
             int index,
+            @Cached TruffleString.CodePointLengthNode lengthNode,
             @Cached TruffleString.SubstringNode substringNode) {
-        return index < 0 || index >= EasyScriptTruffleStrings.length(truffleString)
+        return index < 0 || index >= EasyScriptTruffleStrings.length(truffleString, lengthNode)
                 ? Undefined.INSTANCE
                 : EasyScriptTruffleStrings.substring(truffleString, index, 1, substringNode);
     }
@@ -33,16 +34,18 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     @Specialization(guards = "LENGTH_PROP.equals(propertyName)")
     protected int readLengthProperty(
             TruffleString truffleString,
-            @SuppressWarnings("unused") String propertyName) {
-        return EasyScriptTruffleStrings.length(truffleString);
+            @SuppressWarnings("unused") String propertyName,
+            @Cached TruffleString.CodePointLengthNode lengthNode) {
+        return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 
     @Specialization(guards = "equals(LENGTH_PROP_TS, propertyName, equalNode)")
     protected int readLengthProperty(
             TruffleString truffleString,
             @SuppressWarnings("unused") TruffleString propertyName,
-            @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode) {
-        return EasyScriptTruffleStrings.length(truffleString);
+            @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
+            @Cached TruffleString.CodePointLengthNode lengthNode) {
+        return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 
     @Specialization(guards = {

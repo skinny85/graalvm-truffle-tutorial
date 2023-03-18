@@ -9,8 +9,9 @@ import com.oracle.truffle.api.strings.TruffleString;
 public abstract class CharAtMethodBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization
     protected TruffleString charAtInt(TruffleString self, int index,
+            @Cached TruffleString.CodePointLengthNode lengthNode,
             @Cached TruffleString.SubstringNode substringNode) {
-        return index < 0 || index >= EasyScriptTruffleStrings.length(self)
+        return index < 0 || index >= EasyScriptTruffleStrings.length(self, lengthNode)
             ? EasyScriptTruffleStrings.EMPTY
             : EasyScriptTruffleStrings.substring(self, index, 1, substringNode);
     }
