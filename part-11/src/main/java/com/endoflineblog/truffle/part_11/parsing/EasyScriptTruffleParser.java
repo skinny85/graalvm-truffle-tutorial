@@ -345,7 +345,7 @@ public final class EasyScriptTruffleParser {
         int argumentCount = funcArgs.size();
         // first, initialize the locals with function arguments
         for (int i = 0; i < argumentCount; i++) {
-            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1));
+            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i));
         }
         this.localScopes.push(localVariables);
 
@@ -360,7 +360,7 @@ public final class EasyScriptTruffleParser {
 
         return FuncDeclStmtNodeGen.create(GlobalScopeObjectExprNodeGen.create(),
                 funcDeclStmt.name.getText(),
-                frameDescriptor, new UserFuncBodyStmtNode(funcStmts), argumentCount + 1);
+                frameDescriptor, new UserFuncBodyStmtNode(funcStmts), argumentCount);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
