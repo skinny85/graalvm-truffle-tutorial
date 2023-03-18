@@ -21,8 +21,8 @@ public final class EasyScriptTruffleStrings {
         return equalNode.execute(s1, s2, JAVA_SCRIPT_STRING_ENCODING);
     }
 
-    public static int length(TruffleString truffleString, TruffleString.CodePointLengthNode lengthNode) {
-        return lengthNode.execute(truffleString, JAVA_SCRIPT_STRING_ENCODING);
+    public static int length(TruffleString truffleString) {
+        return truffleString.byteLength(TruffleString.Encoding.UTF_16) >> 1;
     }
 
     public static TruffleString concat(TruffleString s1, TruffleString s2, TruffleString.ConcatNode concatNode) {
