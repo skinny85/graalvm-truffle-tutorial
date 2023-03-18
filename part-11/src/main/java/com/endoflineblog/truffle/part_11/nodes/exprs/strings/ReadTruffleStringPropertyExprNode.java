@@ -15,6 +15,8 @@ import static com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings
 public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";
     protected static final TruffleString LENGTH_PROP_TS = fromJavaString(LENGTH_PROP);
+    protected static final String CHAR_AT_PROP = "charAt";
+    protected static final TruffleString CHAR_AT_PROP_TS = fromJavaString(CHAR_AT_PROP);
     protected static final String SUBSTRING_PROP = "substring";
     protected static final TruffleString SUBSTRING_PROP_TS = fromJavaString(SUBSTRING_PROP);
 
@@ -43,6 +45,29 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
             @Cached TruffleString.CodePointLengthNode lengthNode) {
         return EasyScriptTruffleStrings.length(truffleString, lengthNode);
+    }
+
+    @Specialization(guards = {
+            "CHAR_AT_PROP.equals(propertyName)",
+            "same(charAtMethod.methodTarget, truffleString)"
+    })
+    protected FunctionObject readCharAtProperty(
+            @SuppressWarnings("unused") TruffleString truffleString,
+            @SuppressWarnings("unused") String propertyName,
+            @Cached("create(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString)") FunctionObject charAtMethod) {
+        return charAtMethod;
+    }
+
+    @Specialization(guards = {
+            "equals(CHAR_AT_PROP_TS, propertyName, equalNode)",
+            "same(charAtMethod.methodTarget, truffleString)"
+    })
+    protected FunctionObject readCharAtProperty(
+            @SuppressWarnings("unused") TruffleString truffleString,
+            @SuppressWarnings("unused") TruffleString propertyName,
+            @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
+            @Cached("create(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString)") FunctionObject charAtMethod) {
+        return charAtMethod;
     }
 
     @Specialization(guards = {
