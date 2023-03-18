@@ -229,6 +229,14 @@ public class StringsTest {
     }
 
     @Test
+    public void charAt_called_on_an_empty_string_without_arguments_returns_empty_string() {
+        Value result = this.context.eval("ezs",
+                " ''.charAt()"
+        );
+        assertEquals("", result.asString());
+    }
+
+    @Test
     public void methods_ignore_extra_arguments() {
         Value result = this.context.eval("ezs",
                 " 'abc'.charAt(1, 2, 99)"
