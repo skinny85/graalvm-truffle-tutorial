@@ -31,7 +31,7 @@ public class StringsTest {
     @Test
     public void strings_can_be_created_with_single_quotes() {
         Value result = this.context.eval("ezs",
-                "''"
+                " '' "
         );
         assertTrue(result.isString());
         assertEquals("", result.asString());
@@ -40,7 +40,7 @@ public class StringsTest {
     @Test
     public void single_quote_strings_can_contain_a_single_quote_by_escaping_it() {
         Value result = this.context.eval("ezs",
-                "'\\''"
+                " '\\'' "
         );
         assertTrue(result.isString());
         assertEquals("'", result.asString());
@@ -49,7 +49,7 @@ public class StringsTest {
     @Test
     public void strings_can_be_created_with_double_quotes() {
         Value result = this.context.eval("ezs",
-                "\"\""
+                " \"\" "
         );
         assertTrue(result.isString());
         assertEquals("", result.asString());
@@ -58,7 +58,7 @@ public class StringsTest {
     @Test
     public void double_quote_strings_can_contain_a_double_quote_by_escaping_it() {
         Value result = this.context.eval("ezs",
-                "\"\\\"\""
+                " \"\\\"\" "
         );
         assertTrue(result.isString());
         assertEquals("\"", result.asString());
@@ -95,7 +95,7 @@ public class StringsTest {
     @Test
     public void strings_can_be_concatenated() {
         Value result = this.context.eval("ezs",
-                "'abc' + '_' + 'def'"
+                " 'abc' + '_' + 'def' "
         );
         assertEquals("abc_def", result.asString());
     }
@@ -113,7 +113,7 @@ public class StringsTest {
     public void property_writes_through_indexing_are_ignored() {
         Value result = this.context.eval("ezs", "" +
                 "const arr = [0, 1, 2]; " +
-                "const result = arr['length'] = 5;" +
+                "const result = arr['length'] = 5; " +
                 "[result, arr.length]"
         );
         assertEquals(5, result.getArrayElement(0).asInt());
@@ -123,7 +123,7 @@ public class StringsTest {
     @Test
     public void strings_have_a_length_property() {
         Value result = this.context.eval("ezs",
-                "'length'.length"
+                " 'length'.length"
         );
         assertEquals(6, result.asInt());
     }
@@ -139,7 +139,7 @@ public class StringsTest {
 
     @Test
     public void ezs_strings_in_polyglot_context_have_no_members() {
-        Value result = this.context.eval("ezs", "'a'");
+        Value result = this.context.eval("ezs", " 'a' ");
 
         assertTrue(result.isString());
         assertFalse(result.hasMembers());
@@ -163,7 +163,7 @@ public class StringsTest {
     @Test
     public void strings_can_be_indexed() {
         Value result = this.context.eval("ezs",
-                "'abc'[1][0]"
+                " 'abc'[1][0] "
         );
         assertEquals("b", result.asString());
     }
@@ -180,6 +180,14 @@ public class StringsTest {
     }
 
     @Test
+    public void strings_can_be_compared_with_less() {
+        Value result = this.context.eval("ezs",
+                " 'a' < 'b' "
+        );
+        assertTrue(result.asBoolean());
+    }
+
+    @Test
     public void concatenated_strings_have_a_length_property() {
         Value result = this.context.eval("ezs",
                 "('abc' + 'def').length"
@@ -190,7 +198,7 @@ public class StringsTest {
     @Test
     public void strings_have_a_substring_method() {
         Value result = this.context.eval("ezs",
-                "'abc'.substring(1, 2)"
+                " 'abc'.substring(1, 2)"
         );
         assertEquals("b", result.asString());
     }
@@ -198,14 +206,14 @@ public class StringsTest {
     @Test
     public void methods_ignore_extra_arguments() {
         Value result = this.context.eval("ezs",
-                "'abc'.substring(1, 2, 99)"
+                " 'abc'.substring(1, 2, 99)"
         );
         assertEquals("b", result.asString());
     }
 
     @Test
     public void unknown_string_property_returns_undefined() {
-        Value result = this.context.eval("ezs", "'a'.someProp");
+        Value result = this.context.eval("ezs", " 'a'.someProp");
 
         assertTrue(result.isNull());
         assertEquals("undefined", result.toString());
