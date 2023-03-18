@@ -35,7 +35,7 @@ public final class FunctionObject implements TruffleObject {
         this(callTarget, argumentCount, null);
     }
 
-    public FunctionObject(CallTarget callTarget, int argumentCount,
+    private FunctionObject(CallTarget callTarget, int argumentCount,
             Object methodTarget) {
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
@@ -50,7 +50,7 @@ public final class FunctionObject implements TruffleObject {
      */
     @Override
     public String toString() {
-        return "[Function]";
+        return "[object Function]";
     }
 
     @ExportMessage

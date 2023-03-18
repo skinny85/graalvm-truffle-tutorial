@@ -102,7 +102,7 @@ public class StaticFunctionCallsTest {
                 "Math.abs + 3"
         );
 
-        assertEquals("[Function]3", result.asString());
+        assertEquals("[object Function]3", result.asString());
     }
 
     @Test
