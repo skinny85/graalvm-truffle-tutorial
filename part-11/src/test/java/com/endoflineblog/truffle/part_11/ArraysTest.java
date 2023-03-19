@@ -169,6 +169,15 @@ public class ArraysTest {
     }
 
     @Test
+    public void array_properties_can_be_accessed_with_string_indexes() {
+        Value result = this.context.eval("ezs", "" +
+                "[1, 2, 3]['length']"
+        );
+
+        assertEquals(3, result.asInt());
+    }
+
+    @Test
     public void an_array_can_be_passed_to_a_function_exec() {
         this.context.eval("ezs", "" +
                 "let array = [1, 2, 3]; " +
