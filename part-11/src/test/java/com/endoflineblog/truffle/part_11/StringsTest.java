@@ -265,6 +265,24 @@ public class StringsTest {
     }
 
     @Test
+    public void Math_props_can_be_accessed_through_indexing() {
+        Value result = this.context.eval("ezs",
+                "Math['abs'](-4)"
+        );
+        assertEquals(4, result.asInt());
+    }
+
+    @Test
+    public void string_index_writes_are_ignored() {
+        Value result = this.context.eval("ezs", "" +
+                "let s = 'a'; " +
+                "const tmp = s[0] = 'b'; " +
+                "s + tmp"
+        );
+        assertEquals("ab", result.asString());
+    }
+
+    @Test
     public void count_algorithm_returns_its_input() {
         int input = 10_000;
         Value result = this.context.eval("ezs", "" +
