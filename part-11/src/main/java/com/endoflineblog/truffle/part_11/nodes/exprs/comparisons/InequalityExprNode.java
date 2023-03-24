@@ -1,12 +1,11 @@
 package com.endoflineblog.truffle.part_11.nodes.exprs.comparisons;
 
-import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.BinaryOperationExprNode;
+import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.UnsupportedMessageException;
-import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * Node class representing the strict inequality ({@code !==}) operator.
@@ -28,19 +27,10 @@ public abstract class InequalityExprNode extends BinaryOperationExprNode {
         return leftValue != rightValue;
     }
 
-    @Specialization(guards = {
-            "leftValueInteropLibrary.isString(leftValue)",
-            "rightValueInteropLibrary.isString(rightValue)"
-    }, limit = "1")
-    protected boolean stringInequality(Object leftValue, Object rightValue,
-            @CachedLibrary("leftValue") InteropLibrary leftValueInteropLibrary,
-            @CachedLibrary("rightValue") InteropLibrary rightValueInteropLibrary) {
-        try {
-            return !leftValueInteropLibrary.asString(leftValue).equals(
-                    rightValueInteropLibrary.asString(rightValue));
-        } catch (UnsupportedMessageException e) {
-            throw new EasyScriptException(this, e.getMessage());
-        }
+    @Specialization
+    protected boolean stringInequality(TruffleString leftValue, TruffleString rightValue,
+            @Cached TruffleString.EqualNode equalNode) {
+        return !EasyScriptTruffleStrings.equals(leftValue, rightValue, equalNode);
     }
 
     @Fallback
