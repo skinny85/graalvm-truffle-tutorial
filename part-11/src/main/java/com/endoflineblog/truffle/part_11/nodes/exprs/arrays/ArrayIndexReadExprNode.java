@@ -22,6 +22,19 @@ import com.oracle.truffle.api.strings.TruffleString;
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
 public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
+    @Specialization(limit = "1", guards = "indexInteropLibrary.isString(index)")
+    protected Object readStringPropertyFromString(TruffleString target,
+            Object index,
+            @CachedLibrary("index") InteropLibrary indexInteropLibrary,
+            @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
+        try {
+            return readStringPropertyExprNode.executeReadTruffleStringProperty(target,
+                    indexInteropLibrary.asString(index));
+        } catch (UnsupportedMessageException e) {
+            throw new EasyScriptException(this, e.getMessage());
+        }
+    }
+
     /**
      * The array index syntax can also be used in JavaScript to read a property of an object
      * if the index is a string.
