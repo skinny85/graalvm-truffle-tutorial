@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_11.runtime;
 
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
-import com.oracle.truffle.api.strings.AbstractTruffleString;
 import com.oracle.truffle.api.strings.TruffleString;
 
 public final class EasyScriptTruffleStrings {
@@ -16,7 +15,7 @@ public final class EasyScriptTruffleStrings {
         return fromJavaStringNode.execute(value, JAVA_SCRIPT_STRING_ENCODING);
     }
 
-    public static boolean equals(AbstractTruffleString s1, AbstractTruffleString s2,
+    public static boolean equals(TruffleString s1, TruffleString s2,
             TruffleString.EqualNode equalNode) {
         return equalNode.execute(s1, s2, JAVA_SCRIPT_STRING_ENCODING);
     }
