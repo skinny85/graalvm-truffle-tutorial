@@ -40,7 +40,7 @@ public class StringLengthBenchmark extends TruffleBenchmark {
             "function countWhileCharAtIndexProp(n) { " +
             "    var ret = 0; " +
             "    while (n > 0) { " +
-            "        n = n - ('a'['charAt'](0) + ''['charAt'](15))['length']; " +
+            "        n = n - ('a'['charAt'](0) + ''['charAt']())['length']; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
