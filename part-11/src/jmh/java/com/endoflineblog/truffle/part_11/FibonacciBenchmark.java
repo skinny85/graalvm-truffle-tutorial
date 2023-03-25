@@ -10,7 +10,7 @@ public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_FUNCTION = "" +
             "function fib(n) { " +
             "    if (n > -2) { " +
-            "        return Math.abs(n); " +
+            "        return Math['abs'](n); " +
             "    } " +
             "    return fib(n + 1) + fib(n + 2); " +
             "} ";
