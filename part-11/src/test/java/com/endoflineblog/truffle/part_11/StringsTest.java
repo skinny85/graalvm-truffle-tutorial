@@ -286,15 +286,15 @@ public class StringsTest {
     public void count_algorithm_returns_its_input() {
         int input = 10_000;
         Value result = this.context.eval("ezs", "" +
-                "function countWhileCharAtIndex(n) { " +
+                "function countWhileCharAtIndexProp(n) { " +
                 "    var ret = 0; " +
                 "    while (n > 0) { " +
-                "        n = n - ('ALU'['charAt'](0) + 'ALU'['charAt'](15))['length']; " +
+                "        n = n - ('a'['charAt'](0) + ''['charAt']())['length']; " +
                 "        ret = ret + 1; " +
                 "    } " +
                 "    return ret; " +
                 "}" +
-                "countWhileCharAtIndex(" + input + ");"
+                "countWhileCharAtIndexProp(" + input + ");"
         );
 
         assertEquals(input, result.asInt());

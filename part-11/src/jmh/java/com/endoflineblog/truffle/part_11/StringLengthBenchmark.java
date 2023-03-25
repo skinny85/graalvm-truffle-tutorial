@@ -9,64 +9,50 @@ public class StringLengthBenchmark extends TruffleBenchmark {
     public void setup() {
         super.setup();
 
-        this.truffleContext.eval("ezs", COUNT_WHILE_CHAR_AT_PROP);
-        this.truffleContext.eval("js", COUNT_WHILE_CHAR_AT_PROP);
+        this.truffleContext.eval("ezs", COUNT_WHILE_CHAR_AT_DIRECT_PROP);
+        this.truffleContext.eval("js", COUNT_WHILE_CHAR_AT_DIRECT_PROP);
 
-        this.truffleContext.eval("ezs", COUNT_WHILE_CHAR_AT_INDEX);
-        this.truffleContext.eval("js", COUNT_WHILE_CHAR_AT_INDEX);
+        this.truffleContext.eval("ezs", COUNT_WHILE_CHAR_AT_INDEX_PROP);
+        this.truffleContext.eval("js", COUNT_WHILE_CHAR_AT_INDEX_PROP);
     }
 
-    private static final String COUNT_WHILE_CHAR_AT_PROP = "" +
-            "function countWhileCharAtProp(n) { " +
+    private static final String COUNT_WHILE_CHAR_AT_DIRECT_PROP = "" +
+            "function countWhileCharAtDirectProp(n) { " +
             "    var ret = 0; " +
             "    while (n > 0) { " +
-            "        n = n - ('ALU'.charAt(0) + 'ALU'.charAt(15)).length; " +
-            "        ret = ret + 1; " +
-            "    } " +
-            "    return ret; " +
-            "}";
-
-    static int countWhileSubstringJava(int n) {
-        int ret = 0;
-        while (n > 0) {
-            n = n - ("ALU".substring(0, 1) + "ALU".substring(2, 2)).length();
-            ret = ret + 1;
-        }
-        return ret;
-    }
-
-    @Benchmark
-    public int count_while_char_at_prop_ezs() {
-        return this.truffleContext.eval("ezs", "countWhileCharAtProp(" + INPUT + ");").asInt();
-    }
-
-    @Benchmark
-    public int count_while_char_at_prop_js() {
-        return this.truffleContext.eval("js", "countWhileCharAtProp(" + INPUT + ");").asInt();
-    }
-
-    @Benchmark
-    public int count_while_substr_prop_java() {
-        return countWhileSubstringJava(INPUT);
-    }
-
-    private static final String COUNT_WHILE_CHAR_AT_INDEX = "" +
-            "function countWhileCharAtIndex(n) { " +
-            "    var ret = 0; " +
-            "    while (n > 0) { " +
-            "        n = n - ('ALU'['charAt'](0) + 'ALU'['charAt'](15))['length']; " +
+            "        n = n - ('a'.charAt(0) + ''.charAt()).length; " +
             "        ret = ret + 1; " +
             "    } " +
             "    return ret; " +
             "}";
 
     @Benchmark
-    public int count_while_char_at_index_ezs() {
-        return this.truffleContext.eval("ezs", "countWhileCharAtIndex(" + INPUT + ");").asInt();
+    public int count_while_char_at_direct_prop_ezs() {
+        return this.truffleContext.eval("ezs", "countWhileCharAtDirectProp(" + INPUT + ");").asInt();
     }
 
     @Benchmark
-    public int count_while_char_at_index_js() {
-        return this.truffleContext.eval("js", "countWhileCharAtIndex(" + INPUT + ");").asInt();
+    public int count_while_char_at_direct_prop_js() {
+        return this.truffleContext.eval("js", "countWhileCharAtDirectProp(" + INPUT + ");").asInt();
+    }
+
+    private static final String COUNT_WHILE_CHAR_AT_INDEX_PROP = "" +
+            "function countWhileCharAtIndexProp(n) { " +
+            "    var ret = 0; " +
+            "    while (n > 0) { " +
+            "        n = n - ('a'['charAt'](0) + ''['charAt'](15))['length']; " +
+            "        ret = ret + 1; " +
+            "    } " +
+            "    return ret; " +
+            "}";
+
+    @Benchmark
+    public int count_while_char_at_index_prop_ezs() {
+        return this.truffleContext.eval("ezs", "countWhileCharAtIndexProp(" + INPUT + ");").asInt();
+    }
+
+    @Benchmark
+    public int count_while_char_at_index_prop_js() {
+        return this.truffleContext.eval("js", "countWhileCharAtIndexProp(" + INPUT + ");").asInt();
     }
 }
