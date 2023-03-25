@@ -17,7 +17,7 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
 
     @Specialization
-    protected Object readArrayIndex(
+    protected Object readStringIndex(
             TruffleString truffleString,
             int index,
             @Cached TruffleString.CodePointLengthNode lengthNode,
