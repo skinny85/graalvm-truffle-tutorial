@@ -259,9 +259,11 @@ public class StringsTest {
                 "    return str.charAt(0); " +
                 "} " +
                 "firstChar('A'); " +
-                "firstChar('B'); "
+                "firstChar('B'); " +
+                "firstChar('C'); " +
+                "firstChar('D'); "
         );
-        assertEquals("B", result.asString());
+        assertEquals("D", result.asString());
     }
 
     @Test

@@ -39,11 +39,22 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             "CHAR_AT_PROP.equals(propertyName)",
             "same(charAtMethod.methodTarget, truffleString)"
     })
-    protected FunctionObject readCharAtProperty(
+    protected FunctionObject readCharAtPropertyCached(
             @SuppressWarnings("unused") TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
-            @Cached("create(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString)") FunctionObject charAtMethod) {
+            @Cached("createCharAtMethodObject(truffleString)") FunctionObject charAtMethod) {
         return charAtMethod;
+    }
+
+    @Specialization(guards = "CHAR_AT_PROP.equals(propertyName)", replaces = "readCharAtPropertyCached")
+    protected FunctionObject readCharAtPropertyUncached(
+            TruffleString truffleString,
+            @SuppressWarnings("unused") String propertyName) {
+        return createCharAtMethodObject(truffleString);
+    }
+
+    protected FunctionObject createCharAtMethodObject(TruffleString truffleString) {
+        return new FunctionObject(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString);
     }
 
     /** Accessing any other string property should return 'undefined'. */

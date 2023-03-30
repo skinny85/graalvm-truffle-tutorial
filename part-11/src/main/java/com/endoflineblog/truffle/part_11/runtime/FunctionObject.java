@@ -21,11 +21,6 @@ import com.oracle.truffle.api.strings.TruffleString;
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject implements TruffleObject {
-    public static FunctionObject create(CallTarget callTarget, int argumentCount,
-            Object methodTarget) {
-        return new FunctionObject(callTarget, argumentCount, methodTarget);
-    }
-
     public final CallTarget callTarget;
     public final int argumentCount;
     public final Object methodTarget;
@@ -35,7 +30,7 @@ public final class FunctionObject implements TruffleObject {
         this(callTarget, argumentCount, null);
     }
 
-    private FunctionObject(CallTarget callTarget, int argumentCount,
+    public FunctionObject(CallTarget callTarget, int argumentCount,
             Object methodTarget) {
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
