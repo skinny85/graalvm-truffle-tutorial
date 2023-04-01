@@ -14,6 +14,7 @@ import com.oracle.truffle.api.library.CachedLibrary;
 /**
  * The Node representing writing array indexes
  * (like {@code a[1] = 3}).
+ * Identical to the class with the same name from part 10.
  */
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")

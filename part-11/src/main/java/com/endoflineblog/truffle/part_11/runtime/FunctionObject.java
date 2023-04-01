@@ -13,17 +13,34 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The object that represents a function in EasyScript.
- * Almost identical to the class with the same name from part 8
- * (but different from the class with the same name from part 9,
- * as it's no longer mutable),
- * the only difference is adding {@link ArrayObject}
- * to the list of allowed EasyScript values when calling this function through the GraalVM polyglot API.
+ * Almost identical to the class with the same name from part 10,
+ * the only difference is the {@link #methodTarget} field,
+ * and the override of the {@link #toString()} method.
+ *
+ * @see #methodTarget
+ * @see #toString()
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject implements TruffleObject {
     public final CallTarget callTarget;
     public final int argumentCount;
+
+    /**
+     * The target of the method represented by this object.
+     * If this object represents a function,
+     * this will be {@code null}.
+     * If this object represents a method,
+     * this field will store the object that method was invoked on
+     * (in this part of the series, that will always be a {@link TruffleString},
+     * since we don't support methods on other objects yet).
+     * This field is read by the {@link FunctionDispatchNode function dispatch Node},
+     * and by the Node that reads properties of {@link TruffleString}s.
+     *
+     * @see FunctionDispatchNode
+     * @see com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyExprNode
+     */
     public final Object methodTarget;
+
     private final FunctionDispatchNode functionDispatchNode;
 
     public FunctionObject(CallTarget callTarget, int argumentCount) {
@@ -41,7 +58,7 @@ public final class FunctionObject implements TruffleObject {
     /**
      * Returns the string representation of a given function.
      * In JavaScript, this returns the actual code of a given function (!).
-     * We'll simplify in EasyScript, and just return the string {@code "[Function]"}.
+     * We'll simplify in EasyScript, and just return the string {@code "[object Function]"}.
      */
     @Override
     public String toString() {
@@ -67,7 +84,7 @@ public final class FunctionObject implements TruffleObject {
 
     private boolean isEasyScriptValue(Object argument) {
         // as of this chapter, the only available types in EasyScript are
-        // numbers (ints and doubles), booleans, 'undefined', and functions
+        // numbers (ints and doubles), booleans, 'undefined', functions, and strings
         return EasyScriptTypeSystemGen.isImplicitDouble(argument) ||
                 EasyScriptTypeSystemGen.isBoolean(argument) ||
                 argument == Undefined.INSTANCE ||

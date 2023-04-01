@@ -4,7 +4,7 @@ import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 
 /**
  * An enum that represents the different kinds of variable declarations in JavaScript.
- * Identical to the enum with the same name from part 9.
+ * Identical to the enum with the same name from part 10.
  */
 public enum DeclarationKind {
     /** This represents the 'var' declaration kind. */

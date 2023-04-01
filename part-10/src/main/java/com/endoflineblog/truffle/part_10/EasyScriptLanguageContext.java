@@ -9,7 +9,11 @@ import com.oracle.truffle.api.object.Shape;
 /**
  * The class of the context for the
  * {@link EasyScriptTruffleLanguage TruffleLanguage implementaton in this part of the series}.
- * Identical to the class with the same name from part 9.
+ * Almost identical to the class with the same name from part 9,
+ * the only difference is that we get a {@link Shape}
+ * in our constructor from {@link EasyScriptTruffleLanguage},
+ * as the {@link GlobalScopeObject} is now a {@link DynamicObject},
+ * and requires one when being created.
  */
 public final class EasyScriptLanguageContext {
     private static final TruffleLanguage.ContextReference<EasyScriptLanguageContext> REF =

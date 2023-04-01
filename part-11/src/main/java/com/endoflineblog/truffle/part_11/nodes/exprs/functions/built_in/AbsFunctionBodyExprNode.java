@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 /**
  * An expression Node that represents the implementation of the
  * {@code Math.abs()} JavaScript function.
- * Identical to the class with the same name from part 9.
+ * Identical to the class with the same name from part 10.
  */
 public abstract class AbsFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)

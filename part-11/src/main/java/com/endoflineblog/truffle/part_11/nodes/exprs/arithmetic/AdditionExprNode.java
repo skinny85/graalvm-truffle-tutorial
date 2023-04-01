@@ -11,7 +11,11 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The Node representing number addition.
- * Identical to the class with the same name from part 9.
+ * Similar to the class with the same name from part 9,
+ * the difference being that we need to add specializations for handling strings.
+ *
+ * @see #concatenateTruffleStrings
+ * @see #concatenateComplexAsStrings
  */
 public abstract class AdditionExprNode extends BinaryOperationExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
@@ -65,7 +69,9 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
      * In this case, always return NaN.
      */
     @Fallback
-    protected double addNonNumber(Object leftValue, Object rightValue) {
+    protected double addNonNumber(
+            @SuppressWarnings("unused") Object leftValue,
+            @SuppressWarnings("unused") Object rightValue) {
         return Double.NaN;
     }
 }

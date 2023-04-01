@@ -18,12 +18,28 @@ import com.oracle.truffle.api.strings.TruffleString;
 /**
  * The Node representing reading array indexes
  * (like {@code a[1]}).
+ * Similar to the class with the same name from part 10,
+ * the difference is we add extra specializations for handling strings -
+ * both as targets of the indexing (where we expect {@link TruffleString}s),
+ * and when strings are used as the index -
+ * in code like {@code a["b"]}, which in JavaScript is equivalent to {@code a.b}.
+ *
+ * @see #readStringPropertyOfString
+ * @see #readPropertyOfString
+ * @see #readProperty
  */
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
 public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
+    /**
+     * A specialization for reading a string property of a string,
+     * in code like {@code "a"['length']}.
+     * We delegate to {@link ReadTruffleStringPropertyExprNode},
+     * but we first convert the index to a Java string,
+     * which is what {@link ReadTruffleStringPropertyExprNode} expects.
+     */
     @Specialization(limit = "1", guards = "indexInteropLibrary.isString(index)")
-    protected Object readStringPropertyFromString(TruffleString target,
+    protected Object readStringPropertyOfString(TruffleString target,
             Object index,
             @CachedLibrary("index") InteropLibrary indexInteropLibrary,
             @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
@@ -36,12 +52,13 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     }
 
     /**
-     * The array index syntax can also be used in JavaScript to read a property of an object
-     * if the index is a string.
-     * This is a specialization for {@link TruffleString}.
+     * A specialization for reading a non-string property of a string.
+     * The main usecase for this is string indexing,
+     * in code like {@code "a"[1]}.
+     * We delegate the implementation to {@link ReadTruffleStringPropertyExprNode}.
      */
     @Specialization
-    protected Object readPropertyFromString(TruffleString target, Object index,
+    protected Object readPropertyOfString(TruffleString target, Object index,
             @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
         return readStringPropertyExprNode.executeReadTruffleStringProperty(target,
                 index);
@@ -58,8 +75,9 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     }
 
     /**
-     * The array index syntax can also be used in JavaScript to read a property of an object
-     * if the index is a string.
+     * A specialization for reading a string property of a non-string target,
+     * in code like {@code [1, 2]['length']}.
+     * The implementation is identical to {@code PropertyReadExprNode}.
      */
     @Specialization(guards = {
             "targetInteropLibrary.hasMembers(target)",

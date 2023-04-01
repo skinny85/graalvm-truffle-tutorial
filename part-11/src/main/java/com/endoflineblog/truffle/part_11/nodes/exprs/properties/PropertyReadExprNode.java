@@ -17,16 +17,24 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The Node for reading properties of objects.
- * Used to implement the {@code length} property of arrays.
- * Uses the {@link InteropLibrary#readMember} method in its implementation.
+ * Used in code like {@code t.myProp}.
+ * Similar to the class with the same name from part 10,
+ * the only difference is we add a specialization for when the target of the property read is a
+ * {@link TruffleString}, in which case we delegate to {@link ReadTruffleStringPropertyExprNode}.
+ *
+ * @see #readPropertyOfString
  */
 @NodeChild("target")
 @NodeField(name = "propertyName", type = String.class)
 public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract String getPropertyName();
 
+    /**
+     * The specialization for reading a property of a {@link TruffleString}.
+     * Simply delegates to {@link ReadTruffleStringPropertyExprNode}.
+     */
     @Specialization
-    protected Object readPropertyFromTruffleString(TruffleString target,
+    protected Object readPropertyOfString(TruffleString target,
             @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
         return readStringPropertyExprNode.executeReadTruffleStringProperty(
                 target, this.getPropertyName());

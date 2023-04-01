@@ -15,6 +15,7 @@ public final class StringLiteralExprNode extends EasyScriptExprNode {
         this.value = EasyScriptTruffleStrings.fromJavaString(value);
     }
 
+    /** Empty strings are considered "falsy" in JavaScript. */
     @Override
     public boolean executeBool(VirtualFrame frame) {
         return !this.value.isEmpty();

@@ -7,7 +7,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node representing the {@code return} statement.
- * Identical to the class with the same name from part 9.
+ * Identical to the class with the same name from part 10.
  */
 public final class ReturnStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")

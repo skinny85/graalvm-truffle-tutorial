@@ -12,13 +12,14 @@ import com.oracle.truffle.api.nodes.Node;
 
 /**
  * A helper Node that contains specialization for functions calls.
- * Used by {@link FunctionCallExprNode},
- * and by {@link FunctionObject}.
- * Identical to the class with the same name from part 8,
- * and very similar to the {@code FunctionDispatchNode} class from part 9,
- * the only difference is that we no longer check any Assumptions
- * of the {@link FunctionObject}, as those have been removed in this part
- * ({@link FunctionObject} has gone back to being immutable).
+ * Very similar to the class with the same name from part 10,
+ * the only difference is that we need to handle the {@link FunctionObject#methodTarget}
+ * field - if it's non-{@code null},
+ * we need to add it as the first argument to the method call.
+ * We do that in the {@link #extendArguments} method.
+ *
+ * @see FunctionObject#methodTarget
+ * @see #extendArguments
  */
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
@@ -66,9 +67,18 @@ public abstract class FunctionDispatchNode extends Node {
     }
 
     private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
+        // if the function object doesn't have a target
+        // (meaning, it's a function, not method, call),
+        // and we were called with at least as many arguments as the function takes,
+        // there's nothing to do
         if (arguments.length >= function.argumentCount && function.methodTarget == null) {
             return arguments;
         }
+
+        // otherwise, create a new arguments array,
+        // saving the method target as the first element if it's non-null,
+        // and filling out the remaining arguments with 'undefined's
+        // if we got called with less of them than the function expects
         Object[] ret = new Object[function.argumentCount];
         for (int i = 0; i < function.argumentCount; i++) {
             int j;

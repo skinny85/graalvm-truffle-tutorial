@@ -9,7 +9,11 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * Node class representing the strict inequality ({@code !==}) operator.
- * Identical to the class with the same name from part 9.
+ * Almost identical to the class with the same name from part 10,
+ * the only difference is that we add a specialization for comparing
+ * {@link TruffleString}s for inequality.
+ *
+ * @see #stringInequality 
  */
 public abstract class InequalityExprNode extends BinaryOperationExprNode {
     @Specialization

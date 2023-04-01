@@ -7,7 +7,7 @@ import com.oracle.truffle.api.nodes.Node;
 
 /**
  * A Node that represents an expression statement.
- * Identical to the class with the same name from part 9.
+ * Identical to the class with the same name from part 10.
  */
 public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")

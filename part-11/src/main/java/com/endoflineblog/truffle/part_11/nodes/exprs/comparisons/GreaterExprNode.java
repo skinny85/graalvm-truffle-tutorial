@@ -8,7 +8,11 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * Node class representing the greater ({@code >}) operator.
- * Identical to the class with the same name from part 9.
+ * Almost identical to the class with the same name from part 10,
+ * the only difference is that we add a specialization for comparing
+ * {@link TruffleString}s for greater.
+ *
+ * @see #stringGreater
  */
 public abstract class GreaterExprNode extends BinaryOperationExprNode {
     @Specialization

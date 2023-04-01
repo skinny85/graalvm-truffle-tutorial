@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * The Node representing array literal expressions
  * (like {@code [1, 2, 3]}).
+ * Identical to the class with the same name from part 10.
  */
 public final class ArrayLiteralExprNode extends EasyScriptExprNode {
     private final Shape arrayShape;

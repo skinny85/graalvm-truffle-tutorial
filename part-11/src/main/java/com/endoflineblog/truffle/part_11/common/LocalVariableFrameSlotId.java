@@ -4,7 +4,7 @@ import java.util.Objects;
 
 /**
  * A class that represents the full identifier of a local variable used for a frame slot.
- * Identical to the class with the same name from part 9.
+ * Identical to the class with the same name from part 10.
  */
 public final class LocalVariableFrameSlotId {
     public final String variableName;

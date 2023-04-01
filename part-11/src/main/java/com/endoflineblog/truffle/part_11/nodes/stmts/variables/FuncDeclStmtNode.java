@@ -18,11 +18,7 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
- * Similar to the class with the same name from part 9,
- * the main difference is that we now save the resulting {@link FunctionObject}
- * directly in the {@link com.endoflineblog.truffle.part_11.runtime.GlobalScopeObject}
- * (for getting a reference to which we use the {@link GlobalScopeObjectExprNode}),
- * since {@link FunctionObject} went back to being immutable in this part of the series.
+ * Identical to the class with the same name from part 10.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeField(name = "funcName", type = String.class)

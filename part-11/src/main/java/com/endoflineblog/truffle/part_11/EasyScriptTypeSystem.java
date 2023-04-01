@@ -5,7 +5,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 
 /**
  * The {@link TypeSystem} for EasyScript.
- * Identical to the class with the same name from part 9.
+ * Identical to the class with the same name from part 10.
  */
 @TypeSystem({
         boolean.class,

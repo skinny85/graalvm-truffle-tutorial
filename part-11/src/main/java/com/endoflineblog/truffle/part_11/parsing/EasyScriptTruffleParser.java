@@ -1,6 +1,5 @@
 package com.endoflineblog.truffle.part_11.parsing;
 
-import com.endoflineblog.truffle.part_11.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_11.common.DeclarationKind;
 import com.endoflineblog.truffle.part_11.common.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
@@ -70,10 +69,11 @@ import java.util.stream.Collectors;
 /**
  * This is the class that parses the program and turns it into a Truffle AST.
  * It uses ANTLR to perform the actual parsing,
- * with the grammar defined in the src/main/antlr/com/endoflineblog/truffle/part_10/parsing/antlr/EasyScript.g4 file.
- * This class is invoked by the {@link EasyScriptTruffleLanguage TruffleLanguage implementation for this part}.
+ * with the grammar defined in the {@code src/main/antlr/com/endoflineblog/truffle/part_11/parsing/antlr/EasyScript.g4} file.
+ * This class is invoked by the {@code TruffleLanguage} implementation for this part.
  *
  * @see #parse
+ * @see com.endoflineblog.truffle.part_11.EasyScriptTruffleLanguage
  */
 public final class EasyScriptTruffleParser {
     public static ParsingResult parse(Reader program, Shape arrayShape) throws IOException {

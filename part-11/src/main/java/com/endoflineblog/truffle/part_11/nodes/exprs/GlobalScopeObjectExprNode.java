@@ -13,11 +13,7 @@ import com.oracle.truffle.api.object.DynamicObject;
  * so that they can have this Node as a child,
  * and then use the {@link com.oracle.truffle.api.library.CachedLibrary}
  * annotation in their {@link Specialization} methods.
- *
- * @see com.endoflineblog.truffle.part_11.nodes.stmts.variables.GlobalVarDeclStmtNode
- * @see com.endoflineblog.truffle.part_11.nodes.stmts.variables.FuncDeclStmtNode
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.variables.GlobalVarReferenceExprNode
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.variables.GlobalVarAssignmentExprNode
+ * Identical to the class with the same name from part 10.
  */
 public abstract class GlobalScopeObjectExprNode extends EasyScriptExprNode {
     @Specialization

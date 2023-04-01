@@ -24,21 +24,18 @@ import java.util.stream.IntStream;
 
 /**
  * The {@link TruffleLanguage} implementation for this part of the article series.
- * Very similar to the class with the same name from part 9,
- * the only differences are to account for changes in the built-in {@link MathObject}
- * (we no longer have bindings like {@code Math.pow} and {@code Math.abs},
- * instead {@code Math} is a static object with two properties,
- * {@code abs} and {@code pow}, that we read from in
- * {@link com.endoflineblog.truffle.part_11.nodes.exprs.properties.PropertyReadExprNode}),
- * and caching the root shapes for the {@link ArrayObject}
- * and {@link com.endoflineblog.truffle.part_11.runtime.GlobalScopeObject}.
+ * Very similar to the class with the same name from part 10,
+ * the only difference is we create a {@link StringPrototype}
+ * object that contains the {@link CallTarget}s
+ * for the built-in methods of strings
+ * (we only support {@code charAt()} currently),
+ * and store it in the {@code stringPrototype} field of {@link EasyScriptLanguageContext}.
+ * We create the {@code charAt()} {@link CallTarget}
+ * in a very similar way to the built-in functions for {@code Math}
+ * that we've supported since part 6.
  *
- * @see MathObject
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.properties.PropertyReadExprNode
- * @see #arrayShape
- * @see #globalScopeShape
- * @see ArrayObject
- * @see com.endoflineblog.truffle.part_11.runtime.GlobalScopeObject
+ * @see com.endoflineblog.truffle.part_11.EasyScriptLanguageContext#stringPrototype
+ * @see com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.methods.CharAtMethodBodyExprNode
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {

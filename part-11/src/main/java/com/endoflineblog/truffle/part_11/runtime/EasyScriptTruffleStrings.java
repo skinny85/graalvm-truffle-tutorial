@@ -3,7 +3,11 @@ package com.endoflineblog.truffle.part_11.runtime;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.strings.TruffleString;
 
+/**
+ * A class containing static helper methods for dealing with {@link TruffleString}s in EasyScript.
+ */
 public final class EasyScriptTruffleStrings {
+    /** The string encoding used by EasyScript - UTF-16, same as JavaScript. */
     private static final TruffleString.Encoding JAVA_SCRIPT_STRING_ENCODING = TruffleString.Encoding.UTF_16;
     public static final TruffleString EMPTY = JAVA_SCRIPT_STRING_ENCODING.getEmpty();
 

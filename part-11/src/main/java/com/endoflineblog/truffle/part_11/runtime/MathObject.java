@@ -15,6 +15,7 @@ import com.oracle.truffle.api.staticobject.StaticShape;
  * {@code Math} JavaScript object.
  * Surfaces two properties, {@code abs} and {@code pow},
  * which are built-in functions that any EasyScript program can call.
+ * Identical to the class with the same name from part 10.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class MathObject implements TruffleObject {

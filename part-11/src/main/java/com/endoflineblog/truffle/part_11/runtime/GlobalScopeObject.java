@@ -14,16 +14,7 @@ import com.oracle.truffle.api.object.Shape;
 /**
  * This is the Truffle interop object that represents the global-level scope
  * that contains all global variables.
- * Similar to the class with the same name from part 9,
- * the biggest difference is that we no longer store the variables and their values in a {@link java.util.Map},
- * but instead make it a Truffle {@link DynamicObject}
- * that uses {@link DynamicObjectLibrary} to store and retrieve the variables.
- *
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.GlobalScopeObjectExprNode
- * @see com.endoflineblog.truffle.part_11.nodes.stmts.variables.GlobalVarDeclStmtNode
- * @see com.endoflineblog.truffle.part_11.nodes.stmts.variables.FuncDeclStmtNode
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.variables.GlobalVarReferenceExprNode
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.variables.GlobalVarAssignmentExprNode
+ * Identical to the class with the same name from part 10.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject extends DynamicObject {

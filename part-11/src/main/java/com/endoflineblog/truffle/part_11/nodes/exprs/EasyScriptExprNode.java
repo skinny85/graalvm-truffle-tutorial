@@ -11,7 +11,9 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The abstract common ancestor of all expression Nodes in EasyScript.
- * Identical to the class with the same name from part 9.
+ * Almost identical to the class with the same name from part 10,
+ * the only difference is that we treat empty {@link TruffleString}s
+ * as "falsy" when evaluated as a boolean.
  */
 @TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends EasyScriptNode {
