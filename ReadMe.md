@@ -64,3 +64,4 @@ $ ./gradlew build
 * [Part 8 - conditionals, loops, control flow](part-08)
 * [Part 9 - performance benchmarking](part-09)
 * [Part 10 - arrays, read-only properties](part-10)
+* [Part 11 - strings, static method calls](part-11)
