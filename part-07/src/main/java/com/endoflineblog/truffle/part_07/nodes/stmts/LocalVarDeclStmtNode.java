@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_07.nodes.stmts;
 
 import com.endoflineblog.truffle.part_07.DeclarationKind;
 import com.endoflineblog.truffle.part_07.runtime.Undefined;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
@@ -29,9 +28,6 @@ public final class LocalVarDeclStmtNode extends EasyScriptStmtNode {
                 ? Undefined.INSTANCE
                 // for 'const' and 'let', we write a "dummy" value that LocalVarReferenceExprNode treats specially
                 : DUMMY);
-        // treat this variable as if it wasn't assigned a value yet,
-        // to allow for specializations if its runtime type is 'int' or 'double'
-        frame.getFrameDescriptor().setSlotKind(this.frameSlot, FrameSlotKind.Illegal);
 
         // a definition of a local variable returns undefined,
         // same as a definition of a global variable

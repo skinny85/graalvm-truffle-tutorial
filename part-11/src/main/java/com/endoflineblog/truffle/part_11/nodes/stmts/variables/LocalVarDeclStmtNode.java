@@ -31,9 +31,6 @@ public final class LocalVarDeclStmtNode extends EasyScriptStmtNode {
                 ? Undefined.INSTANCE
                 // for 'const' and 'let', we write a "dummy" value that LocalVarReferenceExprNode treats specially
                 : DUMMY);
-        // treat this variable as if it wasn't assigned a value yet,
-        // to allow for specializations if its runtime type is 'int', 'double' or 'boolean'
-//        frame.getFrameDescriptor().setSlotKind(this.frameSlot, FrameSlotKind.Illegal);
 
         // a definition of a local variable returns undefined,
         // same as a definition of a global variable
