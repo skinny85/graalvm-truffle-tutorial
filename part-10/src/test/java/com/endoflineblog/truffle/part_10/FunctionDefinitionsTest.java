@@ -42,7 +42,7 @@ public class FunctionDefinitionsTest {
                 "f()"
         );
         assertTrue(result.isNull());
-        assertEquals(result.toString(), "undefined");
+        assertEquals("undefined", result.toString());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class FunctionDefinitionsTest {
                 "f()"
         );
         assertTrue(result.isNull());
-        assertEquals(result.toString(), "undefined");
+        assertEquals("undefined", result.toString());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class FunctionDefinitionsTest {
                 "v"
         );
         assertTrue(result.isNull());
-        assertEquals(result.toString(), "undefined");
+        assertEquals("undefined", result.toString());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class FunctionDefinitionsTest {
                 "f();"
         );
         assertTrue(result.isNull());
-        assertEquals(result.toString(), "undefined");
+        assertEquals("undefined", result.toString());
     }
 
     @Test
