@@ -10,22 +10,22 @@ import com.oracle.truffle.api.dsl.Specialization;
  */
 public abstract class InequalityExprNode extends BinaryOperationExprNode {
     @Specialization
-    protected boolean intEquality(int leftValue, int rightValue) {
+    protected boolean intInequality(int leftValue, int rightValue) {
         return leftValue != rightValue;
     }
 
-    @Specialization(replaces = "intEquality")
-    protected boolean doubleEquality(double leftValue, double rightValue) {
+    @Specialization(replaces = "intInequality")
+    protected boolean doubleInequality(double leftValue, double rightValue) {
         return leftValue != rightValue;
     }
 
     @Specialization
-    protected boolean boolEquality(boolean leftValue, boolean rightValue) {
+    protected boolean boolInequality(boolean leftValue, boolean rightValue) {
         return leftValue != rightValue;
     }
 
     @Fallback
-    protected boolean objectEquality(Object leftValue, Object rightValue) {
+    protected boolean objectInequality(Object leftValue, Object rightValue) {
         return leftValue != rightValue;
     }
 }
