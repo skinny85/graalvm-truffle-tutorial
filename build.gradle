@@ -18,6 +18,8 @@ subprojects {
     // These arguments are required because of the JVM 11's module system -
     // we grant this module access to the packages from the Truffle API JAR
     test {
+        useJUnitPlatform()
+
         jvmArgs '-ea',
                 '--add-exports',
                     'org.graalvm.truffle/com.oracle.truffle.api=ALL-UNNAMED',
@@ -41,6 +43,6 @@ subprojects {
         implementation "org.graalvm.truffle:truffle-api:$graal_version"
         annotationProcessor "org.graalvm.truffle:truffle-dsl-processor:$graal_version"
 
-        testImplementation "junit:junit:4.12"
+        testImplementation "org.junit.jupiter:junit-jupiter:5.9.3"
     }
 }

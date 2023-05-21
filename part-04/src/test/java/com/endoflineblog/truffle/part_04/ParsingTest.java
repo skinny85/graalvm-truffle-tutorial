@@ -5,10 +5,11 @@ import com.endoflineblog.truffle.part_03.EasyScriptNode;
 import com.endoflineblog.truffle.part_03.EasyScriptRootNode;
 import com.oracle.truffle.api.CallTarget;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ParsingTest {
     @Test
@@ -22,9 +23,11 @@ public class ParsingTest {
         assertEquals(10.0, result);
     }
 
-    @Test(expected = ParseCancellationException.class)
+    @Test
     public void throws_an_exception_when_the_code_cannot_be_parsed() {
-        EasyScriptTruffleParser.parse("xyz");
+        assertThrows(ParseCancellationException.class, () -> {
+            EasyScriptTruffleParser.parse("xyz");
+        });
     }
 
     @Test

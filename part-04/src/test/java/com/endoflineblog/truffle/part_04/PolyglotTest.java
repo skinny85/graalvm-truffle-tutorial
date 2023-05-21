@@ -2,21 +2,21 @@ package com.endoflineblog.truffle.part_04;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PolyglotTest {
     private Context context;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.context = Context.create();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         this.context.close();
     }

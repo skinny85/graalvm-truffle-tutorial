@@ -1,9 +1,9 @@
 package com.endoflineblog.truffle.part_01;
 
 import com.oracle.truffle.api.CallTarget;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A test illustrating that the simple addition implementation does not handle overflow correctly.
