@@ -49,6 +49,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return REF.get(node);
     }
 
+    private final Shape objectShape = Shape.newBuilder().build();
+
     /** The root {@link Shape} for {@link ArrayObject} */
     private final Shape arrayShape = Shape.newBuilder().layout(ArrayObject.class).build();
 
@@ -66,7 +68,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var context = new EasyScriptLanguageContext(this.globalScopeShape, this.createStringPrototype());
+        var context = new EasyScriptLanguageContext(this.objectShape, this.globalScopeShape,
+                this.createStringPrototype());
         var globalScopeObject = context.globalScopeObject;
 
         var objectLibrary = DynamicObjectLibrary.getUncached();

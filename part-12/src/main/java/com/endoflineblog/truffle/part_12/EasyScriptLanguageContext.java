@@ -29,6 +29,7 @@ public final class EasyScriptLanguageContext {
         return REF.get(node);
     }
 
+    public final Shape objectShape;
     public final DynamicObject globalScopeObject;
 
     /**
@@ -37,7 +38,8 @@ public final class EasyScriptLanguageContext {
      */
     public final StringPrototype stringPrototype;
 
-    public EasyScriptLanguageContext(Shape globalScopeShape, StringPrototype stringPrototype) {
+    public EasyScriptLanguageContext(Shape objectShape, Shape globalScopeShape, StringPrototype stringPrototype) {
+        this.objectShape = objectShape;
         this.globalScopeObject = new GlobalScopeObject(globalScopeShape);
         this.stringPrototype = stringPrototype;
     }

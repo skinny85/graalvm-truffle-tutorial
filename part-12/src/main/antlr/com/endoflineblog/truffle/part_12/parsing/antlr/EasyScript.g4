@@ -40,9 +40,12 @@ expr5 : literal                                            #LiteralExpr5
       | expr5 '.' ID                                       #PropertyReadExpr5
       | '[' (expr1 (',' expr1)*)? ']'                      #ArrayLiteralExpr5
       | arr=expr5 '[' index=expr1 ']'                      #ArrayIndexReadExpr5
+      | '{' (object_kv (',' object_kv)*)? '}'              #ObjectLiteralExpr5
       | expr5 '(' (expr1 (',' expr1)*)? ')'                #CallExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;
+
+object_kv : ID ':' expr1 ;
 
 literal : INT | DOUBLE | 'undefined' | bool_literal | string_literal ;
 bool_literal : 'true' | 'false' ;
