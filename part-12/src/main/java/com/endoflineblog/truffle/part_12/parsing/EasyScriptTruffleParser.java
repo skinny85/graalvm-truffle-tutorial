@@ -27,6 +27,8 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.literals.DoubleLiteralExprN
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.IntLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.StringLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.UndefinedLiteralExprNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralExprNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralKeyValueNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
@@ -457,6 +459,8 @@ public final class EasyScriptTruffleParser {
             return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
             return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
+        } else if (expr5 instanceof EasyScriptParser.ObjectLiteralExpr5Context) {
+            return parseObjectLiteralExpr((EasyScriptParser.ObjectLiteralExpr5Context) expr5);
         } else {
             return parseExpr1(((EasyScriptParser.PrecedenceOneExpr5Context) expr5).expr1());
         }
@@ -524,6 +528,17 @@ public final class EasyScriptTruffleParser {
                 callExpr.expr1().stream()
                         .map(this::parseExpr1)
                         .collect(Collectors.toList()));
+    }
+
+    private ObjectLiteralExprNode parseObjectLiteralExpr(EasyScriptParser.ObjectLiteralExpr5Context objectLiteralExpr) {
+        return new ObjectLiteralExprNode(
+                objectLiteralExpr.object_kv().stream()
+                        .map(this::parseObjectLiteralKeyValue)
+                        .collect(Collectors.toList()));
+    }
+
+    private ObjectLiteralKeyValueNode parseObjectLiteralKeyValue(EasyScriptParser.Object_kvContext objectKeyValue) {
+        return new ObjectLiteralKeyValueNode(objectKeyValue.ID().getText(), this.parseExpr1(objectKeyValue.expr1()));
     }
 
     private EasyScriptExprNode parseIntLiteral(String text) {
