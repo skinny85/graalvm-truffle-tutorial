@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ObjectsTest {
@@ -28,5 +29,24 @@ public class ObjectsTest {
         );
         assertTrue(result.hasMembers());
         assertTrue(result.hasMember("a"));
+        assertEquals(3, result.getMember("a").asInt());
+    }
+
+    @Test
+    public void benchmark_returns_correct_value() {
+        int input = 1_000_000;
+        Value result = this.context.eval("ezs", "" +
+                "function countForObject(n) { " +
+                "    let ret = 0; " +
+                "    for (let i = 0; i < n; i = i + 1) { " +
+                "        let obj = {field: i}; " +
+                "        ret = ret + obj.field; " +
+                "    } " +
+                "    return ret; " +
+                "} " +
+                "countForObject(" + input + ");"
+        );
+        assertTrue(result.fitsInDouble());
+        assertEquals(499_999_500_000D, result.asDouble());
     }
 }
