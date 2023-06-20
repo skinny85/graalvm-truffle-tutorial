@@ -33,7 +33,8 @@ public class ObjectsTest {
 
     @Test
     public void benchmark_returns_correct_value() {
-        Value result = this.context.eval("ezs","" +
+        int input = 1_000_000;
+        Value result = this.context.eval("ezs", "" +
                 "function countForObject(n) { " +
                 "    let ret = 0; " +
                 "    for (let i = 0; i < n; i = i + 1) { " +
@@ -42,9 +43,9 @@ public class ObjectsTest {
                 "    } " +
                 "    return ret; " +
                 "} " +
-                "countForObject(10000000);"
+                "countForObject(" + input + ");"
         );
         assertTrue(result.fitsInDouble());
-        assertEquals(49_999_995_000_000D, result.asDouble());
+        assertEquals(499_999_500_000D, result.asDouble());
     }
 }

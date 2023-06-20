@@ -3,7 +3,7 @@ package com.endoflineblog.truffle.part_12;
 import org.openjdk.jmh.annotations.Benchmark;
 
 public class ObjectLiteralBenchmark extends TruffleBenchmark {
-    private static final int INPUT = 10_000_000;
+    private static final int INPUT = 1_000_000;
 
     @Override
     public void setup() {
