@@ -152,7 +152,7 @@ public final class EasyScriptTruffleParser {
                     } else {
                         // this is a local variable (either of a function, or on the top-level)
                         var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
-                        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Object, frameSlotId, declarationKind);
+                        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, frameSlotId, declarationKind);
                         if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
