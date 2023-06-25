@@ -30,6 +30,7 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.literals.UndefinedLiteralEx
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralKeyValueNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyReadExprNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.exprs.strings.PostIncLocalVarExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarAssignmentExprNode;
@@ -459,6 +460,8 @@ public final class EasyScriptTruffleParser {
             return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
             return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
+        } else if (expr5 instanceof EasyScriptParser.PostIncrExpr5Context) {
+            return parsePostIncrExpr((EasyScriptParser.PostIncrExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.ObjectLiteralExpr5Context) {
             return parseObjectLiteralExpr((EasyScriptParser.ObjectLiteralExpr5Context) expr5);
         } else {
@@ -528,6 +531,21 @@ public final class EasyScriptTruffleParser {
                 callExpr.expr1().stream()
                         .map(this::parseExpr1)
                         .collect(Collectors.toList()));
+    }
+
+    private EasyScriptExprNode parsePostIncrExpr(EasyScriptParser.PostIncrExpr5Context postIncExpr) {
+        String varName = postIncExpr.ID().getText();
+        FrameMember frameMember = this.findFrameMember(varName);
+        if (frameMember == null) {
+            throw new EasyScriptException("Increment is only supported for local variables, but '" +
+                    varName + "' is global");
+        }
+        if (!(frameMember instanceof LocalVariable)) {
+            throw new EasyScriptException("Increment is only supported for local variables, but '" +
+                    varName + "' is a function argument");
+        }
+        LocalVariable localVariable = (LocalVariable) frameMember;
+        return PostIncLocalVarExprNodeGen.create(localVariable.variableIndex);
     }
 
     private ObjectLiteralExprNode parseObjectLiteralExpr(EasyScriptParser.ObjectLiteralExpr5Context objectLiteralExpr) {
