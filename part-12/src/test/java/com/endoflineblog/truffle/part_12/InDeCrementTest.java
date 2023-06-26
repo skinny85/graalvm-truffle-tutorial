@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InDeCrementTest {
     private Context context;
@@ -32,5 +33,19 @@ public class InDeCrementTest {
                 "a(); ");
 
         assertEquals(2, result.asInt());
+    }
+
+    @Test
+    void postfix_increment_works_for_local_variables_that_were_objects() {
+        Value incr = this.context.eval("ezs", "" +
+                "function incr(n) { " +
+                "    let local = n; " +
+                "    local++; " +
+                "    return local; " +
+                "} " +
+                "incr; ");
+
+        assertTrue(Double.isNaN(incr.execute().asDouble()));
+        assertEquals(2, incr.execute(1).asInt());
     }
 }
