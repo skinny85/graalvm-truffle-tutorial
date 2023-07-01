@@ -17,6 +17,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  */
 public abstract class EasyScriptOperationNode extends EasyScriptNode {
     public abstract Object executeOperation(VirtualFrame frame, Object value);
-    public abstract int executeOperationInt(VirtualFrame frame, int value);
+    public abstract int executeOperationInt(VirtualFrame frame, int value) throws ArithmeticException;
     public abstract double executeOperationDouble(VirtualFrame frame, double value);
 }

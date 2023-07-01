@@ -4,7 +4,7 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
 public abstract class IncrementOperationNode extends EasyScriptOperationNode {
-    @Specialization(rewriteOn = ArithmeticException.class)
+    @Specialization
     protected int incrementInt(int value) {
         return Math.addExact(value, 1);
     }

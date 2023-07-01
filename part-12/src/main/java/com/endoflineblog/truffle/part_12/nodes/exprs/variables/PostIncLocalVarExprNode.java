@@ -31,12 +31,16 @@ public abstract class PostIncLocalVarExprNode extends EasyScriptExprNode {
     }
 
     @Specialization(replaces = "intIncrement",
-            guards = "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Double")
+            guards = "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Int || " +
+                    "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Double")
     protected double doubleIncrement(VirtualFrame frame) {
         int frameSlot = this.getFrameSlot();
-        double prevValue = frame.getDouble(frameSlot);
+        double prevValue = frame.getFrameDescriptor().getSlotKind(frameSlot) == FrameSlotKind.Int
+                ? (double) frame.getInt(frameSlot)
+                : frame.getDouble(frameSlot);
         double newValue = this.operation.executeOperationDouble(frame, prevValue);
-        frame.setDouble(frameSlot, newValue); // we know the kind of the slot is Double
+        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Double);
+        frame.setDouble(frameSlot, newValue);
         return prevValue;
     }
 
@@ -45,6 +49,7 @@ public abstract class PostIncLocalVarExprNode extends EasyScriptExprNode {
         int frameSlot = this.getFrameSlot();
         Object prevValue = frame.getObject(frameSlot);
         Object newValue = this.operation.executeOperation(frame, prevValue);
+        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Object); // it can be bool
         frame.setObject(frameSlot, newValue);
         return prevValue;
     }
