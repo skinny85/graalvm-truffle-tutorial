@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_11.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
@@ -102,16 +103,8 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
         return new FunctionObject(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString);
     }
 
-    /**
-     * Accessing any other string property should return 'undefined'.
-     * Note that we can't use {@code @Fallback} here,
-     * as that requires all arguments to be {@link Object}s,
-     * but {@link #executeReadTruffleStringProperty}
-     * is defined with {@link TruffleString} as the first argument,
-     * and specializations can't have more generic arguments types than the
-     * {@code execute*()} method they implement.
-     */
-    @Specialization
+    /** Accessing any other string property should return 'undefined'. */
+    @Fallback
     protected Undefined readUnknownProperty(
             @SuppressWarnings("unused") TruffleString truffleString,
             @SuppressWarnings("unused") Object property) {

@@ -267,6 +267,35 @@ public class StringsTest {
     }
 
     @Test
+    void string_properties_work_after_reading_non_existing_property() {
+        Value add = this.context.eval("ezs", "" +
+                "function readProp(str, prop) { " +
+                "    return str[prop]; " +
+                "} " +
+                "let v1 = readProp('', 'does not exist'); " +
+                "let v2 = readProp('', 'length');");
+
+        Value ezsBindings = this.context.getBindings("ezs");
+        Value v1 = ezsBindings.getMember("v1");
+        Value v2 = ezsBindings.getMember("v2");
+        assertTrue(v1.isNull());
+        assertEquals(0, v2.asInt());
+    }
+
+    @Test
+    void chatAt_works_after_passing_it_undefined() {
+        Value charAtStr = this.context.eval("ezs", "" +
+                "function charAtStr(index) { " +
+                "    return 'str'.charAt(index); " +
+                "} " +
+                "charAtStr; ");
+
+        assertEquals("s", charAtStr.execute().asString());
+        assertEquals("t", charAtStr.execute(1).asString());
+        assertEquals("r", charAtStr.execute(2).asString());
+    }
+
+    @Test
     public void Math_props_can_be_accessed_through_indexing() {
         Value result = this.context.eval("ezs",
                 "Math['abs'](-4)"

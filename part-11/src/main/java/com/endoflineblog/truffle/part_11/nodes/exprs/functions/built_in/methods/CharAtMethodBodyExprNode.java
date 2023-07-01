@@ -4,6 +4,7 @@ import com.endoflineblog.truffle.part_11.nodes.exprs.functions.built_in.BuiltInF
 import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Cached.Shared;
+import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
 
@@ -39,11 +40,14 @@ public abstract class CharAtMethodBodyExprNode extends BuiltInFunctionBodyExprNo
      * or with one that is not an integer.
      * In that case, behave as if it was called with {@code 0}.
      */
-    @Specialization
-    protected TruffleString charAtNonInt(TruffleString self,
+    @Fallback
+    protected TruffleString charAtNonInt(Object self,
             @SuppressWarnings("unused") Object nonIntIndex,
             @Cached @Shared("lengthNode") TruffleString.CodePointLengthNode lengthNode,
             @Cached @Shared("substringNode") TruffleString.SubstringNode substringNode) {
-        return this.charAtInt(self, 0, lengthNode, substringNode);
+        // we know that 'self' is for sure a TruffleString
+        // because of how reading string properties works in ReadTruffleStringPropertyExprNode,
+        // but we need to declare it as Object here because of @Fallback
+        return this.charAtInt((TruffleString) self, 0, lengthNode, substringNode);
     }
 }
