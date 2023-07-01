@@ -1,10 +1,8 @@
 package com.endoflineblog.truffle.part_12.nodes.exprs;
 
-import com.endoflineblog.truffle.part_12.EasyScriptTypeSystem;
 import com.endoflineblog.truffle.part_12.EasyScriptTypeSystemGen;
 import com.endoflineblog.truffle.part_12.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_12.runtime.Undefined;
-import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.strings.TruffleString;
@@ -15,7 +13,6 @@ import com.oracle.truffle.api.strings.TruffleString;
  * the only difference is that we treat empty {@link TruffleString}s
  * as "falsy" when evaluated as a boolean.
  */
-@TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends EasyScriptNode {
     public abstract Object executeGeneric(VirtualFrame frame);
 
