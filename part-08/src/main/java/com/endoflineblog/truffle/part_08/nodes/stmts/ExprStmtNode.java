@@ -40,7 +40,7 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
     @Override
     public Object executeStatement(VirtualFrame frame) {
         Object exprResult = this.expr.executeGeneric(frame);
-        // if this statement was created because of hoisting a variable declaration,
+        // if this statement was created because of transforming a local variable declaration into an assignment,
         // return 'undefined', to be consistent with how other declarations work
         return this.discardExpressionValue ? Undefined.INSTANCE : exprResult;
     }

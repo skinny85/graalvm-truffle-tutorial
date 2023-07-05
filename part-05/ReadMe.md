@@ -128,21 +128,17 @@ to add a specialization handling it;
 in accordance with JavaScript semantics,
 we return `Double.NaN` if any side of addition is `undefined`.
 
-Finally, we have the `RootNode`.
-It takes in a list of statements,
+Finally, we have [our `RootNode`](src/main/java/com/endoflineblog/truffle/part_05/nodes/EasyScriptRootNode.java).
+It's very simple: it takes in a list of statements,
 and in its `execute()` method evaluates them all,
 and returns the value of the last one.
-The one interesting part of our
-[`EasyScriptRootNode` class](src/main/java/com/endoflineblog/truffle/part_05/nodes/EasyScriptRootNode.java)
-is that it implements
-[JavaScript variable hoisting](https://developer.mozilla.org/en-US/docs/Glossary/Hoisting),
-by replacing each `var` declaration with a combination of new a variable initialized with `undefined`,
-and then an assignment expression.
-For that assignment expression, we have to make sure to return `undefined` as a result of evaluating it,
-to be consistent with `let` and `const` declarations,
-so we pass `false` as the second argument of the `ExprStmtNode` constructor,
-which makes it ignore the value of the expression,
-and always return `Undefined.INSTANCE`.
+Since it has a variable amount of children,
+we need to use the [`@Children` annotation](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/nodes/Node.Children.html)
+instead of `@Child`,
+and Truffle actually requires using a Java array as the type of the field,
+instead of a collection like `List` or `Set`.
+Since arrays are itself mutable, you can also mark the entire field as `final`,
+which you can't do for `@Child` fields.
 
 ---
 

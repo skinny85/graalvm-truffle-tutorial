@@ -2,11 +2,14 @@ package com.endoflineblog.truffle.part_09.nodes.stmts.variables;
 
 import com.endoflineblog.truffle.part_09.common.DeclarationKind;
 import com.endoflineblog.truffle.part_09.exceptions.EasyScriptException;
+import com.endoflineblog.truffle.part_09.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_09.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_09.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
-import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.NodeField;
+import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * A Node that represents the declaration of a global
@@ -18,30 +21,29 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * (which happens when you {@link org.graalvm.polyglot.Context#eval} the same program multiple times,
  * to save on the cost of parsing).
  */
-public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
-    private final String variableId;
-    private final DeclarationKind declarationKind;
+@NodeChild(value = "initializerExpr", type = EasyScriptExprNode.class)
+@NodeField(name = "name", type = String.class)
+@NodeField(name = "declarationKind", type = DeclarationKind.class)
+public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
+    protected abstract String getName();
+    protected abstract DeclarationKind getDeclarationKind();
 
     @CompilationFinal
-    private boolean checkVariableExists;
+    private boolean checkVariableExists = true;
 
-    public GlobalVarDeclStmtNode(String variableId, DeclarationKind declarationKind) {
-        this.variableId = variableId;
-        this.declarationKind = declarationKind;
-        this.checkVariableExists = true;
-    }
-
-    @Override
-    public Object executeStatement(VirtualFrame frame) {
+    @Specialization
+    protected Object createVariable(Object value) {
+        String variableId = this.getName();
         var context = this.currentLanguageContext();
-        boolean variableAlreadyExists = !context.globalScopeObject.newVariable(this.variableId, this.declarationKind);
+        boolean isConst = this.getDeclarationKind() == DeclarationKind.CONST;
+        boolean variableAlreadyExists = !context.globalScopeObject.newVariable(variableId, value, isConst);
 
         if (this.checkVariableExists) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             this.checkVariableExists = false;
 
             if (variableAlreadyExists) {
-                throw new EasyScriptException(this, "Identifier '" + this.variableId + "' has already been declared");
+                throw new EasyScriptException(this, "Identifier '" + variableId + "' has already been declared");
             }
         }
 

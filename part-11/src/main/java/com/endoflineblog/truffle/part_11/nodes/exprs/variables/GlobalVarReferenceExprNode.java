@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.variables;
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.GlobalScopeObjectExprNode;
-import com.endoflineblog.truffle.part_11.nodes.stmts.variables.GlobalVarDeclStmtNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -27,8 +26,6 @@ public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
         var value = objectLibrary.getOrDefault(globalScopeObject, variableId, null);
         if (value == null) {
             throw new EasyScriptException(this, "'" + variableId + "' is not defined");
-        } else if (value == GlobalVarDeclStmtNode.DUMMY) {
-            throw new EasyScriptException("Cannot access '" + variableId + "' before initialization");
         } else {
             return value;
         }

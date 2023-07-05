@@ -113,7 +113,7 @@ that is used for the body of a user-defined function.
 
 ## Loops
 
-Loops are implemented using a dedicated Truffle helper `LoopNode`.
+Loops are implemented using a dedicated Truffle helper, `LoopNode`.
 With it, we simply implement a different interface, `RepeatingNode`,
 and its `executeRepeating()` method.
 In that method, we execute the body of the loop, once,

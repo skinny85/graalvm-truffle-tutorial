@@ -56,16 +56,21 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
-    public void cycle_between_var_and_function_works() {
-        Value result = this.context.eval("ezs",
+    public void cycle_between_var_and_function_does_not_work() {
+        try {
+            this.context.eval("ezs",
                 "var v = f();" +
                 "function f() {" +
                     "return v;" +
                 "}" +
                 "v"
-        );
-        assertTrue(result.isNull());
-        assertEquals("undefined", result.toString());
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'v' is not defined", e.getMessage());
+        }
     }
 
     @Test
@@ -81,7 +86,7 @@ public class FunctionDefinitionsTest {
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
-            assertEquals("Cannot access 'v' before initialization", e.getMessage());
+            assertEquals("'v' is not defined", e.getMessage());
         }
     }
 
@@ -169,7 +174,7 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
-    public void local_variables_get_hoisted() {
+    public void local_variables_shadow_globals_only_from_their_declaration() {
         Value result = this.context.eval("ezs",
                 "const b = 5; " +
                 "function f() { " +
@@ -179,8 +184,7 @@ public class FunctionDefinitionsTest {
                 "} " +
                 "f();"
         );
-        assertTrue(result.isNull());
-        assertEquals("undefined", result.toString());
+        assertEquals(5, result.asInt());
     }
 
     @Test
@@ -213,7 +217,7 @@ public class FunctionDefinitionsTest {
     }
 
     @Test
-    public void cannot_use_a_let_variable_before_initialization() {
+    public void cannot_use_a_let_local_variable_before_its_declaration() {
         try {
             this.context.eval("ezs",
                     "function f() { " +
@@ -226,7 +230,7 @@ public class FunctionDefinitionsTest {
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
-            assertEquals("Cannot access 'b' before initialization", e.getMessage());
+            assertEquals("'b' is not defined", e.getMessage());
         }
     }
 

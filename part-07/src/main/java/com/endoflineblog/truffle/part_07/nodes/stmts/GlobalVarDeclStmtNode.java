@@ -2,33 +2,30 @@ package com.endoflineblog.truffle.part_07.nodes.stmts;
 
 import com.endoflineblog.truffle.part_07.DeclarationKind;
 import com.endoflineblog.truffle.part_07.EasyScriptException;
+import com.endoflineblog.truffle.part_07.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_07.runtime.Undefined;
-import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.NodeField;
+import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * A Node that represents the declaration of a global
  * (as opposed to local to a function) variable or constant in EasyScript.
- * Very similar to the class with the same name from part 6,
- * the only difference is that we no longer have the variable's initializer as a child expression;
- * instead, the initializer is executed in a separate
- * {@link com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNode}
- * (this is because user-defined functions, which we start supporting in this part,
- * can now potentially access a global variable before its initializer had a chance to run,
- * and we need to detect that error).
+ * Identical to the class with the same name from part 6.
  */
-public final class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
-    private final String variableId;
-    private final DeclarationKind declarationKind;
+@NodeChild(value = "initializerExpr", type = EasyScriptExprNode.class)
+@NodeField(name = "name", type = String.class)
+@NodeField(name = "declarationKind", type = DeclarationKind.class)
+public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
+    protected abstract String getName();
+    protected abstract DeclarationKind getDeclarationKind();
 
-    public GlobalVarDeclStmtNode(String variableId, DeclarationKind declarationKind) {
-        this.variableId = variableId;
-        this.declarationKind = declarationKind;
-    }
-
-    @Override
-    public Object executeStatement(VirtualFrame frame) {
-        if (!this.currentLanguageContext().globalScopeObject.newVariable(this.variableId, this.declarationKind)) {
-            throw new EasyScriptException(this, "Identifier '" + this.variableId + "' has already been declared");
+    @Specialization
+    protected Object createVariable(Object value) {
+        String variableId = this.getName();
+        boolean isConst = this.getDeclarationKind() == DeclarationKind.CONST;
+        if (!this.currentLanguageContext().globalScopeObject.newVariable(variableId, value, isConst)) {
+            throw new EasyScriptException(this, "Identifier '" + variableId + "' has already been declared");
         }
         // we return 'undefined' for statements that declare variables
         return Undefined.INSTANCE;

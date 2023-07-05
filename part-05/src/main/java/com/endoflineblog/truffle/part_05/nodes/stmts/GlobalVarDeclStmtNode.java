@@ -17,14 +17,8 @@ import com.oracle.truffle.api.dsl.Specialization;
 @NodeField(name = "name", type = String.class)
 @NodeField(name = "declarationKind", type = DeclarationKind.class)
 public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
-    /*
-     * We use these getters in EasyScriptRootNode,
-     * that's why they're public.
-     */
-
-    public abstract EasyScriptExprNode getInitializerExpr();
-    public abstract String getName();
-    public abstract DeclarationKind getDeclarationKind();
+    protected abstract String getName();
+    protected abstract DeclarationKind getDeclarationKind();
 
     @Specialization
     protected Object createVariable(Object value) {

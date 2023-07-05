@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.variables;
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.GlobalScopeObjectExprNode;
-import com.endoflineblog.truffle.part_11.nodes.stmts.variables.GlobalVarDeclStmtNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -31,12 +30,7 @@ public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
             throw new EasyScriptException(this, "'" + variableId + "' is not defined");
         }
         if (property.getFlags() == 1) {
-            // this is a constant
-            Object existingValue = property.get(globalScopeObject, true);
-            if (existingValue != GlobalVarDeclStmtNode.DUMMY) {
-                // the first assignment to a constant is fine
-                throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
-            }
+            throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
         }
         objectLibrary.put(globalScopeObject, variableId, value);
         return value;

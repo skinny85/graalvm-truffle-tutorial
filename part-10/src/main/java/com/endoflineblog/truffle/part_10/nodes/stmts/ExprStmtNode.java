@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_10.nodes.stmts;
 import com.endoflineblog.truffle.part_10.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.Node;
 
 /**
  * A Node that represents an expression statement.
@@ -11,7 +10,7 @@ import com.oracle.truffle.api.nodes.Node;
  */
 public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
-    @Node.Child
+    @Child
     private EasyScriptExprNode expr;
     private final boolean discardExpressionValue;
 
@@ -41,7 +40,7 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
     @Override
     public Object executeStatement(VirtualFrame frame) {
         Object exprResult = this.expr.executeGeneric(frame);
-        // if this statement was created because of hoisting a variable declaration,
+        // if this statement was created because of transforming a local variable declaration into an assignment,
         // return 'undefined', to be consistent with how other declarations work
         return this.discardExpressionValue ? Undefined.INSTANCE : exprResult;
     }

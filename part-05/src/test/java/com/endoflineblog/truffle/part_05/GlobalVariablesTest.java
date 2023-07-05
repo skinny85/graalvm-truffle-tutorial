@@ -92,26 +92,19 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void var_declarations_are_hoisted_to_the_top() {
-        Value result = this.context.eval("ezs",
+    public void using_a_variable_before_it_is_defined_causes_an_error() {
+        try {
+            this.context.eval("ezs",
                 "let b = a; " +
                 "var a = 3; " +
                 "b"
-        );
-
-        assertTrue(result.isNull());
-        assertEquals("undefined", result.toString());
-    }
-
-    @Test
-    public void hoisted_statement_still_returns_undefined() {
-        Value result = this.context.eval("ezs",
-                "let a = 1; " +
-                "var b = 2"
-        );
-
-        assertTrue(result.isNull());
-        assertEquals("undefined", result.toString());
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'a' is not defined", e.getMessage());
+        }
     }
 
     @Test

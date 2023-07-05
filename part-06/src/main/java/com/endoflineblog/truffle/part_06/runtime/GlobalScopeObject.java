@@ -40,7 +40,7 @@ public final class GlobalScopeObject implements TruffleObject {
     }
 
     public boolean newVariable(String name, Object value, boolean isConst) {
-        Object existingValue = this.variables.putIfAbsent(name, value);
+        Object existingValue = this.variables.put(name, value);
         if (isConst) {
             this.constants.add(name);
         }

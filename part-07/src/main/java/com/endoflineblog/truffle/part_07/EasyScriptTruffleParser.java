@@ -7,6 +7,7 @@ import com.endoflineblog.truffle.part_07.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.IntLiteralExprNode;
+import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.LocalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_07.nodes.exprs.NegationExprNode;
@@ -19,8 +20,7 @@ import com.endoflineblog.truffle.part_07.nodes.stmts.BlockStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_07.nodes.stmts.FuncDeclStmtNode;
-import com.endoflineblog.truffle.part_07.nodes.stmts.GlobalVarDeclStmtNode;
-import com.endoflineblog.truffle.part_07.nodes.stmts.LocalVarDeclStmtNode;
+import com.endoflineblog.truffle.part_07.nodes.stmts.GlobalVarDeclStmtNodeGen;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -91,47 +91,24 @@ public final class EasyScriptTruffleParser {
     }
 
     private List<EasyScriptStmtNode> parseStmtsList(List<EasyScriptParser.StmtContext> stmts) {
-        // implement hoisting of declarations
-        // see: https://developer.mozilla.org/en-US/docs/Glossary/Hoisting
-
-        // in the first pass, only handle declarations
+        // in the first pass, only handle function declarations,
+        // as it's legal to invoke functions before they are declared
         var funcDecls = new ArrayList<FuncDeclStmtNode>();
-        var varDecls = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.FuncDeclStmtContext) {
                 funcDecls.add(this.parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
-            } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
-                EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
-                List<EasyScriptParser.BindingContext> varDeclBindings = varDeclStmt.binding();
-                DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
-                for (EasyScriptParser.BindingContext varBinding : varDeclBindings) {
-                    String variableId = varBinding.ID().getText();
-                    if (this.frameDescriptor == null) {
-                        // this is a global variable
-                        varDecls.add(new GlobalVarDeclStmtNode(variableId, declarationKind));
-                    } else {
-                        // this is a function-local variable
-                        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, variableId, declarationKind);
-                        if (this.functionLocals.putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
-                            throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
-                        }
-                        varDecls.add(new LocalVarDeclStmtNode(frameSlot));
-                    }
-                }
             }
         }
 
-        // in the second pass, only handle expression statements
-        // (and add new expression statements that represent the initializer of the variable declarations)
-        var exprStmts = new ArrayList<ExprStmtNode>();
+        // in the second pass, handle the remaining statements that are not function declarations
+        var nonFuncDeclStmts = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.ExprStmtContext) {
-                exprStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
+                nonFuncDeclStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
-                // we turn the variable declaration into an assignment expression
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
-                List<EasyScriptParser.BindingContext> varDeclBindings = varDeclStmt.binding();
                 DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
+                List<EasyScriptParser.BindingContext> varDeclBindings = varDeclStmt.binding();
                 for (EasyScriptParser.BindingContext varBinding : varDeclBindings) {
                     String variableId = varBinding.ID().getText();
                     var bindingExpr = varBinding.expr1();
@@ -146,23 +123,28 @@ public final class EasyScriptTruffleParser {
                     } else {
                         initializerExpr = this.parseExpr1(bindingExpr);
                     }
-                    EasyScriptExprNode assignmentExpr = this.frameDescriptor == null
-                            ? GlobalVarAssignmentExprNodeGen.create(initializerExpr, variableId)
-                            :  LocalVarAssignmentExprNodeGen.create(initializerExpr,
-                                    ((LocalVariable) this.functionLocals.get(variableId)).variableIndex);
-                    exprStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
+
+                    if (this.frameDescriptor == null) {
+                        // this is a global variable
+                        nonFuncDeclStmts.add(GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, declarationKind));
+                    } else {
+                        // this is a function-local variable,
+                        // which we turn into an assignment expression
+                        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, variableId, declarationKind);
+                        if (this.functionLocals.putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
+                            throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
+                        }
+                        LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(initializerExpr, frameSlot);
+                        nonFuncDeclStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
+                    }
                 }
             }
         }
 
-        // the final result is: the function declarations first,
-        // then the variable declarations (initialized with default values),
-        // and then finally the expression statements
-        // (including the variable initializers turned into assignment expressions)
-        var result = new ArrayList<EasyScriptStmtNode>(funcDecls.size() + varDecls.size() + exprStmts.size());
+        // return the function declarations first, and then the remaining statements
+        var result = new ArrayList<EasyScriptStmtNode>(funcDecls.size() + nonFuncDeclStmts.size());
         result.addAll(funcDecls);
-        result.addAll(varDecls);
-        result.addAll(exprStmts);
+        result.addAll(nonFuncDeclStmts);
         return result;
     }
 
