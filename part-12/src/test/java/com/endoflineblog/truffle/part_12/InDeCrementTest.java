@@ -80,4 +80,17 @@ public class InDeCrementTest {
             assertEquals("Assignment to constant variable 'local'", e.getMessage());
         }
     }
+
+    @Test
+    void postfix_decrement_works_for_local_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "function a() { " +
+                "    let local = 3; " +
+                "    local--; " +
+                "    return local; " +
+                "} " +
+                "a(); ");
+
+        assertEquals(2, result.asInt());
+    }
 }

@@ -35,7 +35,10 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarReferenc
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarReferenceExprNodeGen;
-import com.endoflineblog.truffle.part_12.nodes.exprs.variables.PostIncLocalVarExprNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.exprs.variables.PostfixUnaryNumberOperationLocalVarExprNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.ops.DecrementUnaryNumberOperationNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptUnaryNumberOperationNode;
+import com.endoflineblog.truffle.part_12.nodes.ops.IncrementUnaryNumberOperationNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.blocks.BlockStmtNode;
@@ -461,7 +464,9 @@ public final class EasyScriptTruffleParser {
         } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
             return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.PostIncrExpr5Context) {
-            return parsePostIncrExpr((EasyScriptParser.PostIncrExpr5Context) expr5);
+            return this.parseUnaryNrOpExpr(((EasyScriptParser.PostIncrExpr5Context) expr5).ID().getText(), UnaryNrOp.INCR);
+        } else if (expr5 instanceof EasyScriptParser.PostDecrExpr5Context) {
+            return this.parseUnaryNrOpExpr(((EasyScriptParser.PostDecrExpr5Context) expr5).ID().getText(), UnaryNrOp.DECR);
         } else if (expr5 instanceof EasyScriptParser.ObjectLiteralExpr5Context) {
             return parseObjectLiteralExpr((EasyScriptParser.ObjectLiteralExpr5Context) expr5);
         } else {
@@ -533,8 +538,9 @@ public final class EasyScriptTruffleParser {
                         .collect(Collectors.toList()));
     }
 
-    private EasyScriptExprNode parsePostIncrExpr(EasyScriptParser.PostIncrExpr5Context postIncExpr) {
-        String variableId = postIncExpr.ID().getText();
+    private enum UnaryNrOp { INCR, DECR }
+
+    private EasyScriptExprNode parseUnaryNrOpExpr(String variableId, UnaryNrOp unaryNrOp) {
         FrameMember frameMember = this.findFrameMember(variableId);
         if (frameMember == null) {
             throw new EasyScriptException("Increment is only supported for local variables, but '" +
@@ -548,7 +554,10 @@ public final class EasyScriptTruffleParser {
         if (localVariable.declarationKind == DeclarationKind.CONST) {
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
         }
-        return PostIncLocalVarExprNodeGen.create(localVariable.variableIndex);
+        EasyScriptUnaryNumberOperationNode operation = unaryNrOp == UnaryNrOp.INCR
+            ? IncrementUnaryNumberOperationNodeGen.create()
+            : DecrementUnaryNumberOperationNodeGen.create();
+        return PostfixUnaryNumberOperationLocalVarExprNodeGen.create(operation, localVariable.variableIndex);
     }
 
     private ObjectLiteralExprNode parseObjectLiteralExpr(EasyScriptParser.ObjectLiteralExpr5Context objectLiteralExpr) {

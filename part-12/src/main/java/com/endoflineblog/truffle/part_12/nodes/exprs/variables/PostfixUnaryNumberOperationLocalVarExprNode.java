@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_12.nodes.exprs.variables;
 
 import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptUnaryNumberOperationNode;
-import com.endoflineblog.truffle.part_12.nodes.ops.IncrementUnaryNumberOperationNodeGen;
 import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -11,11 +10,13 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 @NodeField(name = "frameSlot", type = int.class)
 @ImportStatic(FrameSlotKind.class)
-public abstract class PostIncLocalVarExprNode extends EasyScriptExprNode {
-    private final EasyScriptUnaryNumberOperationNode operation;
+public abstract class PostfixUnaryNumberOperationLocalVarExprNode extends EasyScriptExprNode {
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    private EasyScriptUnaryNumberOperationNode operation;
 
-    protected PostIncLocalVarExprNode() {
-        this.operation = IncrementUnaryNumberOperationNodeGen.create();
+    protected PostfixUnaryNumberOperationLocalVarExprNode(EasyScriptUnaryNumberOperationNode operation) {
+        this.operation = operation;
     }
 
     protected abstract int getFrameSlot();
