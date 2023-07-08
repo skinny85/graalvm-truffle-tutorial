@@ -534,17 +534,20 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parsePostIncrExpr(EasyScriptParser.PostIncrExpr5Context postIncExpr) {
-        String varName = postIncExpr.ID().getText();
-        FrameMember frameMember = this.findFrameMember(varName);
+        String variableId = postIncExpr.ID().getText();
+        FrameMember frameMember = this.findFrameMember(variableId);
         if (frameMember == null) {
             throw new EasyScriptException("Increment is only supported for local variables, but '" +
-                    varName + "' is global");
+                    variableId + "' is global");
         }
         if (!(frameMember instanceof LocalVariable)) {
             throw new EasyScriptException("Increment is only supported for local variables, but '" +
-                    varName + "' is a function argument");
+                    variableId + "' is a function argument");
         }
         LocalVariable localVariable = (LocalVariable) frameMember;
+        if (localVariable.declarationKind == DeclarationKind.CONST) {
+            throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
+        }
         return PostIncLocalVarExprNodeGen.create(localVariable.variableIndex);
     }
 

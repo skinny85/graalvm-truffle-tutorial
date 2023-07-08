@@ -1,12 +1,14 @@
 package com.endoflineblog.truffle.part_12;
 
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InDeCrementTest {
@@ -60,5 +62,22 @@ public class InDeCrementTest {
                 "overflow(); ");
 
         assertEquals(Integer.MAX_VALUE + 1D, result.asDouble());
+    }
+
+    @Test
+    void postfix_increment_fails_for_const_local_variable() {
+        try {
+            this.context.eval("ezs", "" +
+                    "function const_incr(n) { " +
+                    "    const local = n; " +
+                    "    local++; " +
+                    "    return local; " +
+                    "} " +
+                    "const_incr(3); ");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Assignment to constant variable 'local'", e.getMessage());
+        }
     }
 }
