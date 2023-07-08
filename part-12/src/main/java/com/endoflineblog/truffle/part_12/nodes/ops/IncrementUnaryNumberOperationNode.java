@@ -3,7 +3,7 @@ package com.endoflineblog.truffle.part_12.nodes.ops;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
-public abstract class IncrementOperationNode extends EasyScriptOperationNode {
+public abstract class IncrementUnaryNumberOperationNode extends EasyScriptUnaryNumberOperationNode {
     @Specialization
     protected int incrementInt(int value) {
         return Math.addExact(value, 1);
