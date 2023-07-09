@@ -467,6 +467,9 @@ public final class EasyScriptTruffleParser {
         } else if (expr5 instanceof EasyScriptParser.PreIncrExpr5Context) {
             return this.parseUnaryNrOpExpr(((EasyScriptParser.PreIncrExpr5Context) expr5).ID().getText(),
                     Affix.PREFIX, UnaryNrOp.INCR);
+        } else if (expr5 instanceof EasyScriptParser.PreDecrExpr5Context) {
+            return this.parseUnaryNrOpExpr(((EasyScriptParser.PreDecrExpr5Context) expr5).ID().getText(),
+                    Affix.PREFIX, UnaryNrOp.DECR);
         } else if (expr5 instanceof EasyScriptParser.PostIncrExpr5Context) {
             return this.parseUnaryNrOpExpr(((EasyScriptParser.PostIncrExpr5Context) expr5).ID().getText(),
                     Affix.POSTFIX, UnaryNrOp.INCR);

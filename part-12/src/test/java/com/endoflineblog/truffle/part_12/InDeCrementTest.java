@@ -50,6 +50,31 @@ public class InDeCrementTest {
     }
 
     @Test
+    void prefix_decrement_works_for_local_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "function a() { " +
+                "    let local = 3; " +
+                "    --local; " +
+                "    return local; " +
+                "} " +
+                "a(); ");
+
+        assertEquals(2, result.asInt());
+    }
+
+    @Test
+    void prefix_decrement_returns_the_new_value() {
+        Value result = this.context.eval("ezs", "" +
+                "function a() { " +
+                "    let local = 3; " +
+                "    return --local; " +
+                "} " +
+                "a(); ");
+
+        assertEquals(2, result.asInt());
+    }
+
+    @Test
     void postfix_increment_works_for_local_variables() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
