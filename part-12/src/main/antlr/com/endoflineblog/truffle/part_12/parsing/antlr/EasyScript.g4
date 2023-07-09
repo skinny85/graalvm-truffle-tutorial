@@ -37,10 +37,10 @@ expr4 : left=expr4 o=('+' | '-') right=expr5               #AddSubtractExpr4
       ;
 expr5 : literal                                            #LiteralExpr5
       | ID                                                 #ReferenceExpr5
-      | '++' ID                                            #PreIncrExpr5
-      | '--' ID                                            #PreDecrExpr5
-      | ID '++'                                            #PostIncrExpr5
-      | ID '--'                                            #PostDecrExpr5
+      | '++' lvalue                                        #PreIncrExpr5
+      | '--' lvalue                                        #PreDecrExpr5
+      | lvalue '++'                                        #PostIncrExpr5
+      | lvalue '--'                                        #PostDecrExpr5
       | expr5 '.' ID                                       #PropertyReadExpr5
       | '[' (expr1 (',' expr1)*)? ']'                      #ArrayLiteralExpr5
       | arr=expr5 '[' index=expr1 ']'                      #ArrayIndexReadExpr5
@@ -48,6 +48,9 @@ expr5 : literal                                            #LiteralExpr5
       | expr5 '(' (expr1 (',' expr1)*)? ')'                #CallExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;
+
+lvalue : ID                                           #IdLValue
+       ;
 
 object_kv : ID ':' expr1 ;
 

@@ -465,16 +465,16 @@ public final class EasyScriptTruffleParser {
         } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
             return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.PreIncrExpr5Context) {
-            return this.parseUnaryNrOpExpr(((EasyScriptParser.PreIncrExpr5Context) expr5).ID().getText(),
+            return this.parseUnaryNrOpExpr(((EasyScriptParser.PreIncrExpr5Context) expr5).lvalue(),
                     Affix.PREFIX, UnaryNrOp.INCR);
         } else if (expr5 instanceof EasyScriptParser.PreDecrExpr5Context) {
-            return this.parseUnaryNrOpExpr(((EasyScriptParser.PreDecrExpr5Context) expr5).ID().getText(),
+            return this.parseUnaryNrOpExpr(((EasyScriptParser.PreDecrExpr5Context) expr5).lvalue(),
                     Affix.PREFIX, UnaryNrOp.DECR);
         } else if (expr5 instanceof EasyScriptParser.PostIncrExpr5Context) {
-            return this.parseUnaryNrOpExpr(((EasyScriptParser.PostIncrExpr5Context) expr5).ID().getText(),
+            return this.parseUnaryNrOpExpr(((EasyScriptParser.PostIncrExpr5Context) expr5).lvalue(),
                     Affix.POSTFIX, UnaryNrOp.INCR);
         } else if (expr5 instanceof EasyScriptParser.PostDecrExpr5Context) {
-            return this.parseUnaryNrOpExpr(((EasyScriptParser.PostDecrExpr5Context) expr5).ID().getText(),
+            return this.parseUnaryNrOpExpr(((EasyScriptParser.PostDecrExpr5Context) expr5).lvalue(),
                     Affix.POSTFIX, UnaryNrOp.DECR);
         } else if (expr5 instanceof EasyScriptParser.ObjectLiteralExpr5Context) {
             return parseObjectLiteralExpr((EasyScriptParser.ObjectLiteralExpr5Context) expr5);
@@ -549,7 +549,11 @@ public final class EasyScriptTruffleParser {
 
     private enum UnaryNrOp { INCR, DECR }
 
-    private EasyScriptExprNode parseUnaryNrOpExpr(String variableId, Affix affix, UnaryNrOp unaryNrOp) {
+    private EasyScriptExprNode parseUnaryNrOpExpr(EasyScriptParser.LvalueContext lvalue, Affix affix, UnaryNrOp unaryNrOp) {
+        return this.parseIdUnaryNrOpExpr(((EasyScriptParser.IdLValueContext) lvalue).ID().getText(), affix, unaryNrOp);
+    }
+
+    private EasyScriptExprNode parseIdUnaryNrOpExpr(String variableId, Affix affix, UnaryNrOp unaryNrOp) {
         FrameMember frameMember = this.findFrameMember(variableId);
         if (frameMember == null) {
             throw new EasyScriptException("Increment is only supported for local variables, but '" +
