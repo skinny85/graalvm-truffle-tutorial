@@ -37,6 +37,7 @@ expr4 : left=expr4 o=('+' | '-') right=expr5               #AddSubtractExpr4
       ;
 expr5 : literal                                            #LiteralExpr5
       | ID                                                 #ReferenceExpr5
+      | '++' ID                                            #PreIncrExpr5
       | ID '++'                                            #PostIncrExpr5
       | ID '--'                                            #PostDecrExpr5
       | expr5 '.' ID                                       #PropertyReadExpr5
