@@ -366,9 +366,17 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {
-        String variableId = assignmentExpr.ID().getText();
-        FrameMember frameMember = this.findFrameMember(variableId);
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
+        return this.parseAssignmentExprLValue(assignmentExpr.lvalue(), initializerExpr);
+    }
+
+    private EasyScriptExprNode parseAssignmentExprLValue(EasyScriptParser.LvalueContext lvalue, EasyScriptExprNode initializerExpr) {
+        return this.parseAssignmentExprIdLValue((EasyScriptParser.IdLValueContext) lvalue, initializerExpr);
+    }
+
+    private EasyScriptExprNode parseAssignmentExprIdLValue(EasyScriptParser.IdLValueContext idLValue, EasyScriptExprNode initializerExpr) {
+        String variableId = idLValue.ID().getText();
+        FrameMember frameMember = this.findFrameMember(variableId);
         if (frameMember == null) {
             return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
         } else {

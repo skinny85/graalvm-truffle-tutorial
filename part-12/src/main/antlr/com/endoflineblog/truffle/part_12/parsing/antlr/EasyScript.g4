@@ -21,7 +21,7 @@ stmt :         kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDe
 binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;
 
-expr1 : ID '=' expr1                                       #AssignmentExpr1
+expr1 : lvalue '=' expr1                                   #AssignmentExpr1
       | arr=expr5 '[' index=expr1 ']' '=' rvalue=expr1     #ArrayIndexWriteExpr1
       | expr2                                              #PrecedenceTwoExpr1
       ;
