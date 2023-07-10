@@ -127,6 +127,19 @@ public class InDeCrementTest {
     }
 
     @Test
+    void postfix_increment_returns_NaN_for_booleans() {
+        Value result = this.context.eval("ezs", "" +
+                "function a(n) { " +
+                "    let local = n; " +
+                "    local++; " +
+                "    return local; " +
+                "} " +
+                "a(true); ");
+
+        assertTrue(Double.isNaN(result.asDouble()));
+    }
+
+    @Test
     void postfix_increment_fails_for_const_local_variable() {
         try {
             this.context.eval("ezs", "" +
