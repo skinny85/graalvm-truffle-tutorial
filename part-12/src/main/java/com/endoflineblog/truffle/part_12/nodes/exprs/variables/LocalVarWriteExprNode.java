@@ -48,9 +48,9 @@ public abstract class LocalVarWriteExprNode extends EasyScriptExprNode {
     }
 
     @Specialization(replaces = "writeInt",
-            guards = "(frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
-                    "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Int) || " +
-                    "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Double")
+            guards = "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
+                    "(frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Int || " +
+                    "frame.getFrameDescriptor().getSlotKind(getFrameSlot()) == Double)")
     protected double writeDouble(VirtualFrame frame, double rvalue) {
         int frameSlot = this.getFrameSlot();
         if (this.operation == null) {
@@ -96,11 +96,10 @@ public abstract class LocalVarWriteExprNode extends EasyScriptExprNode {
             frame.setObject(frameSlot, rvalue);
             return rvalue;
         } else {
-            // it could happen that the frame slot kind is Bool here,
-            // if the program is in/decrementing a variable containing a boolean value
-            Object prevValue = frame.getFrameDescriptor().getSlotKind(frameSlot) == FrameSlotKind.Boolean
-                    ? frame.getBoolean(frameSlot)
-                    : frame.getObject(frameSlot);
+            // it could happen that the frame slot kind is not Object here,
+            // if the program is plus-assigning an object to what was previously a primitive,
+            // or in/decrementing a variable containing a boolean value
+            Object prevValue = frame.getValue(frameSlot);
             Object newValue = this.operation.executeOperation(frame, prevValue, rvalue);
             frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Object);
             frame.setObject(frameSlot, newValue);
