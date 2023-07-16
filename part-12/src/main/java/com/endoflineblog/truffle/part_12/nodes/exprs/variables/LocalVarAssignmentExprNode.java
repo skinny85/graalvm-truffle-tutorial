@@ -14,12 +14,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 @NodeField(name = "frameSlot", type = int.class)
 @NodeField(name = "affix", type = Affix.class)
 @ImportStatic(FrameSlotKind.class)
-public abstract class LocalVarWriteExprNode extends EasyScriptExprNode {
+public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     protected EasyScriptBinaryNumberOperationNode operation;
 
-    protected LocalVarWriteExprNode(EasyScriptBinaryNumberOperationNode operation) {
+    protected LocalVarAssignmentExprNode(EasyScriptBinaryNumberOperationNode operation) {
         this.operation = operation;
     }
 

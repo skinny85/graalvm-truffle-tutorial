@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PlusAssignmentTest {
     private Context context;
@@ -22,7 +23,7 @@ public class PlusAssignmentTest {
     }
 
     @Test
-    public void plus_assignment_works() {
+    public void plus_assignment_works_for_local_variables() {
         Value addTwo = this.context.eval("ezs", "" +
                 "function addTwo(n) { " +
                 "    let local = 2; " +
@@ -34,6 +35,6 @@ public class PlusAssignmentTest {
 
         assertEquals(5, addTwo.execute(3).asInt());
         assertEquals("2ab", addTwo.execute("ab").asString());
-//        assertTrue(addTwo.execute(true).isNull());
+        assertTrue(Double.isNaN(addTwo.execute(true).asDouble()));
     }
 }
