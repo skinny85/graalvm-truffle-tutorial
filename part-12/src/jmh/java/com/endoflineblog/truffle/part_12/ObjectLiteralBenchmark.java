@@ -18,7 +18,7 @@ public class ObjectLiteralBenchmark extends TruffleBenchmark {
             "    let ret = 0; " +
             "    for (let i = 0; i < n; i++) { " +
             "        let obj = {field: i}; " +
-            "        ret = ret + obj.field; " +
+            "        ret += obj.field; " +
             "    } " +
             "    return ret; " +
             "}";
