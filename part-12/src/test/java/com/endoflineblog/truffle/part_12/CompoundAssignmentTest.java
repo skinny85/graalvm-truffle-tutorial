@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class InDeCrementTest {
+public class CompoundAssignmentTest {
     private Context context;
 
     @BeforeEach
@@ -167,5 +167,21 @@ public class InDeCrementTest {
                 "a(); ");
 
         assertEquals(2, result.asInt());
+    }
+
+    @Test
+    public void plus_assignment_works_for_local_variables() {
+        Value addTwo = this.context.eval("ezs", "" +
+                "function addTwo(n) { " +
+                "    let local = 2; " +
+                "    local += n; " +
+                "    return local; " +
+                "} " +
+                "addTwo; "
+        );
+
+        assertEquals(5, addTwo.execute(3).asInt());
+        assertEquals("2ab", addTwo.execute("ab").asString());
+        assertTrue(Double.isNaN(addTwo.execute(true).asDouble()));
     }
 }
