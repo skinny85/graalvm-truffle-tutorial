@@ -186,6 +186,19 @@ public class CompoundAssignmentTest {
     }
 
     @Test
+    public void plus_assignment_for_local_variables_returns_the_new_value() {
+        Value value = this.context.eval("ezs", "" +
+                "function addTwo(n) { " +
+                "    let local = 2; " +
+                "    return local += n; " +
+                "} " +
+                "addTwo(3); "
+        );
+
+        assertEquals(5, value.asInt());
+    }
+
+    @Test
     public void plus_assignment_works_for_global_variables() {
         Value result = this.context.eval("ezs", "" +
                 "let global = 2; " +

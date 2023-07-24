@@ -43,7 +43,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
             int prevValue = frame.getInt(frameSlot);
             int newValue = this.operation.executeOperationInt(prevValue, rvalue);
             frame.setInt(frameSlot, newValue);
-            return this.getAffix() == Affix.PREFIX ? newValue : prevValue;
+            return this.getAffix() == Affix.POSTFIX ? prevValue : newValue;
         }
     }
 
@@ -67,7 +67,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
             double newValue = this.operation.executeOperationDouble(prevValue, rvalue);
             frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Double);
             frame.setDouble(frameSlot, newValue);
-            return this.getAffix() == Affix.PREFIX ? newValue : prevValue;
+            return this.getAffix() == Affix.POSTFIX ? prevValue : newValue;
         }
     }
 
@@ -103,7 +103,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
             Object newValue = this.operation.executeOperation(prevValue, rvalue);
             frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Object);
             frame.setObject(frameSlot, newValue);
-            return this.getAffix() == Affix.PREFIX ? newValue : prevValue;
+            return this.getAffix() == Affix.POSTFIX ? prevValue : newValue;
         }
     }
 }
