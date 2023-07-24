@@ -375,10 +375,19 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseAssignmentExprIdLValue(EasyScriptParser.IdLValueContext idLValue, String operator, EasyScriptExprNode initializerExpr) {
+        EasyScriptBinaryNumberOperationNode operationNode;
+        switch (operator) {
+            case "+=":
+                operationNode = AdditionOrConcatenationOperationNodeGen.create();
+                break;
+            case "=":
+            default:
+                operationNode = null;
+        }
         String variableId = idLValue.ID().getText();
         FrameMember frameMember = this.findFrameMember(variableId);
         if (frameMember == null) {
-            return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
+            return GlobalVarAssignmentExprNodeGen.create(operationNode, GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId, null);
         } else {
             if (frameMember instanceof FunctionArgument) {
                 return new WriteFunctionArgExprNode(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
@@ -386,15 +395,6 @@ public final class EasyScriptTruffleParser {
                 var localVariable = (LocalVariable) frameMember;
                 if (localVariable.declarationKind == DeclarationKind.CONST) {
                     throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
-                }
-                EasyScriptBinaryNumberOperationNode operationNode;
-                switch (operator) {
-                    case "+=":
-                        operationNode = AdditionOrConcatenationOperationNodeGen.create();
-                        break;
-                    case "=":
-                    default:
-                        operationNode = null;
                 }
                 return LocalVarAssignmentExprNodeGen.create(operationNode, initializerExpr, localVariable.variableIndex, null);
             }

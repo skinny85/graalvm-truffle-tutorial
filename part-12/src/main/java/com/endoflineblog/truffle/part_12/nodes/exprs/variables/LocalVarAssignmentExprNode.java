@@ -41,7 +41,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
             // we know that local variables are always initialized,
             // so the frame slot kind is for sure Int here
             int prevValue = frame.getInt(frameSlot);
-            int newValue = this.operation.executeOperationInt(frame, prevValue, rvalue);
+            int newValue = this.operation.executeOperationInt(prevValue, rvalue);
             frame.setInt(frameSlot, newValue);
             return this.getAffix() == Affix.PREFIX ? newValue : prevValue;
         }
@@ -64,7 +64,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
             double prevValue = frame.getFrameDescriptor().getSlotKind(frameSlot) == FrameSlotKind.Int
                     ? (double) frame.getInt(frameSlot)
                     : frame.getDouble(frameSlot);
-            double newValue = this.operation.executeOperationDouble(frame, prevValue, rvalue);
+            double newValue = this.operation.executeOperationDouble(prevValue, rvalue);
             frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Double);
             frame.setDouble(frameSlot, newValue);
             return this.getAffix() == Affix.PREFIX ? newValue : prevValue;
@@ -100,7 +100,7 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
             // if the program is plus-assigning an object to what was previously a primitive,
             // or in/decrementing a variable containing a boolean value
             Object prevValue = frame.getValue(frameSlot);
-            Object newValue = this.operation.executeOperation(frame, prevValue, rvalue);
+            Object newValue = this.operation.executeOperation(prevValue, rvalue);
             frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Object);
             frame.setObject(frameSlot, newValue);
             return this.getAffix() == Affix.PREFIX ? newValue : prevValue;

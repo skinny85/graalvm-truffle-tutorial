@@ -1,8 +1,10 @@
 package com.endoflineblog.truffle.part_12.nodes.exprs.variables;
 
+import com.endoflineblog.truffle.part_12.common.Affix;
 import com.endoflineblog.truffle.part_12.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.GlobalScopeObjectExprNode;
+import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryNumberOperationNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -18,11 +20,22 @@ import com.oracle.truffle.api.object.Property;
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeChild(value = "assignmentExpr")
 @NodeField(name = "name", type = String.class)
+@NodeField(name = "affix", type = Affix.class)
 public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    protected EasyScriptBinaryNumberOperationNode operation;
+
+    protected GlobalVarAssignmentExprNode(EasyScriptBinaryNumberOperationNode operation) {
+        this.operation = operation;
+    }
+
     protected abstract String getName();
 
+    protected abstract Affix getAffix();
+
     @Specialization(limit = "1")
-    protected Object assignVariable(DynamicObject globalScopeObject, Object value,
+    protected Object assignVariable(DynamicObject globalScopeObject, Object rvalue,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         String variableId = this.getName();
         Property property = objectLibrary.getProperty(globalScopeObject, variableId);
@@ -32,7 +45,14 @@ public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
         if (property.getFlags() == 1) {
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
         }
-        objectLibrary.put(globalScopeObject, variableId, value);
-        return value;
+        if (this.operation == null) {
+            objectLibrary.put(globalScopeObject, variableId, rvalue);
+            return rvalue;
+        } else {
+            Object prevValue = objectLibrary.getOrDefault(globalScopeObject, variableId, null);
+            Object newValue = this.operation.executeOperation(prevValue, rvalue);
+            objectLibrary.put(globalScopeObject, variableId, newValue);
+            return this.getAffix() == Affix.POSTFIX ? prevValue : newValue;
+        }
     }
 }

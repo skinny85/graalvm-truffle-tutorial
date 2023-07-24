@@ -5,7 +5,6 @@ import com.endoflineblog.truffle.part_12.nodes.ops.AdditionOrConcatenationOperat
 import com.endoflineblog.truffle.part_12.nodes.ops.AdditionOrConcatenationOperationNodeGen;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * The Node representing number addition.
@@ -18,17 +17,17 @@ public abstract class AdditionExprNode extends BinaryOperationExprNode {
     }
 
     @Specialization(rewriteOn = ArithmeticException.class)
-    protected int addInts(VirtualFrame frame, int leftValue, int rightValue) {
-        return this.additionOrConcatenationOperationNode.executeOperationInt(frame, leftValue, rightValue);
+    protected int addInts(int leftValue, int rightValue) {
+        return this.additionOrConcatenationOperationNode.executeOperationInt(leftValue, rightValue);
     }
 
     @Specialization(replaces = "addInts")
-    protected double addDoubles(VirtualFrame frame, double leftValue, double rightValue) {
-        return this.additionOrConcatenationOperationNode.executeOperationDouble(frame, leftValue, rightValue);
+    protected double addDoubles(double leftValue, double rightValue) {
+        return this.additionOrConcatenationOperationNode.executeOperationDouble(leftValue, rightValue);
     }
 
     @Fallback
-    protected Object addNonNumber(VirtualFrame frame, Object leftValue, Object rightValue) {
-        return this.additionOrConcatenationOperationNode.executeOperation(frame, leftValue, rightValue);
+    protected Object addNonNumber(Object leftValue, Object rightValue) {
+        return this.additionOrConcatenationOperationNode.executeOperation(leftValue, rightValue);
     }
 }

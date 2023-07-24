@@ -184,4 +184,25 @@ public class CompoundAssignmentTest {
         assertEquals("2ab", addTwo.execute("ab").asString());
         assertTrue(Double.isNaN(addTwo.execute(true).asDouble()));
     }
+
+    @Test
+    public void plus_assignment_works_for_global_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "let global = 2; " +
+                "global += 3; " +
+                "global; "
+        );
+
+        assertEquals(5, result.asInt());
+    }
+
+    @Test
+    public void plus_assignment_for_global_variables_returns_the_new_value() {
+        Value result = this.context.eval("ezs", "" +
+                "let global = 2; " +
+                "global += 3; "
+        );
+
+        assertEquals(5, result.asInt());
+    }
 }
