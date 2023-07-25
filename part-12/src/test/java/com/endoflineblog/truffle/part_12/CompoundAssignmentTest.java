@@ -199,6 +199,28 @@ public class CompoundAssignmentTest {
     }
 
     @Test
+    void prefix_increment_works_for_global_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "let global = 3; " +
+                "++global; ");
+
+        assertEquals(4, result.asInt());
+        Value global = this.context.getBindings("ezs").getMember("global");
+        assertEquals(4, global.asInt());
+    }
+
+    @Test
+    void postfix_increment_works_for_global_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "let global = 3; " +
+                "global++; ");
+
+        assertEquals(3, result.asInt());
+        Value global = this.context.getBindings("ezs").getMember("global");
+        assertEquals(4, global.asInt());
+    }
+
+    @Test
     public void plus_assignment_works_for_global_variables() {
         Value result = this.context.eval("ezs", "" +
                 "let global = 2; " +

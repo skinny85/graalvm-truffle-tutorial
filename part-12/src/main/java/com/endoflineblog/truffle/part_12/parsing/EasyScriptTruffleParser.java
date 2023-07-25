@@ -571,10 +571,14 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseIdUnaryNrOpExpr(String variableId, Affix affix, UnaryNrOp unaryNrOp) {
+        EasyScriptBinaryNumberOperationNode operation = unaryNrOp == UnaryNrOp.INCR
+                ? AdditionBinaryNumberOperationNodeGen.create()
+                : SubtractionBinaryNumberOperationNodeGen.create();
+        IntLiteralExprNode oneLiteral = new IntLiteralExprNode(1);
+
         FrameMember frameMember = this.findFrameMember(variableId);
         if (frameMember == null) {
-            throw new EasyScriptException("Increment is only supported for local variables, but '" +
-                    variableId + "' is global");
+            return GlobalVarAssignmentExprNodeGen.create(operation, GlobalScopeObjectExprNodeGen.create(), oneLiteral, variableId, affix);
         }
         if (!(frameMember instanceof LocalVariable)) {
             throw new EasyScriptException("Increment is only supported for local variables, but '" +
@@ -584,10 +588,7 @@ public final class EasyScriptTruffleParser {
         if (localVariable.declarationKind == DeclarationKind.CONST) {
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
         }
-        EasyScriptBinaryNumberOperationNode operation = unaryNrOp == UnaryNrOp.INCR
-            ? AdditionBinaryNumberOperationNodeGen.create()
-            : SubtractionBinaryNumberOperationNodeGen.create();
-        return LocalVarAssignmentExprNodeGen.create(operation, new IntLiteralExprNode(1), localVariable.variableIndex, affix);
+        return LocalVarAssignmentExprNodeGen.create(operation, oneLiteral, localVariable.variableIndex, affix);
     }
 
     private ObjectLiteralExprNode parseObjectLiteralExpr(EasyScriptParser.ObjectLiteralExpr5Context objectLiteralExpr) {
