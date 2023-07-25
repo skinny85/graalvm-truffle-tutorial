@@ -114,7 +114,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void postfix_increment_works_for_int_overflow() {
+    void local_variables_postfix_increment_handles_int_overflow() {
         Value result = this.context.eval("ezs", "" +
                 "function overflow() { " +
                 "    let local = " + Integer.MAX_VALUE + "; " +

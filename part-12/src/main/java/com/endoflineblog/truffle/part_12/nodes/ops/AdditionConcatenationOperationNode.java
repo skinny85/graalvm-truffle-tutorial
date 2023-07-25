@@ -8,28 +8,28 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
 
-public abstract class AdditionOrConcatenationOperationNode extends EasyScriptBinaryNumberOperationNode {
+public abstract class AdditionConcatenationOperationNode extends EasyScriptBinaryOperationNode {
     @Specialization
-    protected int addIntegers(int arg1, int arg2) {
-        return Math.addExact(arg1, arg2);
+    protected int addIntegers(int lvalue, int rvalue) {
+        return Math.addExact(lvalue, rvalue);
     }
 
     @Specialization(replaces = "addIntegers")
-    protected double addDoubles(double arg1, double arg2) {
-        return arg1 + arg2;
+    protected double addDoubles(double lvalue, double rvalue) {
+        return lvalue + rvalue;
     }
 
     @Specialization
-    protected TruffleString concatenateTruffleStrings(TruffleString leftValue, TruffleString rightValue,
+    protected TruffleString concatenateTruffleStrings(TruffleString lvalue, TruffleString rvalue,
             @Cached TruffleString.ConcatNode concatNode) {
-        return EasyScriptTruffleStrings.concat(leftValue, rightValue, concatNode);
+        return EasyScriptTruffleStrings.concat(lvalue, rvalue, concatNode);
     }
 
-    @Specialization(guards = "isComplex(leftValue) || isComplex(rightValue)")
-    protected TruffleString concatenateComplexAsStrings(Object leftValue, Object rightValue,
+    @Specialization(guards = "isComplex(lvalue) || isComplex(rvalue)")
+    protected TruffleString concatenateComplexAsStrings(Object lvalue, Object rvalue,
             @Cached TruffleString.FromJavaStringNode fromJavaStringNode) {
         return EasyScriptTruffleStrings.fromJavaString(
-                EasyScriptTruffleStrings.concatToStrings(leftValue, rightValue),
+                EasyScriptTruffleStrings.concatToStrings(lvalue, rvalue),
                 fromJavaStringNode);
     }
 
@@ -44,8 +44,8 @@ public abstract class AdditionOrConcatenationOperationNode extends EasyScriptBin
     }
 
     @Fallback
-    protected Object addNonNumbers(@SuppressWarnings("unused") Object arg1,
-            @SuppressWarnings("unused") Object arg2) {
+    protected Object addNonNumbers(@SuppressWarnings("unused") Object lvalue,
+            @SuppressWarnings("unused") Object rvalue) {
         return Double.NaN;
     }
 }

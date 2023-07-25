@@ -2,7 +2,7 @@ package com.endoflineblog.truffle.part_12.nodes.exprs.variables;
 
 import com.endoflineblog.truffle.part_12.common.Affix;
 import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryNumberOperationNode;
+import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryOperationNode;
 import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
@@ -17,9 +17,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    protected EasyScriptBinaryNumberOperationNode operation;
+    protected EasyScriptBinaryOperationNode operation;
 
-    protected LocalVarAssignmentExprNode(EasyScriptBinaryNumberOperationNode operation) {
+    protected LocalVarAssignmentExprNode(EasyScriptBinaryOperationNode operation) {
         this.operation = operation;
     }
 

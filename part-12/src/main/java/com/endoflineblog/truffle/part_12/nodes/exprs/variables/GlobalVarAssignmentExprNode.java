@@ -4,7 +4,7 @@ import com.endoflineblog.truffle.part_12.common.Affix;
 import com.endoflineblog.truffle.part_12.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.GlobalScopeObjectExprNode;
-import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryNumberOperationNode;
+import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryOperationNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -24,9 +24,9 @@ import com.oracle.truffle.api.object.Property;
 public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    protected EasyScriptBinaryNumberOperationNode operation;
+    protected EasyScriptBinaryOperationNode operation;
 
-    protected GlobalVarAssignmentExprNode(EasyScriptBinaryNumberOperationNode operation) {
+    protected GlobalVarAssignmentExprNode(EasyScriptBinaryOperationNode operation) {
         this.operation = operation;
     }
 

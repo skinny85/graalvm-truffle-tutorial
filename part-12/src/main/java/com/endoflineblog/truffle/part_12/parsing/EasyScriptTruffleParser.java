@@ -36,10 +36,10 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarReferenc
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarReferenceExprNodeGen;
-import com.endoflineblog.truffle.part_12.nodes.ops.AdditionBinaryNumberOperationNodeGen;
-import com.endoflineblog.truffle.part_12.nodes.ops.AdditionOrConcatenationOperationNodeGen;
-import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryNumberOperationNode;
-import com.endoflineblog.truffle.part_12.nodes.ops.SubtractionBinaryNumberOperationNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.ops.AdditionConcatenationOperationNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.ops.AdditionOperationNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryOperationNode;
+import com.endoflineblog.truffle.part_12.nodes.ops.SubtractionOperationNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.blocks.BlockStmtNode;
@@ -375,19 +375,19 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseAssignmentExprIdLValue(EasyScriptParser.IdLValueContext idLValue, String operator, EasyScriptExprNode initializerExpr) {
-        EasyScriptBinaryNumberOperationNode operationNode;
+        EasyScriptBinaryOperationNode operation;
         switch (operator) {
             case "+=":
-                operationNode = AdditionOrConcatenationOperationNodeGen.create();
+                operation = AdditionConcatenationOperationNodeGen.create();
                 break;
             case "=":
             default:
-                operationNode = null;
+                operation = null;
         }
         String variableId = idLValue.ID().getText();
         FrameMember frameMember = this.findFrameMember(variableId);
         if (frameMember == null) {
-            return GlobalVarAssignmentExprNodeGen.create(operationNode, GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId, null);
+            return GlobalVarAssignmentExprNodeGen.create(operation, GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId, null);
         } else {
             if (frameMember instanceof FunctionArgument) {
                 return new WriteFunctionArgExprNode(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
@@ -396,7 +396,7 @@ public final class EasyScriptTruffleParser {
                 if (localVariable.declarationKind == DeclarationKind.CONST) {
                     throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
                 }
-                return LocalVarAssignmentExprNodeGen.create(operationNode, initializerExpr, localVariable.variableIndex, null);
+                return LocalVarAssignmentExprNodeGen.create(operation, initializerExpr, localVariable.variableIndex, null);
             }
         }
     }
@@ -571,9 +571,9 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseIdUnaryNrOpExpr(String variableId, Affix affix, UnaryNrOp unaryNrOp) {
-        EasyScriptBinaryNumberOperationNode operation = unaryNrOp == UnaryNrOp.INCR
-                ? AdditionBinaryNumberOperationNodeGen.create()
-                : SubtractionBinaryNumberOperationNodeGen.create();
+        EasyScriptBinaryOperationNode operation = unaryNrOp == UnaryNrOp.INCR
+                ? AdditionOperationNodeGen.create()
+                : SubtractionOperationNodeGen.create();
         IntLiteralExprNode oneLiteral = new IntLiteralExprNode(1);
 
         FrameMember frameMember = this.findFrameMember(variableId);
