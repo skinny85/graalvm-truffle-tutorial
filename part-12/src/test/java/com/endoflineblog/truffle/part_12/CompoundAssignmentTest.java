@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_12;
 
+import com.endoflineblog.truffle.part_12.runtime.Undefined;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
@@ -25,7 +26,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void prefix_increment_works_for_local_variables() {
+    void local_variables_prefix_increment_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
                 "    let local = 3; " +
@@ -38,7 +39,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void prefix_increment_returns_the_new_value() {
+    void local_variables_prefix_increment_returns_the_new_value() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
                 "    let local = 3; " +
@@ -50,7 +51,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void prefix_decrement_works_for_local_variables() {
+    void local_variables_prefix_decrement_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
                 "    let local = 3; " +
@@ -63,7 +64,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void prefix_decrement_returns_the_new_value() {
+    void local_variables_prefix_decrement_returns_the_new_value() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
                 "    let local = 3; " +
@@ -75,20 +76,20 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void postfix_increment_works_for_local_variables() {
+    void local_variables_postfix_increment_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
-                "    let local = 1; " +
+                "    let local = 3; " +
                 "    local++; " +
                 "    return local; " +
                 "} " +
                 "a(); ");
 
-        assertEquals(2, result.asInt());
+        assertEquals(4, result.asInt());
     }
 
     @Test
-    void postfix_increment_returns_the_old_value() {
+    void local_variables_postfix_increment_returns_the_old_value() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
                 "    let local = 3; " +
@@ -100,7 +101,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void postfix_increment_works_for_local_variables_that_were_objects() {
+    void local_variables_postfix_increment_handles_objects_and_booleans() {
         Value incr = this.context.eval("ezs", "" +
                 "function incr(n) { " +
                 "    let local = n; " +
@@ -109,8 +110,9 @@ public class CompoundAssignmentTest {
                 "} " +
                 "incr; ");
 
-        assertTrue(Double.isNaN(incr.execute().asDouble()));
+        assertTrue(Double.isNaN(incr.execute(Undefined.INSTANCE).asDouble()));
         assertEquals(2, incr.execute(1).asInt());
+        assertTrue(Double.isNaN(incr.execute(true).asDouble()));
     }
 
     @Test
@@ -127,20 +129,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void postfix_increment_returns_NaN_for_booleans() {
-        Value result = this.context.eval("ezs", "" +
-                "function a(n) { " +
-                "    let local = n; " +
-                "    local++; " +
-                "    return local; " +
-                "} " +
-                "a(true); ");
-
-        assertTrue(Double.isNaN(result.asDouble()));
-    }
-
-    @Test
-    void postfix_increment_fails_for_const_local_variable() {
+    void local_variables_postfix_increment_fails_with_const_variable() {
         try {
             this.context.eval("ezs", "" +
                     "function const_incr(n) { " +
@@ -157,7 +146,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void postfix_decrement_works_for_local_variables() {
+    void local_variables_postfix_decrement_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "function a() { " +
                 "    let local = 3; " +
@@ -170,7 +159,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    public void plus_assignment_works_for_local_variables() {
+    void local_variables_plus_assignment_modifies_the_variable() {
         Value addTwo = this.context.eval("ezs", "" +
                 "function addTwo(n) { " +
                 "    let local = 2; " +
@@ -186,7 +175,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    public void plus_assignment_for_local_variables_returns_the_new_value() {
+    void local_variables_plus_assignment_returns_the_new_value() {
         Value value = this.context.eval("ezs", "" +
                 "function addTwo(n) { " +
                 "    let local = 2; " +
@@ -199,7 +188,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void prefix_increment_works_for_global_variables() {
+    void global_variables_prefix_increment_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "let global = 3; " +
                 "++global; ");
@@ -210,7 +199,7 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    void postfix_increment_works_for_global_variables() {
+    void global_variables_postfix_increment_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "let global = 3; " +
                 "global++; ");
@@ -221,23 +210,13 @@ public class CompoundAssignmentTest {
     }
 
     @Test
-    public void plus_assignment_works_for_global_variables() {
+    void global_variables_plus_assignment_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "let global = 2; " +
-                "global += 3; " +
-                "global; "
-        );
+                "global += 3; ");
 
         assertEquals(5, result.asInt());
-    }
-
-    @Test
-    public void plus_assignment_for_global_variables_returns_the_new_value() {
-        Value result = this.context.eval("ezs", "" +
-                "let global = 2; " +
-                "global += 3; "
-        );
-
-        assertEquals(5, result.asInt());
+        Value bindings = this.context.getBindings("ezs");
+        assertEquals(5, bindings.getMember("global").asDouble());
     }
 }
