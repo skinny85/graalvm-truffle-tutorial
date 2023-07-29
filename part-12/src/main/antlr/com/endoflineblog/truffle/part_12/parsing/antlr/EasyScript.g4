@@ -45,7 +45,8 @@ expr5 : literal                                            #LiteralExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;
 
-object_kv : ID ':' expr1 ;
+object_kv : object_key ':' expr1 ;
+object_key : ID | string_literal ;
 
 literal : INT | DOUBLE | 'undefined' | bool_literal | string_literal ;
 bool_literal : 'true' | 'false' ;

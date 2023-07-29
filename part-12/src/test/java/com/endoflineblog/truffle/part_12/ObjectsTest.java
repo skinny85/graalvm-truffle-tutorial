@@ -24,12 +24,19 @@ public class ObjectsTest {
 
     @Test
     public void object_literal_is_polyglot_value() {
-        Value result = this.context.eval("ezs",
-                "{ a: 3 }"
+        Value result = this.context.eval("ezs", "" +
+                "{" +
+                "    a: 3, " +
+                "    'b': 4.5, " +
+                "    \"c\": [6, 7] " +
+                "}"
         );
         assertTrue(result.hasMembers());
+        assertEquals(3, result.getMemberKeys().size());
         assertTrue(result.hasMember("a"));
         assertEquals(3, result.getMember("a").asInt());
+        assertEquals(4.5, result.getMember("b").asDouble());
+        assertEquals(2, result.getMember("c").getArraySize());
     }
 
     @Test

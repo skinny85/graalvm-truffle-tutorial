@@ -481,11 +481,7 @@ public final class EasyScriptTruffleParser {
         }
         EasyScriptParser.String_literalContext stringTerminal = literalExpr.literal().string_literal();
         if (stringTerminal != null) {
-            String stringLiteral = stringTerminal.getText();
-            // remove the quotes delineating the string literal,
-            // and unescape the string (meaning, turn \' into ', etc.)
-            return new StringLiteralExprNode(StringEscapeUtils.unescapeJson(
-                    stringLiteral.substring(1, stringLiteral.length() - 1)));
+            return new StringLiteralExprNode(this.unescapeStringLiteral(stringTerminal));
         }
         return new UndefinedLiteralExprNode();
     }
@@ -538,7 +534,22 @@ public final class EasyScriptTruffleParser {
     }
 
     private ObjectLiteralKeyValueNode parseObjectLiteralKeyValue(EasyScriptParser.Object_kvContext objectKeyValue) {
-        return new ObjectLiteralKeyValueNode(objectKeyValue.ID().getText(), this.parseExpr1(objectKeyValue.expr1()));
+        String key = this.parseObjectLiteralKey(objectKeyValue.object_key());
+        return new ObjectLiteralKeyValueNode(key, this.parseExpr1(objectKeyValue.expr1()));
+    }
+
+    private String parseObjectLiteralKey(EasyScriptParser.Object_keyContext objectKey) {
+        TerminalNode id = objectKey.ID();
+        return id == null
+                ? this.unescapeStringLiteral(objectKey.string_literal())
+                : id.getText();
+    }
+
+    private String unescapeStringLiteral(EasyScriptParser.String_literalContext stringLiteral) {
+        String stringLiteralText = stringLiteral.getText();
+        // remove the quotes delineating the string literal,
+        // and unescape the string (meaning, turn \' into ', etc.)
+        return StringEscapeUtils.unescapeJson(stringLiteralText.substring(1, stringLiteralText.length() - 1));
     }
 
     private EasyScriptExprNode parseIntLiteral(String text) {
