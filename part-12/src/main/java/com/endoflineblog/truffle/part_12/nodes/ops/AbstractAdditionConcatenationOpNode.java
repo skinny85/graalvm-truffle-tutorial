@@ -4,22 +4,11 @@ import com.endoflineblog.truffle.part_12.EasyScriptTypeSystemGen;
 import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_12.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
-import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
 
-public abstract class AdditionConcatenationOperationNode extends EasyScriptBinaryOperationNode {
-    @Specialization
-    protected int addIntegers(int lvalue, int rvalue) {
-        return Math.addExact(lvalue, rvalue);
-    }
-
-    @Specialization(replaces = "addIntegers")
-    protected double addDoubles(double lvalue, double rvalue) {
-        return lvalue + rvalue;
-    }
-
-    @Specialization
+public abstract class AbstractAdditionConcatenationOpNode extends AbstractAdditionOpNode {
+    @Specialization(insertBefore = "addNonNumbers")
     protected TruffleString concatenateTruffleStrings(TruffleString lvalue, TruffleString rvalue,
             @Cached TruffleString.ConcatNode concatNode) {
         return EasyScriptTruffleStrings.concat(lvalue, rvalue, concatNode);
@@ -41,11 +30,5 @@ public abstract class AdditionConcatenationOperationNode extends EasyScriptBinar
         return EasyScriptTypeSystemGen.isImplicitDouble(value) ||
                 EasyScriptTypeSystemGen.isBoolean(value) ||
                 value == Undefined.INSTANCE;
-    }
-
-    @Fallback
-    protected Object addNonNumbers(@SuppressWarnings("unused") Object lvalue,
-            @SuppressWarnings("unused") Object rvalue) {
-        return Double.NaN;
     }
 }

@@ -4,7 +4,7 @@ import com.endoflineblog.truffle.part_12.common.Affix;
 import com.endoflineblog.truffle.part_12.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.GlobalScopeObjectExprNode;
-import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryOperationNode;
+import com.endoflineblog.truffle.part_12.nodes.ops.EasyScriptBinaryOpNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -24,9 +24,9 @@ import com.oracle.truffle.api.object.Property;
 public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    protected EasyScriptBinaryOperationNode operation;
+    protected EasyScriptBinaryOpNode operation;
 
-    protected GlobalVarAssignmentExprNode(EasyScriptBinaryOperationNode operation) {
+    protected GlobalVarAssignmentExprNode(EasyScriptBinaryOpNode operation) {
         this.operation = operation;
     }
 
@@ -50,7 +50,7 @@ public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
             return rvalue;
         } else {
             Object prevValue = objectLibrary.getOrDefault(globalScopeObject, variableId, null);
-            Object newValue = this.operation.executeOperation(prevValue, rvalue);
+            Object newValue = this.operation.executeOp(prevValue, rvalue);
             objectLibrary.put(globalScopeObject, variableId, newValue);
             return this.getAffix() == Affix.POSTFIX ? prevValue : newValue;
         }

@@ -159,6 +159,22 @@ public class CompoundAssignmentTest {
     }
 
     @Test
+    void local_variables_postfix_decrement_handles_int_overflow() {
+        Value result = this.context.eval("ezs", "" +
+                "function overflow() { " +
+                // if we just use Integer.MIN_VALUE, that will overflow int,
+                // as EasyScript parses it as two expressions,
+                // negation and an int literal
+                "    let local = " + (Integer.MIN_VALUE + 1) + " - 1; " +
+                "    local--; " +
+                "    return local; " +
+                "} " +
+                "overflow(); ");
+
+        assertEquals(Integer.MIN_VALUE - 1D, result.asDouble());
+    }
+
+    @Test
     void local_variables_plus_assignment_modifies_the_variable() {
         Value addTwo = this.context.eval("ezs", "" +
                 "function addTwo(n) { " +
@@ -188,6 +204,19 @@ public class CompoundAssignmentTest {
     }
 
     @Test
+    void local_variables_plus_assignment_handles_int_overflow() {
+        Value result = this.context.eval("ezs", "" +
+                "function overflow() { " +
+                "    let local = " + Integer.MAX_VALUE + "; " +
+                "    local += 2; " +
+                "    return local; " +
+                "} " +
+                "overflow(); ");
+
+        assertEquals(Integer.MAX_VALUE + 2D, result.asDouble());
+    }
+
+    @Test
     void global_variables_prefix_increment_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "let global = 3; " +
@@ -210,6 +239,31 @@ public class CompoundAssignmentTest {
     }
 
     @Test
+    void global_variables_postfix_increment_handles_int_overflow() {
+        Value result = this.context.eval("ezs", "" +
+                "let global = " + Integer.MAX_VALUE + "; " +
+                "global++; ");
+
+        assertEquals(Integer.MAX_VALUE, result.asInt());
+        Value bindings = this.context.getBindings("ezs");
+        assertEquals(Integer.MAX_VALUE + 1D, bindings.getMember("global").asDouble());
+    }
+
+    @Test
+    void global_variables_postfix_decrement_handles_int_overflow() {
+        Value result = this.context.eval("ezs", "" +
+                // if we just use Integer.MIN_VALUE, that will overflow int,
+                // as EasyScript parses it as two expressions,
+                // negation and an int literal
+                "let global = " + (Integer.MIN_VALUE + 1) + " - 1; " +
+                "global--; ");
+
+        assertEquals(Integer.MIN_VALUE, result.asInt());
+        Value bindings = this.context.getBindings("ezs");
+        assertEquals(Integer.MIN_VALUE - 1D, bindings.getMember("global").asDouble());
+    }
+
+    @Test
     void global_variables_plus_assignment_modifies_the_variable() {
         Value result = this.context.eval("ezs", "" +
                 "let global = 2; " +
@@ -218,5 +272,16 @@ public class CompoundAssignmentTest {
         assertEquals(5, result.asInt());
         Value bindings = this.context.getBindings("ezs");
         assertEquals(5, bindings.getMember("global").asDouble());
+    }
+
+    @Test
+    void global_variables_plus_assignment_handles_int_overflow() {
+        Value result = this.context.eval("ezs", "" +
+                "let global = " + Integer.MAX_VALUE + "; " +
+                "global += 2; ");
+
+        assertEquals(Integer.MAX_VALUE + 2D, result.asDouble());
+        Value bindings = this.context.getBindings("ezs");
+        assertEquals(Integer.MAX_VALUE + 2D, bindings.getMember("global").asDouble());
     }
 }
