@@ -22,7 +22,7 @@ public final class ObjectLiteralExprNode extends EasyScriptExprNode {
         EasyScriptLanguageContext easyScriptLanguageContext = this.currentLanguageContext();
         JavaScriptObject object = new JavaScriptObject(easyScriptLanguageContext.objectShape);
         for (int i = 0; i < this.members.length; i++) {
-            this.members[i].executeObjectWriteGeneric(frame, object);
+            this.members[i].executeObjectLiteralKeyValue(frame, object);
         }
         return object;
     }
