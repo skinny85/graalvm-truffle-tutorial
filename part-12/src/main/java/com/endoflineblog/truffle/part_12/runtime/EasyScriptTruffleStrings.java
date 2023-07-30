@@ -45,4 +45,9 @@ public final class EasyScriptTruffleStrings {
     public static String concatToStrings(Object o1, Object o2) {
         return o1.toString() + o2.toString();
     }
+
+    @TruffleBoundary
+    public static String toString(Object object) {
+        return object.toString();
+    }
 }

@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_12.nodes.exprs.objects;
 
 import com.endoflineblog.truffle.part_12.nodes.EasyScriptNode;
+import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_12.runtime.JavaScriptObject;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -22,5 +23,11 @@ public abstract class ObjectPropertyWriteNode extends EasyScriptNode {
     protected void writeStringKey(JavaScriptObject object, String key, Object value,
             @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
         dynamicObjectLibrary.putWithFlags(object, key, value, 0);
+    }
+
+    @Specialization(limit = "1")
+    protected void writeObjectKey(JavaScriptObject object, Object key, Object value,
+            @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
+        dynamicObjectLibrary.putWithFlags(object, EasyScriptTruffleStrings.toString(key), value, 0);
     }
 }

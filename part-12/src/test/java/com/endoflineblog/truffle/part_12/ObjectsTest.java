@@ -29,16 +29,18 @@ public class ObjectsTest {
                 "    a: 3, " +
                 "    'b': 4.5, " +
                 "    \"c\\'\": [6, 7], " +
-                "    ['d' + 'e']: { a: 4 } " +
+                "    ['d' + 'e']: { a: 4 }, " +
+                "    [89]: undefined " +
                 "}"
         );
         assertTrue(result.hasMembers());
-        assertEquals(4, result.getMemberKeys().size());
+        assertEquals(5, result.getMemberKeys().size());
         assertTrue(result.hasMember("a"));
         assertEquals(3, result.getMember("a").asInt());
         assertEquals(4.5, result.getMember("b").asDouble());
         assertEquals(2, result.getMember("c'").getArraySize());
         assertTrue(result.getMember("de").hasMember("a"));
+        assertTrue(result.getMember("89").isNull());
     }
 
     @Test
