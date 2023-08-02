@@ -28,8 +28,6 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.literals.IntLiteralExprNode
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.StringLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralExprNode;
-import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralKeyValueConstantNode;
-import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralKeyValueExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralKeyValueNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
@@ -545,9 +543,9 @@ public final class EasyScriptTruffleParser {
             String key = id == null
                     ? this.unescapeStringLiteral(objectKey.string_literal())
                     : id.getText();
-            return new ObjectLiteralKeyValueConstantNode(key, valueExpr);
+            return new ObjectLiteralKeyValueNode(new StringLiteralExprNode(key), valueExpr);
         } else {
-            return new ObjectLiteralKeyValueExprNode(this.parseExpr1(keyExpr), valueExpr);
+            return new ObjectLiteralKeyValueNode(this.parseExpr1(keyExpr), valueExpr);
         }
     }
 
