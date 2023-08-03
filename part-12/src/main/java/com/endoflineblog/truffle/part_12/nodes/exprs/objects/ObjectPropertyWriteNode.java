@@ -14,20 +14,17 @@ public abstract class ObjectPropertyWriteNode extends EasyScriptNode {
 
     @Specialization(limit = "1")
     protected void writeTruffleStringKey(JavaScriptObject object, TruffleString key, Object value,
-            @Cached TruffleString.ToJavaStringNode toJavaStringNode,
-            @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
-        this.writeStringKey(object, toJavaStringNode.execute(key), value, dynamicObjectLibrary);
-    }
-
-    @Specialization(limit = "1")
-    protected void writeStringKey(JavaScriptObject object, String key, Object value,
             @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
         dynamicObjectLibrary.putWithFlags(object, key, value, 0);
     }
 
     @Specialization(limit = "1")
     protected void writeObjectKey(JavaScriptObject object, Object key, Object value,
+            @Cached TruffleString.FromJavaStringNode fromJavaStringNode,
             @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
-        dynamicObjectLibrary.putWithFlags(object, EasyScriptTruffleStrings.toString(key), value, 0);
+        this.writeTruffleStringKey(object, EasyScriptTruffleStrings.fromJavaString(
+                        EasyScriptTruffleStrings.toString(key),
+                        fromJavaStringNode),
+                value, dynamicObjectLibrary);
     }
 }

@@ -15,9 +15,9 @@ public class ObjectLiteralBenchmark extends TruffleBenchmark {
 
     private static final String COUNT_FOR_OBJECT = "" +
             "function countForObject(n) { " +
-            "    let ret = 0; " +
+            "    let ret = 0, fie = 'fie'; " +
             "    for (let i = 0; i < n; i = i + 1) { " +
-            "        let obj = { ['fie' + 'ld']: i }; " +
+            "        let obj = { [fie + 'ld']: i }; " +
             "        ret = ret + obj.field; " +
             "    } " +
             "    return ret; " +

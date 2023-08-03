@@ -502,8 +502,8 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parsePropertyReadExpr(EasyScriptParser.PropertyReadExpr5Context propertyReadExpr) {
         return PropertyReadExprNodeGen.create(
-                this.parseExpr5(propertyReadExpr.expr5()),
-                propertyReadExpr.ID().getText());
+                propertyReadExpr.ID().getText(),
+                this.parseExpr5(propertyReadExpr.expr5()));
     }
 
     private ArrayLiteralExprNode parseArrayLiteralExpr(EasyScriptParser.ArrayLiteralExpr5Context arrayLiteralExpr) {
