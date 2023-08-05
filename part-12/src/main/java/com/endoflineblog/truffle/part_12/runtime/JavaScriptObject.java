@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_12.runtime;
 
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.CachedLibrary;
@@ -8,6 +9,7 @@ import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
+import com.oracle.truffle.api.strings.TruffleString;
 
 @ExportLibrary(InteropLibrary.class)
 public final class JavaScriptObject extends DynamicObject {
@@ -22,14 +24,16 @@ public final class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     boolean isMemberReadable(String member,
+            @Cached TruffleString.FromJavaStringNode fromJavaStringNode,
             @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        return objectLibrary.containsKey(this, member);
+        return objectLibrary.containsKey(this, EasyScriptTruffleStrings.fromJavaString(member, fromJavaStringNode));
     }
 
     @ExportMessage
     Object readMember(String member,
+            @Cached TruffleString.FromJavaStringNode fromJavaStringNode,
             @CachedLibrary("this") DynamicObjectLibrary objectLibrary) throws UnknownIdentifierException {
-        Object ret = objectLibrary.getOrDefault(this, member, null);
+        Object ret = objectLibrary.getOrDefault(this, EasyScriptTruffleStrings.fromJavaString(member, fromJavaStringNode), null);
         if (ret == null) {
             throw UnknownIdentifierException.create(member);
         }

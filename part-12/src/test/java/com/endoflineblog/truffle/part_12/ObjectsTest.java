@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -56,7 +58,7 @@ public class ObjectsTest {
     @Test
     public void object_literal_is_polyglot_value() {
         Value result = this.context.eval("ezs", "" +
-                "{" +
+                "{ " +
                 "    a: 3, " +
                 "    'b': 4.5, " +
                 "    \"c\\'\": [6, 7], " +
@@ -65,13 +67,13 @@ public class ObjectsTest {
                 "}"
         );
         assertTrue(result.hasMembers());
-        assertEquals(5, result.getMemberKeys().size());
         assertTrue(result.hasMember("a"));
         assertEquals(3, result.getMember("a").asInt());
         assertEquals(4.5, result.getMember("b").asDouble());
         assertEquals(2, result.getMember("c'").getArraySize());
         assertTrue(result.getMember("de").hasMember("a"));
         assertTrue(result.getMember("89").isNull());
+        assertEquals(Set.of("a", "b", "c'", "de", "89"), result.getMemberKeys());
     }
 
     @Test
