@@ -8,21 +8,21 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 public final class ObjectLiteralKeyValueNode extends EasyScriptNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private EasyScriptExprNode key, value;
+    private EasyScriptExprNode keyExpr, valueExpr;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private ObjectPropertyWriteNode objectPropertyWriteNode;
 
-    public ObjectLiteralKeyValueNode(EasyScriptExprNode key, EasyScriptExprNode value) {
-        this.key = key;
-        this.value = value;
+    public ObjectLiteralKeyValueNode(EasyScriptExprNode keyExpr, EasyScriptExprNode valueExpr) {
+        this.keyExpr = keyExpr;
+        this.valueExpr = valueExpr;
         this.objectPropertyWriteNode = ObjectPropertyWriteNodeGen.create();
     }
 
     public void executeObjectLiteralKeyValue(VirtualFrame frame, JavaScriptObject object) {
-        Object key = this.key.executeGeneric(frame);
-        Object value = this.value.executeGeneric(frame);
+        Object key = this.keyExpr.executeGeneric(frame);
+        Object value = this.valueExpr.executeGeneric(frame);
         this.objectPropertyWriteNode.executePropertyWrite(object, key, value);
     }
 }

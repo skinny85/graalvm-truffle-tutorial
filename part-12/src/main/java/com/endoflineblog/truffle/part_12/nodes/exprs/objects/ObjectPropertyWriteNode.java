@@ -10,21 +10,21 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 public abstract class ObjectPropertyWriteNode extends EasyScriptNode {
-    public abstract void executePropertyWrite(JavaScriptObject object, Object key, Object value);
+    public abstract void executePropertyWrite(JavaScriptObject object, Object property, Object propertyValue);
 
     @Specialization(limit = "1")
-    protected void writeTruffleStringKey(JavaScriptObject object, TruffleString key, Object value,
+    protected void writeTruffleStringProperty(JavaScriptObject object, TruffleString propertyName, Object propertyValue,
             @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
-        dynamicObjectLibrary.putWithFlags(object, key, value, 0);
+        dynamicObjectLibrary.putWithFlags(object, propertyName, propertyValue, 0);
     }
 
     @Specialization(limit = "1")
-    protected void writeObjectKey(JavaScriptObject object, Object key, Object value,
+    protected void writeObjectProperty(JavaScriptObject object, Object property, Object propertyValue,
             @Cached TruffleString.FromJavaStringNode fromJavaStringNode,
             @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
-        this.writeTruffleStringKey(object, EasyScriptTruffleStrings.fromJavaString(
-                        EasyScriptTruffleStrings.toString(key),
+        this.writeTruffleStringProperty(object, EasyScriptTruffleStrings.fromJavaString(
+                        EasyScriptTruffleStrings.toString(property),
                         fromJavaStringNode),
-                value, dynamicObjectLibrary);
+                propertyValue, dynamicObjectLibrary);
     }
 }
