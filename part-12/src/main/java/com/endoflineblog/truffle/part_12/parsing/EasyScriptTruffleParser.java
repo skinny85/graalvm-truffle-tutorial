@@ -29,7 +29,7 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.literals.StringLiteralExprN
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralKeyValueNode;
-import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyReadExprNodeGen;
+import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyReadExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarAssignmentExprNode;
@@ -501,9 +501,9 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parsePropertyReadExpr(EasyScriptParser.PropertyReadExpr5Context propertyReadExpr) {
-        return PropertyReadExprNodeGen.create(
-                propertyReadExpr.ID().getText(),
-                this.parseExpr5(propertyReadExpr.expr5()));
+        return new PropertyReadExprNode(
+                this.parseExpr5(propertyReadExpr.expr5()),
+                propertyReadExpr.ID().getText());
     }
 
     private ArrayLiteralExprNode parseArrayLiteralExpr(EasyScriptParser.ArrayLiteralExpr5Context arrayLiteralExpr) {

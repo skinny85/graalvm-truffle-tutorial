@@ -23,6 +23,37 @@ public class ObjectsTest {
     }
 
     @Test
+    public void properties_of_object_can_be_read_directly() {
+        Value result = this.context.eval("ezs", "" +
+                "let object = { field: 23 }; " +
+                "object.field"
+        );
+
+        assertEquals(23, result.asInt());
+    }
+
+    @Test
+    public void properties_of_object_can_be_read_indexed() {
+        Value result = this.context.eval("ezs", "" +
+                "let object = { field: 123 }; " +
+                "object['field']"
+        );
+
+        assertEquals(123, result.asInt());
+    }
+
+    @Test
+    public void non_string_properties_return_undefined_currently() {
+        Value result = this.context.eval("ezs", "" +
+                "let object = { 'undefined': 45 }; " +
+                "object[undefined]"
+        );
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
     public void object_literal_is_polyglot_value() {
         Value result = this.context.eval("ezs", "" +
                 "{" +
