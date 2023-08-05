@@ -140,6 +140,7 @@ public class ArraysTest {
 
         assertEquals(1, array.getArraySize());
         assertEquals(9, array.getArrayElement(0).asInt());
+        assertFalse(array.hasMember("-1"));
     }
 
     @Test
