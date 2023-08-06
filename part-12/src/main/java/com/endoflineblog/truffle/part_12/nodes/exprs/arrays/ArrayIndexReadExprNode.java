@@ -3,7 +3,9 @@ package com.endoflineblog.truffle.part_12.nodes.exprs.arrays;
 import com.endoflineblog.truffle.part_12.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectPropertyReadNode;
+import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -40,13 +42,26 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     }
 
     /**
+     * A specialization for reading a Java string property of any object.
+     * We need to convert the property name from a Java String to a {@link TruffleString},
+     * which is what {@link ObjectPropertyReadNode} expects.
+     */
+    @Specialization
+    protected Object readJavaStringProperty(Object target, String propertyName,
+            @Cached TruffleString.FromJavaStringNode fromJavaStringNode,
+            @Cached @Shared("objectPropertyReadNode") ObjectPropertyReadNode objectPropertyReadNode) {
+        return objectPropertyReadNode.executePropertyRead(target,
+                EasyScriptTruffleStrings.fromJavaString(propertyName, fromJavaStringNode));
+    }
+
+    /**
      * A specialization for reading a string property of a non-string target,
      * in code like {@code [1, 2]['length']}.
      * The implementation is identical to {@code PropertyReadExprNode}.
      */
     @Fallback
     protected Object readProperty(Object target, Object property,
-            @Cached ObjectPropertyReadNode objectPropertyReadNode) {
+            @Cached @Shared("objectPropertyReadNode") ObjectPropertyReadNode objectPropertyReadNode) {
         return objectPropertyReadNode.executePropertyRead(target, property);
     }
 }

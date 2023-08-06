@@ -11,10 +11,11 @@ import com.endoflineblog.truffle.part_12.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_12.parsing.EasyScriptTruffleParser;
 import com.endoflineblog.truffle.part_12.parsing.ParsingResult;
 import com.endoflineblog.truffle.part_12.runtime.ArrayObject;
+import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_12.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_12.runtime.GlobalScopeObject;
+import com.endoflineblog.truffle.part_12.runtime.JavaScriptObject;
 import com.endoflineblog.truffle.part_12.runtime.MathObject;
-import com.endoflineblog.truffle.part_12.runtime.StringPrototype;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
@@ -68,11 +69,12 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
+        var objectLibrary = DynamicObjectLibrary.getUncached();
+
         var context = new EasyScriptLanguageContext(this.objectShape, this.globalScopeShape,
-                this.createStringPrototype());
+                this.createStringPrototype(objectLibrary));
         var globalScopeObject = context.globalScopeObject;
 
-        var objectLibrary = DynamicObjectLibrary.getUncached();
         // the 1 flag indicates Math is a constant, and cannot be reassigned
         objectLibrary.putConstant(globalScopeObject, "Math", MathObject.create(this,
             this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
@@ -86,9 +88,11 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return context.globalScopeObject;
     }
 
-    private StringPrototype createStringPrototype() {
-        return new StringPrototype(
-                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance()));
+    private JavaScriptObject createStringPrototype(DynamicObjectLibrary objectLibrary) {
+        JavaScriptObject stringPrototype = new JavaScriptObject(this.objectShape);
+        objectLibrary.putConstant(stringPrototype, EasyScriptTruffleStrings.fromJavaString("charAt"),
+                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance()), 0);
+        return stringPrototype;
     }
 
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {

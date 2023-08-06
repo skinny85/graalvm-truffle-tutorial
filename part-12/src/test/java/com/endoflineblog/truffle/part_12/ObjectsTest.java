@@ -56,6 +56,21 @@ public class ObjectsTest {
     }
 
     @Test
+    public void java_strings_can_be_used_for_indexing() {
+        this.context.eval("ezs", "" +
+                "function access(o, propertyName) { " +
+                "    return o[propertyName]; " +
+                "} " +
+                "let object = { field: 2 }; "
+        );
+        Value ezsBindings = this.context.getBindings("ezs");
+        Value object = ezsBindings.getMember("object");
+        Value access = ezsBindings.getMember("access");
+
+        assertEquals(2, access.execute(object, "field").asInt());
+    }
+
+    @Test
     public void object_literal_is_polyglot_value() {
         Value result = this.context.eval("ezs", "" +
                 "{ " +

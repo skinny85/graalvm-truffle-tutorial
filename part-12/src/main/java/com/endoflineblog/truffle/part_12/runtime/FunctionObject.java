@@ -92,6 +92,7 @@ public final class FunctionObject implements TruffleObject {
                 argument instanceof ArrayObject ||
                 argument instanceof TruffleString ||
                 argument instanceof String ||
+                argument instanceof JavaScriptObject ||
                 argument instanceof FunctionObject;
     }
 }

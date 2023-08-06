@@ -28,26 +28,6 @@ public abstract class ObjectPropertyReadNode extends EasyScriptNode {
     public abstract Object executePropertyRead(Object target, Object property);
 
     /**
-     * A specialization for reading a string property of a string,
-     * in code like {@code "a"['length']}.
-     * We delegate to {@link ReadTruffleStringPropertyExprNode},
-     * but we first convert the property name to a Java string,
-     * which is what {@link ReadTruffleStringPropertyExprNode} expects
-     * (it's very likely it's a TruffleString).
-     */
-    @Specialization(limit = "1", guards = "propertyInteropLibrary.isString(propertyName)")
-    protected Object readStringPropertyOfString(TruffleString target, Object propertyName,
-            @CachedLibrary("propertyName") InteropLibrary propertyInteropLibrary,
-            @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
-        try {
-            return readStringPropertyExprNode.executeReadTruffleStringProperty(target,
-                    propertyInteropLibrary.asString(propertyName));
-        } catch (UnsupportedMessageException e) {
-            throw new EasyScriptException(this, e.getMessage());
-        }
-    }
-
-    /**
      * The specialization for reading a property of a {@link TruffleString}.
      * Simply delegates to {@link ReadTruffleStringPropertyExprNode}.
      */
@@ -64,6 +44,7 @@ public abstract class ObjectPropertyReadNode extends EasyScriptNode {
         return dynamicObjectLibrary.getOrDefault(object, propertyName, null);
     }
 
+    // ToDo get rid of this specialization in favor of the above one
     @Specialization(guards = {
             "objectInteropLibrary.hasMembers(object)",
             "propertyInteropLibrary.isString(property)"

@@ -2,7 +2,7 @@ package com.endoflineblog.truffle.part_12;
 
 import com.endoflineblog.truffle.part_12.nodes.exprs.strings.ReadTruffleStringPropertyExprNode;
 import com.endoflineblog.truffle.part_12.runtime.GlobalScopeObject;
-import com.endoflineblog.truffle.part_12.runtime.StringPrototype;
+import com.endoflineblog.truffle.part_12.runtime.JavaScriptObject;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
@@ -17,7 +17,6 @@ import com.oracle.truffle.api.object.Shape;
  * That field is then read by the expression Node for reading string properties.
  *
  * @see #stringPrototype
- * @see StringPrototype
  * @see ReadTruffleStringPropertyExprNode
  */
 public final class EasyScriptLanguageContext {
@@ -36,9 +35,9 @@ public final class EasyScriptLanguageContext {
      * The object containing the {@code CallTarget}s
      * for the built-in methods of strings.
      */
-    public final StringPrototype stringPrototype;
+    public final JavaScriptObject stringPrototype;
 
-    public EasyScriptLanguageContext(Shape objectShape, Shape globalScopeShape, StringPrototype stringPrototype) {
+    public EasyScriptLanguageContext(Shape objectShape, Shape globalScopeShape, JavaScriptObject stringPrototype) {
         this.objectShape = objectShape;
         this.globalScopeObject = new GlobalScopeObject(globalScopeShape);
         this.stringPrototype = stringPrototype;
