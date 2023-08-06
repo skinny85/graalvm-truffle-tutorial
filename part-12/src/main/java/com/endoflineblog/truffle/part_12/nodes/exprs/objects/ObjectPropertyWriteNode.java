@@ -4,6 +4,7 @@ import com.endoflineblog.truffle.part_12.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_12.runtime.JavaScriptObject;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
@@ -18,10 +19,10 @@ public abstract class ObjectPropertyWriteNode extends EasyScriptNode {
         dynamicObjectLibrary.putWithFlags(object, propertyName, propertyValue, 0);
     }
 
-    @Specialization(limit = "1")
+    @Fallback
     protected void writeObjectProperty(JavaScriptObject object, Object property, Object propertyValue,
             @Cached TruffleString.FromJavaStringNode fromJavaStringNode,
-            @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
+            @CachedLibrary(limit = "1") DynamicObjectLibrary dynamicObjectLibrary) {
         this.writeTruffleStringProperty(object, EasyScriptTruffleStrings.fromJavaString(
                         EasyScriptTruffleStrings.toString(property),
                         fromJavaStringNode),
