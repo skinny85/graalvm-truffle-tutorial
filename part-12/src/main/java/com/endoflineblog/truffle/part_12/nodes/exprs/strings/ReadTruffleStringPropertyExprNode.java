@@ -2,10 +2,8 @@ package com.endoflineblog.truffle.part_12.nodes.exprs.strings;
 
 import com.endoflineblog.truffle.part_12.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
-import com.endoflineblog.truffle.part_12.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_12.runtime.JavaScriptObject;
 import com.endoflineblog.truffle.part_12.runtime.Undefined;
-import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.ImportStatic;
@@ -72,16 +70,11 @@ public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
             TruffleString truffleString,
             TruffleString propertyName,
             @SuppressWarnings("unused") @Cached TruffleString.EqualNode equalNode,
-            @CachedLibrary(limit = "1") DynamicObjectLibrary objectLibrary) {
-        JavaScriptObject stringPrototype = this.currentLanguageContext().stringPrototype;
-        Object propertyValue = objectLibrary.getOrDefault(stringPrototype, propertyName, null);
-        if (propertyValue == null) {
-            return Undefined.INSTANCE;
-        }
-        return propertyValue instanceof CallTarget
-                // ToDo where do we get the number of arguments from???
-                ? new FunctionObject((CallTarget) propertyValue, 2, truffleString)
-                : propertyValue;
+            @Cached("currentLanguageContext().stringPrototype") JavaScriptObject stringPrototype,
+            @CachedLibrary("stringPrototype") DynamicObjectLibrary objectLibrary,
+            @Cached ObjectPrototypePropertyReadCacheNode objectPrototypePropertyReadCacheNode) {
+        return objectPrototypePropertyReadCacheNode.executeObjectPrototypeReadProperty(
+                truffleString, propertyName, stringPrototype, objectLibrary);
     }
 
     /** Accessing any other string property should return 'undefined'. */
