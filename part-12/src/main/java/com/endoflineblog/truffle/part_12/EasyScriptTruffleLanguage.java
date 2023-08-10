@@ -91,22 +91,17 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     private JavaScriptObject createStringPrototype(DynamicObjectLibrary objectLibrary) {
         JavaScriptObject stringPrototype = new JavaScriptObject(this.objectShape);
         objectLibrary.putConstant(stringPrototype, EasyScriptTruffleStrings.fromJavaString("charAt"),
-                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance()), 0);
+                this.defineBuiltInFunction(CharAtMethodBodyExprNodeFactory.getInstance()), 0);
         return stringPrototype;
     }
 
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
-        return new FunctionObject(this.createCallTarget(nodeFactory),
-                nodeFactory.getExecutionSignature().size());
-    }
-
-    private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         int argumentCount = nodeFactory.getExecutionSignature().size();
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> new ReadFunctionArgExprNode(i))
                 .toArray(ReadFunctionArgExprNode[]::new);
         var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));
-        return rootNode.getCallTarget();
+        return new FunctionObject(rootNode.getCallTarget(), argumentCount);
     }
 }

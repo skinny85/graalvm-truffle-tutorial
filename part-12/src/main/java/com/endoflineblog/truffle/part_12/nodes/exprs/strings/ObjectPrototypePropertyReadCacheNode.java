@@ -54,9 +54,8 @@ public abstract class ObjectPrototypePropertyReadCacheNode extends Node {
         public abstract Object executeObjectPropertyValue(Object object, Object propertyValue);
 
         @Specialization
-        protected FunctionObject whenValueIsMethod(Object object, CallTarget propertyValue) {
-            // ToDo where do we get the number of arguments from???
-            return new FunctionObject(propertyValue, 2, object);
+        protected FunctionObject whenValueIsMethod(Object object, FunctionObject propertyValue) {
+            return propertyValue.withMethodTarget(object);
         }
 
         @Specialization(guards = "propertyValue == null")
