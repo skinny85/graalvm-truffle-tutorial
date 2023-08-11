@@ -1,8 +1,8 @@
 package com.endoflineblog.truffle.part_12.runtime;
 
 import com.endoflineblog.truffle.part_12.EasyScriptTruffleLanguage;
+import com.endoflineblog.truffle.part_12.nodes.exprs.strings.ReadTruffleStringPropertyExprNode;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
@@ -15,7 +15,7 @@ import com.oracle.truffle.api.object.Shape;
  * Identical to the class with the same name from part 10.
  */
 @ExportLibrary(InteropLibrary.class)
-public final class ArrayObject extends DynamicObject {
+public final class ArrayObject extends JavaScriptObject {
     /**
      * The field that signifies this {@link DynamicObject}
      * always has a property called {@code length}.
@@ -87,32 +87,8 @@ public final class ArrayObject extends DynamicObject {
         }
     }
 
-    @ExportMessage
-    boolean hasMembers() {
-        return true;
-    }
-
-    @ExportMessage
-    boolean isMemberReadable(String member) {
-        return "length".equals(member);
-    }
-
-    @ExportMessage
-    Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) throws UnknownIdentifierException {
-        switch (member) {
-            case "length": return objectLibrary.getOrDefault(this, "length", 0);
-            default: throw UnknownIdentifierException.create(member);
-        }
-    }
-
-    @ExportMessage
-    Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
-        return new MemberNamesObject(new String[]{"length"});
-    }
-
     private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {
         this.arrayElements = arrayElements;
-        objectLibrary.putInt(this, "length", arrayElements.length);
+        objectLibrary.putInt(this, ReadTruffleStringPropertyExprNode.LENGTH_PROP, arrayElements.length);
     }
 }

@@ -15,7 +15,6 @@ import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_12.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_12.runtime.GlobalScopeObject;
 import com.endoflineblog.truffle.part_12.runtime.JavaScriptObject;
-import com.endoflineblog.truffle.part_12.runtime.MathObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
@@ -76,9 +75,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         var globalScopeObject = context.globalScopeObject;
 
         // the 1 flag indicates Math is a constant, and cannot be reassigned
-        objectLibrary.putConstant(globalScopeObject, "Math", MathObject.create(this,
-            this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
-            this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance())), 1);
+        objectLibrary.putConstant(globalScopeObject, "Math", this.createMathObject(objectLibrary), 1);
 
         return context;
     }
@@ -93,6 +90,15 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         objectLibrary.putConstant(stringPrototype, EasyScriptTruffleStrings.fromJavaString("charAt"),
                 this.defineBuiltInFunction(CharAtMethodBodyExprNodeFactory.getInstance()), 0);
         return stringPrototype;
+    }
+
+    private JavaScriptObject createMathObject(DynamicObjectLibrary objectLibrary) {
+        var math = new JavaScriptObject(this.objectShape);
+        objectLibrary.putConstant(math, EasyScriptTruffleStrings.fromJavaString("abs"),
+                this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()), 0);
+        objectLibrary.putConstant(math, EasyScriptTruffleStrings.fromJavaString("pow"),
+                this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance()), 0);
+        return math;
     }
 
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {

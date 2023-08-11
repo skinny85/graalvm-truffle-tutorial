@@ -13,7 +13,7 @@ import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.strings.TruffleString;
 
 @ExportLibrary(InteropLibrary.class)
-public final class JavaScriptObject extends DynamicObject {
+public class JavaScriptObject extends DynamicObject {
     public JavaScriptObject(Shape shape) {
         super(shape);
     }

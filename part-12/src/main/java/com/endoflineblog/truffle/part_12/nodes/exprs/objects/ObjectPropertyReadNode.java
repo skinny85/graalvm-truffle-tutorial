@@ -9,8 +9,6 @@ import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.UnknownIdentifierException;
-import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
@@ -41,24 +39,7 @@ public abstract class ObjectPropertyReadNode extends EasyScriptNode {
     @Specialization(limit = "1")
     protected Object readPropertyOfJavaScriptObject(JavaScriptObject object, TruffleString propertyName,
             @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
-        return dynamicObjectLibrary.getOrDefault(object, propertyName, null);
-    }
-
-    // ToDo get rid of this specialization in favor of the above one
-    @Specialization(guards = {
-            "objectInteropLibrary.hasMembers(object)",
-            "propertyInteropLibrary.isString(property)"
-    }, limit = "1")
-    protected Object readPropertyOfInteropObject(Object object, Object property,
-            @CachedLibrary("object") InteropLibrary objectInteropLibrary,
-            @CachedLibrary("property") InteropLibrary propertyInteropLibrary) {
-        try {
-            return objectInteropLibrary.readMember(object, propertyInteropLibrary.asString(property));
-        } catch (UnknownIdentifierException e) {
-            return Undefined.INSTANCE;
-        } catch (UnsupportedMessageException e) {
-            throw new EasyScriptException(this, e.getMessage());
-        }
+        return dynamicObjectLibrary.getOrDefault(object, propertyName, Undefined.INSTANCE);
     }
 
     /**

@@ -32,7 +32,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  */
 @ImportStatic(EasyScriptTruffleStrings.class)
 public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
-    protected static final TruffleString LENGTH_PROP = EasyScriptTruffleStrings.fromJavaString("length");
+    public static final TruffleString LENGTH_PROP = EasyScriptTruffleStrings.fromJavaString("length");
 
     /** The abstract {@code execute*()} method for this node. */
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
