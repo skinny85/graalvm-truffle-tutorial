@@ -30,6 +30,7 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.literals.UndefinedLiteralEx
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectLiteralKeyValueNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyReadExprNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyWriteExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.LocalVarAssignmentExprNode;
@@ -353,6 +354,8 @@ public final class EasyScriptTruffleParser {
         }
         if (expr1 instanceof EasyScriptParser.AssignmentExpr1Context) {
             return parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1);
+        } else if (expr1 instanceof EasyScriptParser.PropertyWriteExpr1Context) {
+            return this.parsePropertyWriteExpr((EasyScriptParser.PropertyWriteExpr1Context) expr1);
         } else if (expr1 instanceof EasyScriptParser.ArrayIndexWriteExpr1Context) {
             return this.parseArrayIndexWriteExpr((EasyScriptParser.ArrayIndexWriteExpr1Context) expr1);
         } else {
@@ -377,6 +380,13 @@ public final class EasyScriptTruffleParser {
                 return LocalVarAssignmentExprNodeGen.create(initializerExpr, localVariable.variableIndex);
             }
         }
+    }
+
+    private EasyScriptExprNode parsePropertyWriteExpr(EasyScriptParser.PropertyWriteExpr1Context propertyWriteExpr) {
+        return new PropertyWriteExprNode(
+                this.parseExpr5(propertyWriteExpr.expr5()),
+                propertyWriteExpr.ID().getText(),
+                this.parseExpr1(propertyWriteExpr.rvalue));
     }
 
     private EasyScriptExprNode parseArrayIndexWriteExpr(EasyScriptParser.ArrayIndexWriteExpr1Context arrayIndexWriteExpr) {

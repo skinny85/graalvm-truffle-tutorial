@@ -22,6 +22,7 @@ binding : ID ('=' expr1)? ;
 func_args : (ID (',' ID)* )? ;
 
 expr1 : ID '=' expr1                                       #AssignmentExpr1
+      | expr5 '.' ID '=' rvalue=expr1                      #PropertyWriteExpr1
       | arr=expr5 '[' index=expr1 ']' '=' rvalue=expr1     #ArrayIndexWriteExpr1
       | expr2                                              #PrecedenceTwoExpr1
       ;

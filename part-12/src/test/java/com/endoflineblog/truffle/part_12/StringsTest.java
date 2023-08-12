@@ -110,14 +110,25 @@ public class StringsTest {
     }
 
     @Test
-    public void property_writes_through_indexing_are_ignored() {
+    public void writes_to_non_length_array_property_are_saved() {
         Value result = this.context.eval("ezs", "" +
                 "const arr = [0, 1, 2]; " +
-                "const result = arr['length'] = 5; " +
-                "[result, arr.length]"
+                "const result = arr['xyz'] = 5; " +
+                "[result, arr.xyz]"
         );
         assertEquals(5, result.getArrayElement(0).asInt());
-        assertEquals(3, result.getArrayElement(1).asInt());
+        assertEquals(5, result.getArrayElement(1).asInt());
+    }
+
+    @Test
+    public void negative_index_array_writes_can_be_read_as_strings() {
+        Value result = this.context.eval("ezs", "" +
+                "let a = [9]; " +
+                "a[-1] = 45; " +
+                "a['-1']"
+        );
+
+        assertEquals(45, result.asInt());
     }
 
     @Test

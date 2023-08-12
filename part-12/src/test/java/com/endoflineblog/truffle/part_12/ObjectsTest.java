@@ -92,6 +92,41 @@ public class ObjectsTest {
     }
 
     @Test
+    public void properties_of_object_can_be_written_directly() {
+        Value result = this.context.eval("ezs", "" +
+                "let object = { }; " +
+                "object.field = 23; " +
+                "object.field"
+        );
+
+        assertEquals(23, result.asInt());
+    }
+
+    @Test
+    public void properties_of_object_can_be_written_indexed() {
+        Value result = this.context.eval("ezs", "" +
+                "let object = { }; " +
+                "object['field'] = 23; " +
+                "object.field"
+        );
+
+        assertEquals(23, result.asInt());
+    }
+
+    @Test
+    public void properties_of_Math_can_be_overwritten() {
+        Value result = this.context.eval("ezs", "" +
+                "function id(n) { " +
+                "    return n; " +
+                "} " +
+                "Math.abs = id; " +
+                "Math.abs(-3)"
+        );
+
+        assertEquals(-3, result.asInt());
+    }
+
+    @Test
     public void benchmark_returns_correct_value() {
         int input = 1_000_000;
         Value result = this.context.eval("ezs", "" +

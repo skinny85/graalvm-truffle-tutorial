@@ -131,7 +131,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void negative_indexes_are_ignored_on_write() {
+    public void negative_indexes_are_converted_to_strings_on_write() {
         Value array = this.context.eval("ezs", "" +
                 "let a = [9]; " +
                 "a[-1] = 45; " +
@@ -140,7 +140,7 @@ public class ArraysTest {
 
         assertEquals(1, array.getArraySize());
         assertEquals(9, array.getArrayElement(0).asInt());
-        assertFalse(array.hasMember("-1"));
+        assertTrue(array.hasMember("-1"));
     }
 
     @Test

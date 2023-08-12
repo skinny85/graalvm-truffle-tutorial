@@ -2,6 +2,8 @@ package com.endoflineblog.truffle.part_12.nodes.exprs.arrays;
 
 import com.endoflineblog.truffle.part_12.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectPropertyWriteNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.objects.ObjectPropertyWriteNodeGen;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -20,6 +22,14 @@ import com.oracle.truffle.api.library.CachedLibrary;
 @NodeChild("indexExpr")
 @NodeChild("rvalueExpr")
 public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    private ObjectPropertyWriteNode objectPropertyWriteNode;
+
+    protected ArrayIndexWriteExprNode() {
+        this.objectPropertyWriteNode = ObjectPropertyWriteNodeGen.create();
+    }
+
     @Specialization(guards = "arrayInteropLibrary.isArrayElementWritable(array, index)", limit = "1")
     protected Object writeIntIndex(Object array, int index, Object rvalue,
             @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
@@ -31,16 +41,8 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
         return rvalue;
     }
 
-    @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
-    protected Object indexUndefined(@SuppressWarnings("unused") Object target,
-            Object index, @SuppressWarnings("unused") Object rvalue,
-            @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary) {
-        throw new EasyScriptException("Cannot set properties of undefined (setting '" + index + "')");
-    }
-
     @Fallback
-    protected Object writeNonArrayOrNonIntIndex(@SuppressWarnings("unused") Object array,
-            @SuppressWarnings("unused") Object index, Object rvalue) {
-        return rvalue;
+    protected Object writeNonArray(Object object, Object property, Object rvalue) {
+        return this.objectPropertyWriteNode.executePropertyWrite(object, property, rvalue);
     }
 }
