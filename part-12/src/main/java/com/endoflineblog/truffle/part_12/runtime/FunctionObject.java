@@ -7,9 +7,9 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.functions.FunctionDispatchN
 import com.endoflineblog.truffle.part_12.nodes.exprs.strings.ReadTruffleStringPropertyExprNode;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -22,7 +22,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * @see #toString()
  */
 @ExportLibrary(InteropLibrary.class)
-public final class FunctionObject implements TruffleObject {
+public final class FunctionObject extends JavaScriptObject {
     public final CallTarget callTarget;
     public final int argumentCount;
 
@@ -44,12 +44,13 @@ public final class FunctionObject implements TruffleObject {
 
     private final FunctionDispatchNode functionDispatchNode;
 
-    public FunctionObject(CallTarget callTarget, int argumentCount) {
-        this(callTarget, argumentCount, null);
+    public FunctionObject(Shape shape, CallTarget callTarget, int argumentCount) {
+        this(shape, callTarget, argumentCount, null);
     }
 
-    private FunctionObject(CallTarget callTarget, int argumentCount,
+    private FunctionObject(Shape shape, CallTarget callTarget, int argumentCount,
             Object methodTarget) {
+        super(shape);
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
         this.methodTarget = methodTarget;
@@ -57,7 +58,7 @@ public final class FunctionObject implements TruffleObject {
     }
 
     public FunctionObject withMethodTarget(Object methodTarget) {
-        return new FunctionObject(this.callTarget, this.argumentCount, methodTarget);
+        return new FunctionObject(this.getShape(), this.callTarget, this.argumentCount, methodTarget);
     }
 
     /**

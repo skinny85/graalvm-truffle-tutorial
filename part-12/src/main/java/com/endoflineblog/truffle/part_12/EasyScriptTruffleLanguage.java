@@ -108,6 +108,6 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                 .toArray(ReadFunctionArgExprNode[]::new);
         var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));
-        return new FunctionObject(rootNode.getCallTarget(), argumentCount);
+        return new FunctionObject(this.objectShape, rootNode.getCallTarget(), argumentCount);
     }
 }

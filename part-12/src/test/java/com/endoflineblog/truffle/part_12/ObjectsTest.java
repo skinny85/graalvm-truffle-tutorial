@@ -127,6 +127,16 @@ public class ObjectsTest {
     }
 
     @Test
+    public void functions_can_have_properties() {
+        Value result = this.context.eval("ezs", "" +
+                "Math.pow.args = 2; " +
+                "Math.pow['args']"
+        );
+
+        assertEquals(2, result.asInt());
+    }
+
+    @Test
     public void benchmark_returns_correct_value() {
         int input = 1_000_000;
         Value result = this.context.eval("ezs", "" +

@@ -44,7 +44,8 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
             var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.getFrameDescriptor(), this.getFuncBody());
             var callTarget = funcRootNode.getCallTarget();
 
-            this.cachedFunction = new FunctionObject(callTarget, this.getArgumentCount());
+            this.cachedFunction = new FunctionObject(this.currentLanguageContext().objectShape,
+                    callTarget, this.getArgumentCount());
         }
 
         // we allow functions to be redefined, to comply with JavaScript semantics
