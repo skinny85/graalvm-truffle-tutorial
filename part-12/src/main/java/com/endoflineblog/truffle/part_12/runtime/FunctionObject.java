@@ -94,10 +94,8 @@ public final class FunctionObject extends JavaScriptObject {
         return EasyScriptTypeSystemGen.isImplicitDouble(argument) ||
                 EasyScriptTypeSystemGen.isBoolean(argument) ||
                 argument == Undefined.INSTANCE ||
-                argument instanceof ArrayObject ||
                 argument instanceof TruffleString ||
                 argument instanceof String ||
-                argument instanceof JavaScriptObject ||
-                argument instanceof FunctionObject;
+                argument instanceof JavaScriptObject;
     }
 }
