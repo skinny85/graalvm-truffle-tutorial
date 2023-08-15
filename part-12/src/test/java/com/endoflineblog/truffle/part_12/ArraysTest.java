@@ -144,6 +144,18 @@ public class ArraysTest {
     }
 
     @Test
+    public void negative_indexes_can_be_read_after_write() {
+        Value result = this.context.eval("ezs", "" +
+                "let a = [9]; " +
+                "a[-1] = 45; " +
+                "a[-1]"
+        );
+
+        assertTrue(result.fitsInInt());
+        assertEquals(45, result.asInt());
+    }
+
+    @Test
     public void non_stable_array_reads_work_correctly() {
         Value result = this.context.eval("ezs", "" +
                 "function readFirstArrayEl(array) { " +

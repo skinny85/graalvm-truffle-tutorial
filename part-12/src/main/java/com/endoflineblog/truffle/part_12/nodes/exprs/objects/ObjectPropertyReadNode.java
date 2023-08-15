@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_12.nodes.exprs.objects;
 import com.endoflineblog.truffle.part_12.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_12.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.strings.ReadTruffleStringPropertyExprNode;
+import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_12.runtime.JavaScriptObject;
 import com.endoflineblog.truffle.part_12.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
@@ -40,6 +41,17 @@ public abstract class ObjectPropertyReadNode extends EasyScriptNode {
     protected Object readPropertyOfJavaScriptObject(JavaScriptObject object, TruffleString propertyName,
             @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
         return dynamicObjectLibrary.getOrDefault(object, propertyName, Undefined.INSTANCE);
+    }
+
+    @Specialization(limit = "1")
+    protected Object readNonStringPropertyOfJavaScriptObject(JavaScriptObject object, Object property,
+            @Cached TruffleString.FromJavaStringNode fromJavaStringNode,
+            @CachedLibrary("object") DynamicObjectLibrary dynamicObjectLibrary) {
+        return this.readPropertyOfJavaScriptObject(object,
+                EasyScriptTruffleStrings.fromJavaString(
+                        EasyScriptTruffleStrings.toString(property),
+                        fromJavaStringNode),
+                dynamicObjectLibrary);
     }
 
     /**

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ObjectsTest {
@@ -45,14 +46,24 @@ public class ObjectsTest {
     }
 
     @Test
-    public void non_string_properties_return_undefined_currently() {
+    public void non_string_properties_return_saved_value() {
         Value result = this.context.eval("ezs", "" +
                 "let object = { 'undefined': 45 }; " +
                 "object[undefined]"
         );
 
-        assertTrue(result.isNull());
-        assertEquals("undefined", result.toString());
+        assertEquals(45, result.asInt());
+    }
+
+    @Test
+    public void non_string_property_writes_return_saved_value() {
+        Value result = this.context.eval("ezs", "" +
+                "let object = { }; " +
+                "object[true] = false; " +
+                "object['true']"
+        );
+
+        assertFalse(result.asBoolean());
     }
 
     @Test
