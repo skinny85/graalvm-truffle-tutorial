@@ -179,6 +179,46 @@ public class ArraysTest {
     }
 
     @Test
+    public void writes_to_array_length_property_change_its_arraySize() {
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [0, 1, 2]; " +
+                "arr['length'] = 5; " +
+                "arr"
+        );
+        assertEquals(5, result.getArraySize());
+    }
+
+    @Test
+    public void writes_to_array_length_property_erase_indexes_beyond_new_length() {
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [0, 1, 2]; " +
+                "arr.length = 1; " +
+                "arr[1]"
+        );
+        assertTrue(result.isNull());
+    }
+
+    @Test
+    public void writes_to_array_length_property_expand_elements_with_undefined() {
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [0, 1, 2]; " +
+                "arr.length = 5; " +
+                "arr[4]"
+        );
+        assertTrue(result.isNull());
+    }
+
+    @Test
+    public void writes_to_array_length_property_expand_writable_elements() {
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [0, 1, 2]; " +
+                "arr.length = 5; " +
+                "arr[4] = 4"
+        );
+        assertEquals(4, result.asInt());
+    }
+
+    @Test
     public void an_array_can_be_passed_to_a_function_exec() {
         this.context.eval("ezs", "" +
                 "let array = [1, 2, 3]; " +
