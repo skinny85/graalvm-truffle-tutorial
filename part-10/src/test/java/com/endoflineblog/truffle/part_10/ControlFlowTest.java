@@ -55,7 +55,7 @@ public class ControlFlowTest {
     }
 
     @Test
-    public void a_function_is_eqal_to_itself_but_not_lte() {
+    public void a_function_is_equal_to_itself_but_not_lte() {
         this.context.eval("ezs",
                 "function f() { return false; } " +
                 "var t1 = f === f; " +
