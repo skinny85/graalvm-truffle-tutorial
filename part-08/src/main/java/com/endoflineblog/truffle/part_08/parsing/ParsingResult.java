@@ -10,6 +10,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 public final class ParsingResult {
     /** The Node representing the list of statements that the EasyScript program consists of. */
     public final BlockStmtNode programStmtBlock;
+
     /**
      * The {@link FrameDescriptor} used for the Truffle program itself
      * (which can contain local variables in this part).
