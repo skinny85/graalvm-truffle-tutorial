@@ -8,7 +8,7 @@ import com.oracle.truffle.api.CallTarget;
  * Used in the expression Node for reading {@code TruffleString} properties.
  * Nodes access it through the {@code TruffleLanguageContext}'s {@code stringPrototype} field.
  *
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyExprNode
+ * @see com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyNode
  * @see com.endoflineblog.truffle.part_11.EasyScriptLanguageContext#stringPrototype
  */
 public final class StringPrototype {

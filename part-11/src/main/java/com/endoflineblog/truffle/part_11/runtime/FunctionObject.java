@@ -37,7 +37,7 @@ public final class FunctionObject implements TruffleObject {
      * and by the Node that reads properties of {@link TruffleString}s.
      *
      * @see FunctionDispatchNode
-     * @see com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyExprNode
+     * @see com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyNode
      */
     public final Object methodTarget;
 

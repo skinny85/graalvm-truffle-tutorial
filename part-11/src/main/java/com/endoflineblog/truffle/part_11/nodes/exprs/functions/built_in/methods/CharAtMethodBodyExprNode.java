@@ -46,7 +46,7 @@ public abstract class CharAtMethodBodyExprNode extends BuiltInFunctionBodyExprNo
             @Cached @Shared("lengthNode") TruffleString.CodePointLengthNode lengthNode,
             @Cached @Shared("substringNode") TruffleString.SubstringNode substringNode) {
         // we know that 'self' is for sure a TruffleString
-        // because of how reading string properties works in ReadTruffleStringPropertyExprNode,
+        // because of how reading string properties works in ReadTruffleStringPropertyNode,
         // but we need to declare it as Object here because of @Fallback
         return this.charAtInt((TruffleString) self, 0, lengthNode, substringNode);
     }

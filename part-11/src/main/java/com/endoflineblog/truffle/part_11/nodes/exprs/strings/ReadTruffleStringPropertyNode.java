@@ -29,7 +29,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * @see #readUnknownProperty
  */
 @ImportStatic(EasyScriptTruffleStrings.class)
-public abstract class ReadTruffleStringPropertyExprNode extends EasyScriptNode {
+public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";
     protected static final String CHAR_AT_PROP = "charAt";
 

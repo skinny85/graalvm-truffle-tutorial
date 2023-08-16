@@ -2,7 +2,7 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.arrays;
 
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyExprNode;
+import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyNode;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -34,17 +34,17 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     /**
      * A specialization for reading a string property of a string,
      * in code like {@code "a"['length']}.
-     * We delegate to {@link ReadTruffleStringPropertyExprNode},
+     * We delegate to {@link ReadTruffleStringPropertyNode},
      * but we first convert the index to a Java string,
-     * which is what {@link ReadTruffleStringPropertyExprNode} expects.
+     * which is what {@link ReadTruffleStringPropertyNode} expects.
      */
     @Specialization(limit = "1", guards = "indexInteropLibrary.isString(index)")
     protected Object readStringPropertyOfString(TruffleString target,
             Object index,
             @CachedLibrary("index") InteropLibrary indexInteropLibrary,
-            @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
+            @Cached ReadTruffleStringPropertyNode readStringPropertyNode) {
         try {
-            return readStringPropertyExprNode.executeReadTruffleStringProperty(target,
+            return readStringPropertyNode.executeReadTruffleStringProperty(target,
                     indexInteropLibrary.asString(index));
         } catch (UnsupportedMessageException e) {
             throw new EasyScriptException(this, e.getMessage());
@@ -55,12 +55,12 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * A specialization for reading a non-string property of a string.
      * The main usecase for this is string indexing,
      * in code like {@code "a"[1]}.
-     * We delegate the implementation to {@link ReadTruffleStringPropertyExprNode}.
+     * We delegate the implementation to {@link ReadTruffleStringPropertyNode}.
      */
     @Specialization
     protected Object readPropertyOfString(TruffleString target, Object index,
-            @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
-        return readStringPropertyExprNode.executeReadTruffleStringProperty(target,
+            @Cached ReadTruffleStringPropertyNode readStringPropertyNode) {
+        return readStringPropertyNode.executeReadTruffleStringProperty(target,
                 index);
     }
 

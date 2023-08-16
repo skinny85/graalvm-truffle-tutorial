@@ -2,7 +2,7 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyExprNode;
+import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyNode;
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -20,7 +20,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * Used in code like {@code t.myProp}.
  * Similar to the class with the same name from part 10,
  * the only difference is we add a specialization for when the target of the property read is a
- * {@link TruffleString}, in which case we delegate to {@link ReadTruffleStringPropertyExprNode}.
+ * {@link TruffleString}, in which case we delegate to {@link ReadTruffleStringPropertyNode}.
  *
  * @see #readPropertyOfString
  */
@@ -31,12 +31,12 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
 
     /**
      * The specialization for reading a property of a {@link TruffleString}.
-     * Simply delegates to {@link ReadTruffleStringPropertyExprNode}.
+     * Simply delegates to {@link ReadTruffleStringPropertyNode}.
      */
     @Specialization
     protected Object readPropertyOfString(TruffleString target,
-            @Cached ReadTruffleStringPropertyExprNode readStringPropertyExprNode) {
-        return readStringPropertyExprNode.executeReadTruffleStringProperty(
+            @Cached ReadTruffleStringPropertyNode readStringPropertyNode) {
+        return readStringPropertyNode.executeReadTruffleStringProperty(
                 target, this.getPropertyName());
     }
 

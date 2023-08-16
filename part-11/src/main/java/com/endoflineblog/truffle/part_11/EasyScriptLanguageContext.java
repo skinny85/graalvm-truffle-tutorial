@@ -17,7 +17,7 @@ import com.oracle.truffle.api.object.Shape;
  *
  * @see #stringPrototype
  * @see StringPrototype
- * @see com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyExprNode
+ * @see com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyNode
  */
 public final class EasyScriptLanguageContext {
     private static final TruffleLanguage.ContextReference<EasyScriptLanguageContext> REF =
