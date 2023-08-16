@@ -207,7 +207,7 @@ public class ControlFlowTest {
     }
 
     @Test
-    public void test_parsing_source() {
+    public void negative_recursive_fibonacci_is_correct() {
         Source fibProgram = Source.create("ezs", "" +
                 "function fib(n) { " +
                 "    if (n > -2) { " +
