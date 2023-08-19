@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_12.nodes.stmts.variables;
 
-import com.endoflineblog.truffle.part_12.nodes.exprs.GlobalScopeObjectExprNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_12.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.blocks.UserFuncBodyStmtNode;
@@ -20,7 +20,7 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
  * A Node that represents the declaration of a function in EasyScript.
  * Identical to the class with the same name from part 10.
  */
-@NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
+@NodeChild(value = "globalScopeObjectExpr", type = EasyScriptExprNode.class)
 @NodeField(name = "funcName", type = String.class)
 @NodeField(name = "frameDescriptor", type = FrameDescriptor.class)
 @NodeField(name = "funcBody", type = UserFuncBodyStmtNode.class)
@@ -35,7 +35,7 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
     private FunctionObject cachedFunction;
 
     @Specialization(limit = "1")
-    protected Object declareFunction(DynamicObject globalScopeObject,
+    protected Object declareFunction(DynamicObject globalScopeObject, // ToDo rename this to the more generic name (without 'global')
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         if (this.cachedFunction == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();

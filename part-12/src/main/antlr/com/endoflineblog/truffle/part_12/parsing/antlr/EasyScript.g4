@@ -8,7 +8,7 @@ start : stmt+ EOF ;
 
 stmt :         kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDeclStmt
      |                                                         expr1 ';'? #ExprStmt
-     |       'function' name=ID '(' args=func_args ')' '{' stmt* '}' ';'? #FuncDeclStmt
+     |                               'function' subroutine_signature ';'? #FuncDeclStmt
      |                                               'return' expr1? ';'? #ReturnStmt
      |                                                 '{' stmt* '}' ';'? #BlockStmt
      |    'if' '(' cond=expr1 ')' then_stmt=stmt ('else' else_stmt=stmt)? #IfStmt
@@ -17,8 +17,11 @@ stmt :         kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDe
      | 'for' '(' init=stmt? ';' cond=expr1? ';' updt=expr1? ')' body=stmt #ForStmt
      |                                                       'break' ';'? #BreakStmt
      |                                                    'continue' ';'? #ContinueStmt
+     |                              'class' ID '{' class_member* '}' ';'? #ClassDeclStmt
      ;
 binding : ID ('=' expr1)? ;
+class_member : subroutine_signature ;
+subroutine_signature : name=ID '(' args=func_args ')' '{' stmt* '}' ;
 func_args : (ID (',' ID)* )? ;
 
 expr1 : ID '=' expr1                                       #AssignmentExpr1

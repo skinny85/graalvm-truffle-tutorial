@@ -51,12 +51,12 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     private final Shape arrayShape = Shape.newBuilder().layout(ArrayObject.class).build();
 
     /** The root {@link Shape} for {@link com.endoflineblog.truffle.part_12.runtime.GlobalScopeObject}. */
-    private final Shape globalScopeShape = Shape.newBuilder().build();
+    private final Shape rootShape = Shape.newBuilder().build();
 
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         ParsingResult parsingResult = EasyScriptTruffleParser.parse(
-                request.getSource().getReader(), this.arrayShape);
+                request.getSource().getReader(), this.rootShape, this.arrayShape);
         var programRootNode = new StmtBlockRootNode(this, parsingResult.topLevelFrameDescriptor,
                 parsingResult.programStmtBlock);
         return programRootNode.getCallTarget();
@@ -64,7 +64,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var context = new EasyScriptLanguageContext(this.globalScopeShape, this.createStringPrototype());
+        var context = new EasyScriptLanguageContext(this.rootShape, this.createStringPrototype());
         var globalScopeObject = context.globalScopeObject;
 
         var objectLibrary = DynamicObjectLibrary.getUncached();
