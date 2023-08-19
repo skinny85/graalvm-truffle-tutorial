@@ -324,9 +324,8 @@ public final class EasyScriptTruffleParser {
             classMethods.add(this.parseSubroutineDeclStmt(classMember.subroutine_signature(),
                     new DynamicObjectReferenceExprNode(classPrototype)));
         }
-        return ClassDeclStmtNodeGen.create(GlobalScopeObjectExprNodeGen.create(),
-                classPrototype,
-                classMethods.toArray(EasyScriptStmtNode[]::new));
+        return ClassDeclStmtNodeGen.create(
+                classMethods, GlobalScopeObjectExprNodeGen.create(), classPrototype);
     }
 
     private FuncDeclStmtNode parseSubroutineDeclStmt(EasyScriptParser.Subroutine_signatureContext subroutineSignature,

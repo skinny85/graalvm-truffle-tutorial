@@ -22,9 +22,13 @@ public class ClassTest {
     }
 
     @Test
-    void empty_class_declaration_creates_object() {
+    void class_declaration_creates_object() {
         Value result = this.context.eval("ezs", "" +
-                "class A { } " +
+                "class A { " +
+                "    a() { " +
+                "        return 'A.a'; " +
+                "    } " +
+                "} " +
                 "A;");
 
         assertEquals("[class A]", result.toString());

@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_12.nodes.stmts.classes;
 
 import com.endoflineblog.truffle.part_12.nodes.exprs.GlobalScopeObjectExprNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.EasyScriptStmtNode;
+import com.endoflineblog.truffle.part_12.nodes.stmts.variables.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_12.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_12.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives;
@@ -15,15 +16,22 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
+import java.util.List;
+
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeField(name = "classPrototypeObject", type = ClassPrototypeObject.class)
-@NodeField(name = "classMethodDecls", type = EasyScriptStmtNode[].class)
 public abstract class ClassDeclStmtNode extends EasyScriptStmtNode {
     @CompilationFinal
     private boolean cached;
 
+    @Children
+    private final FuncDeclStmtNode[] classMethodDecls;
+
+    protected ClassDeclStmtNode(List<FuncDeclStmtNode> classMethodDecls) {
+        this.classMethodDecls = classMethodDecls.toArray(FuncDeclStmtNode[]::new);
+    }
+
     protected abstract ClassPrototypeObject getClassPrototypeObject();
-    protected abstract EasyScriptStmtNode[] getClassMethodDecls();
 
     @ExplodeLoop
     @Specialization(limit = "1")
@@ -31,7 +39,7 @@ public abstract class ClassDeclStmtNode extends EasyScriptStmtNode {
                 @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         if (!this.cached) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
-            for (var classMethodDecl : this.getClassMethodDecls()) {
+            for (var classMethodDecl : this.classMethodDecls) {
                 classMethodDecl.executeStatement(frame);
             }
             this.cached = true;
