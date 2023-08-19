@@ -27,6 +27,8 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.literals.DoubleLiteralExprN
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.IntLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.StringLiteralExprNode;
 import com.endoflineblog.truffle.part_12.nodes.exprs.literals.UndefinedLiteralExprNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.objects.NewExprNode;
+import com.endoflineblog.truffle.part_12.nodes.exprs.objects.NewExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_12.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
@@ -475,6 +477,8 @@ public final class EasyScriptTruffleParser {
             return parseReference(((EasyScriptParser.ReferenceExpr5Context) expr5).ID().getText());
         } else if (expr5 instanceof EasyScriptParser.PropertyReadExpr5Context) {
             return this.parsePropertyReadExpr((EasyScriptParser.PropertyReadExpr5Context) expr5);
+        } else if (expr5 instanceof EasyScriptParser.NewExpr5Context) {
+            return this.parseNewExpr((EasyScriptParser.NewExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.ArrayLiteralExpr5Context) {
             return parseArrayLiteralExpr((EasyScriptParser.ArrayLiteralExpr5Context) expr5);
         } else if (expr5 instanceof EasyScriptParser.ArrayIndexReadExpr5Context) {
@@ -528,6 +532,14 @@ public final class EasyScriptTruffleParser {
         return PropertyReadExprNodeGen.create(
                 this.parseExpr5(propertyReadExpr.expr5()),
                 propertyReadExpr.ID().getText());
+    }
+
+    private EasyScriptExprNode parseNewExpr(EasyScriptParser.NewExpr5Context newExpr) {
+        return NewExprNodeGen.create(
+                newExpr.expr1().stream()
+                        .map(this::parseExpr1)
+                        .collect(Collectors.toList()),
+                this.parseExpr5(newExpr.constr));
     }
 
     private ArrayLiteralExprNode parseArrayLiteralExpr(EasyScriptParser.ArrayLiteralExpr5Context arrayLiteralExpr) {
