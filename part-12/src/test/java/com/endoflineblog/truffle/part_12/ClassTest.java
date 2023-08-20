@@ -45,6 +45,10 @@ public class ClassTest {
                 "new A;");
 
         assertTrue(result.hasMembers());
+        assertTrue(result.hasMember("a"));
+        Value methodA = result.getMember("a");
+        assertTrue(methodA.canExecute());
+        assertEquals("A.a", methodA.execute().asString());
     }
 
     @Test
