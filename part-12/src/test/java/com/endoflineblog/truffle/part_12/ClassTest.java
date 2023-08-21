@@ -42,7 +42,7 @@ public class ClassTest {
                 "        return 'A.a'; " +
                 "    } " +
                 "} " +
-                "new A;");
+                "new A();");
 
         assertTrue(result.hasMembers());
         assertTrue(result.hasMember("a"));
@@ -52,10 +52,24 @@ public class ClassTest {
     }
 
     @Test
+    void methods_can_be_called_on_class_instances() {
+        Value result = this.context.eval("ezs", "" +
+                "class A { " +
+                "    a() { " +
+                "        return 'A.a'; " +
+                "    } " +
+                "} " +
+                "const a = new A(); " +
+                "a.a(); ");
+
+        assertEquals("A.a", result.asString());
+    }
+
+    @Test
     void new_with_non_class_is_an_error() {
         try {
             this.context.eval("ezs",
-                    "new 3;");
+                    "new 3();");
             fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
