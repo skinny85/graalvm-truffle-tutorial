@@ -471,11 +471,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr5(EasyScriptParser.Expr5Context expr5) {
-        if (expr5 instanceof EasyScriptParser.PropertyReadExpr5Context) {
-            return this.parsePropertyReadExpr((EasyScriptParser.PropertyReadExpr5Context) expr5);
-        } else if (expr5 instanceof EasyScriptParser.ArrayIndexReadExpr5Context) {
-            return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr5Context) expr5);
-        } else if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
+        if (expr5 instanceof EasyScriptParser.CallExpr5Context) {
             return parseCallExpr((EasyScriptParser.CallExpr5Context) expr5);
         } else {
             return this.parseExpr6(((EasyScriptParser.PrecedenceSixExpr5Context) expr5).expr6());
@@ -487,12 +483,24 @@ public final class EasyScriptTruffleParser {
             return parseLiteralExpr((EasyScriptParser.LiteralExpr5Context) expr6);
         } else if (expr6 instanceof EasyScriptParser.ReferenceExpr5Context) {
             return parseReference(((EasyScriptParser.ReferenceExpr5Context) expr6).ID().getText());
+        } else if (expr6 instanceof EasyScriptParser.PropertyReadExpr5Context) {
+            return this.parsePropertyReadExpr((EasyScriptParser.PropertyReadExpr5Context) expr6);
+        } else if (expr6 instanceof EasyScriptParser.ArrayIndexReadExpr5Context) {
+            return this.parseArrayIndexReadExpr((EasyScriptParser.ArrayIndexReadExpr5Context) expr6);
         } else if (expr6 instanceof EasyScriptParser.ArrayLiteralExpr5Context) {
             return parseArrayLiteralExpr((EasyScriptParser.ArrayLiteralExpr5Context) expr6);
         } else if (expr6 instanceof EasyScriptParser.NewExpr5Context) {
             return this.parseNewExpr((EasyScriptParser.NewExpr5Context) expr6);
         } else {
-            return parseExpr1(((EasyScriptParser.PrecedenceOneExpr5Context) expr6).expr1());
+            return parseExpr7(((EasyScriptParser.PrecedenceSevenExpr5Context) expr6).expr7());
+        }
+    }
+
+    private EasyScriptExprNode parseExpr7(EasyScriptParser.Expr7Context expr7) {
+        if (expr7 instanceof EasyScriptParser.CallExpr7Context) {
+            return parseCallExpr6((EasyScriptParser.CallExpr7Context) expr7);
+        } else {
+            return parseExpr1(((EasyScriptParser.PrecedenceOneExpr5Context) expr7).expr1());
         }
     }
 
@@ -536,7 +544,7 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parsePropertyReadExpr(EasyScriptParser.PropertyReadExpr5Context propertyReadExpr) {
         return PropertyReadExprNodeGen.create(
-                this.parseExpr5(propertyReadExpr.expr5()),
+                this.parseExpr6(propertyReadExpr.expr6()),
                 propertyReadExpr.ID().getText());
     }
 
@@ -556,13 +564,21 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parseArrayIndexReadExpr(EasyScriptParser.ArrayIndexReadExpr5Context arrayIndexReadExpr) {
         return ArrayIndexReadExprNodeGen.create(
-                this.parseExpr5(arrayIndexReadExpr.arr),
+                this.parseExpr6(arrayIndexReadExpr.arr),
                 this.parseExpr1(arrayIndexReadExpr.index));
     }
 
     private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr5Context callExpr) {
         return new FunctionCallExprNode(
                 parseExpr5(callExpr.expr5()),
+                callExpr.expr1().stream()
+                        .map(this::parseExpr1)
+                        .collect(Collectors.toList()));
+    }
+
+    private FunctionCallExprNode parseCallExpr6(EasyScriptParser.CallExpr7Context callExpr) {
+        return new FunctionCallExprNode(
+                parseExpr7(callExpr.expr7()),
                 callExpr.expr1().stream()
                         .map(this::parseExpr1)
                         .collect(Collectors.toList()));
