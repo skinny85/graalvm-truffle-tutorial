@@ -59,8 +59,7 @@ public class ClassTest {
                 "        return 'A.a'; " +
                 "    } " +
                 "} " +
-                "const a = new A(); " +
-                "a.a(); ");
+                "new A().a();");
 
         assertEquals("A.a", result.asString());
     }

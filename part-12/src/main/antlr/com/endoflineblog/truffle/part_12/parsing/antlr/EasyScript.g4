@@ -38,13 +38,15 @@ expr4 : left=expr4 o=('+' | '-') right=expr5               #AddSubtractExpr4
       | '-' expr5                                          #UnaryMinusExpr4
       | expr5                                              #PrecedenceFiveExpr4
       ;
-expr5 : literal                                            #LiteralExpr5
-      | ID                                                 #ReferenceExpr5
-      | expr5 '.' ID                                       #PropertyReadExpr5
-      | 'new' constr=expr5 '(' (expr1 (',' expr1)*)? ')'   #NewExpr5
-      | '[' (expr1 (',' expr1)*)? ']'                      #ArrayLiteralExpr5
+expr5 : expr5 '.' ID                                       #PropertyReadExpr5
       | arr=expr5 '[' index=expr1 ']'                      #ArrayIndexReadExpr5
       | expr5 '(' (expr1 (',' expr1)*)? ')'                #CallExpr5
+      | expr6                                              #PrecedenceSixExpr5
+      ;
+expr6 : literal                                            #LiteralExpr5
+      | ID                                                 #ReferenceExpr5
+      | '[' (expr1 (',' expr1)*)? ']'                      #ArrayLiteralExpr5
+      | 'new' constr=expr6 '(' (expr1 (',' expr1)*)? ')'   #NewExpr5
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;
 
