@@ -491,6 +491,8 @@ public final class EasyScriptTruffleParser {
             return parseArrayLiteralExpr((EasyScriptParser.ArrayLiteralExpr5Context) expr6);
         } else if (expr6 instanceof EasyScriptParser.NewExpr5Context) {
             return this.parseNewExpr((EasyScriptParser.NewExpr5Context) expr6);
+        } else if (expr6 instanceof EasyScriptParser.CallExpr6Context) {
+            return parseCallExpr6((EasyScriptParser.CallExpr6Context) expr6);
         } else {
             return parseExpr1(((EasyScriptParser.PrecedenceOneExpr5Context) expr6).expr1());
         }
@@ -563,6 +565,14 @@ public final class EasyScriptTruffleParser {
     private FunctionCallExprNode parseCallExpr(EasyScriptParser.CallExpr5Context callExpr) {
         return new FunctionCallExprNode(
                 parseExpr5(callExpr.expr5()),
+                callExpr.expr1().stream()
+                        .map(this::parseExpr1)
+                        .collect(Collectors.toList()));
+    }
+
+    private FunctionCallExprNode parseCallExpr6(EasyScriptParser.CallExpr6Context callExpr) {
+        return new FunctionCallExprNode(
+                parseExpr6(callExpr.expr6()),
                 callExpr.expr1().stream()
                         .map(this::parseExpr1)
                         .collect(Collectors.toList()));

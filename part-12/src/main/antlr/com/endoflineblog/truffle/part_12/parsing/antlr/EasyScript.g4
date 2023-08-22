@@ -47,6 +47,7 @@ expr6 : literal                                            #LiteralExpr5
       | ID                                                 #ReferenceExpr5
       | '[' (expr1 (',' expr1)*)? ']'                      #ArrayLiteralExpr5
       | 'new' constr=expr6 '(' (expr1 (',' expr1)*)? ')'   #NewExpr5
+      | expr6 '(' (expr1 (',' expr1)*)? ')'                #CallExpr6
       | '(' expr1 ')'                                      #PrecedenceOneExpr5
       ;
 
