@@ -24,7 +24,6 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
     private FunctionDispatchNode dispatchNode;
 
     public FunctionCallExprNode(EasyScriptExprNode targetFunction, List<EasyScriptExprNode> callArguments) {
-        super();
         this.targetFunction = targetFunction;
         this.callArguments = callArguments.toArray(new EasyScriptExprNode[]{});
         this.dispatchNode = FunctionDispatchNodeGen.create();

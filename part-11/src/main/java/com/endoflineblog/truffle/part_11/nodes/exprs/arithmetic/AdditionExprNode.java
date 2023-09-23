@@ -11,7 +11,7 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The Node representing number addition.
- * Similar to the class with the same name from part 9,
+ * Similar to the class with the same name from part 10,
  * the difference being that we need to add specializations for handling strings.
  *
  * @see #concatenateTruffleStrings

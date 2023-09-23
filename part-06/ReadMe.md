@@ -58,7 +58,9 @@ that reduces duplication when creating an instance of the built-in function's bo
 
 The invoking side is implemented by the
 [`FunctionCallExprNode` class](src/main/java/com/endoflineblog/truffle/part_06/nodes/exprs/functions/FunctionCallExprNode.java).
-It evaluates the target of the call, its arguments,
+It evaluates the target of the call, its arguments
+(we have to evaluate them explicitly, in a loop,
+as the Truffle DSL has a limitation where it doesn't support specializations with a variable amount of children Nodes),
 and then delegates to a `FunctionDispatchNode`.
 
 The [`FunctionDispatchNode` class](src/main/java/com/endoflineblog/truffle/part_06/nodes/exprs/functions/FunctionDispatchNode.java)

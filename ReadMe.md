@@ -65,3 +65,4 @@ $ ./gradlew build
 * [Part 9 - performance benchmarking](part-09)
 * [Part 10 - arrays, read-only properties](part-10)
 * [Part 11 - strings, static method calls](part-11)
+* [Part 12 - classes 1: methods, `new` operator](part-12)
