@@ -29,6 +29,7 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.literals.StringLiteralExprN
 import com.endoflineblog.truffle.part_13.nodes.exprs.literals.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.objects.ClassDeclExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.objects.NewExprNodeGen;
+import com.endoflineblog.truffle.part_13.nodes.exprs.objects.ThisExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_13.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_13.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
@@ -492,6 +493,8 @@ public final class EasyScriptTruffleParser {
     private EasyScriptExprNode parseExpr6(EasyScriptParser.Expr6Context expr6) {
         if (expr6 instanceof EasyScriptParser.LiteralExpr6Context) {
             return this.parseLiteralExpr((EasyScriptParser.LiteralExpr6Context) expr6);
+        } else if (expr6 instanceof EasyScriptParser.ThisExpr6Context) {
+            return new ThisExprNode();
         } else if (expr6 instanceof EasyScriptParser.ReferenceExpr6Context) {
             return this.parseReference(((EasyScriptParser.ReferenceExpr6Context) expr6).ID().getText());
         } else if (expr6 instanceof EasyScriptParser.ArrayLiteralExpr6Context) {
