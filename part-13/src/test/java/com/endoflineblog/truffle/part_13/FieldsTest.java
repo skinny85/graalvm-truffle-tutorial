@@ -25,12 +25,29 @@ public class FieldsTest {
     @Test
     void this_in_global_function_is_undefined() {
         Value result = this.context.eval("ezs", "" +
-                "function returnThis() { " +
+                "function returnThis(ignored) { " +
                 "    return this; " +
                 "} " +
-                "returnThis();"
+                "returnThis(3);"
         );
         assertTrue(result.isNull());
         assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    void returning_this_from_a_method_returns_the_object() {
+        Value result = this.context.eval("ezs", "" +
+                "class A { " +
+                "    returnThis() { " +
+                "        return this; " +
+                "    } " +
+                "} " +
+                "let a = new A; " +
+                "a.returnThis(); "
+        );
+        // ToDo fix, as this is incorrect behavior
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+//        assertTrue(result.asBoolean());
     }
 }

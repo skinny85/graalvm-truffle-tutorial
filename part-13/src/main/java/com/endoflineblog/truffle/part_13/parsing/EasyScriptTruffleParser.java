@@ -361,7 +361,9 @@ public final class EasyScriptTruffleParser {
         int argumentCount = funcArgs.size();
         // first, initialize the locals with function arguments
         for (int i = 0; i < argumentCount; i++) {
-            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i));
+            // offset the arguments by one,
+            // because the first argument is always `this`
+            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1));
         }
         this.localScopes.push(localVariables);
 

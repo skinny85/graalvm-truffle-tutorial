@@ -60,32 +60,24 @@ public abstract class FunctionDispatchNode extends Node {
     }
 
     private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
-        // if the function object doesn't have a target
-        // (meaning, it's a function, not method, call),
-        // and we were called with at least as many arguments as the function takes,
-        // there's nothing to do
-        if (arguments.length >= function.argumentCount && function.methodTarget == null) {
-            return arguments;
-        }
-
-        // otherwise, create a new arguments array,
-        // saving the method target as the first element if it's non-null,
-        // and filling out the remaining arguments with 'undefined's
-        // if we got called with less of them than the function expects
-        Object[] ret = new Object[function.argumentCount];
-        for (int i = 0; i < function.argumentCount; i++) {
-            int j;
-            if (function.methodTarget == null) {
-                j = i;
+        // create a new array of arguments, reserving the first one for 'this',
+        // which means we need to offset the remaining arguments by one
+        int extendedArgumentsLength = function.argumentCount +
+                (function.methodTarget == null ? 1 : 0);
+        Object[] ret = new Object[extendedArgumentsLength];
+        for (int i = 0; i < extendedArgumentsLength; i++) {
+            if (i == 0) {
+                // for 'this', if we don't have a method target, we need to use 'undefined'
+                ret[i] = function.methodTarget == null ? Undefined.INSTANCE : function.methodTarget;
             } else {
-                if (i == 0) {
-                    ret[0] = function.methodTarget;
-                    continue;
-                } else {
-                    j = i - 1;
-                }
+                // we need to offset the arguments by one
+                int j = i - 1;
+                ret[i] = j < arguments.length
+                        ? arguments[j]
+                        // if a function was called with fewer arguments than it declares,
+                        // we fill them with `undefined`
+                        : Undefined.INSTANCE;
             }
-            ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
         }
         return ret;
     }

@@ -82,18 +82,22 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     private StringPrototype createStringPrototype() {
         return new StringPrototype(
-                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance()));
+                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance(),
+                        // built-in method implementation Nodes already have an argument for `this`,
+                        // so there's no need to offset the method arguments
+                        /* offsetArguments */ false));
     }
 
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
-        return new FunctionObject(this.createCallTarget(nodeFactory),
+        return new FunctionObject(this.createCallTarget(nodeFactory, /* offsetArguments */ true),
                 nodeFactory.getExecutionSignature().size());
     }
 
-    private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
+    private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory,
+            boolean offsetArguments) {
         int argumentCount = nodeFactory.getExecutionSignature().size();
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
-                .mapToObj(i -> new ReadFunctionArgExprNode(i))
+                .mapToObj(i -> new ReadFunctionArgExprNode(offsetArguments ? i + 1 : i))
                 .toArray(ReadFunctionArgExprNode[]::new);
         var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));

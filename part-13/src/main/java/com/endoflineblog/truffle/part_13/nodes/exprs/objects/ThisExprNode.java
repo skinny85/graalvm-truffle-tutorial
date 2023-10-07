@@ -7,10 +7,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 public class ThisExprNode extends EasyScriptExprNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        return frame.getArguments().length > 0
-                // if 'this' is available, it's passed as the first argument
-                ? frame.getArguments()[0]
-                // if 'this' is not available, it's 'undefined'
-                : Undefined.INSTANCE;
+        // because of how we handle calls in FunctionDispatchNode,
+        // the `this` object is always in the first argument
+        return frame.getArguments()[0];
     }
 }
