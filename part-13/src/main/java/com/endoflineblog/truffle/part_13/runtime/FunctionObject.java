@@ -42,7 +42,7 @@ public final class FunctionObject implements TruffleObject {
     private final FunctionDispatchNode functionDispatchNode;
 
     public FunctionObject(CallTarget callTarget, int argumentCount) {
-        this(callTarget, argumentCount, null);
+        this(callTarget, argumentCount, Undefined.INSTANCE);
     }
 
     public FunctionObject(CallTarget callTarget, int argumentCount,
@@ -51,6 +51,10 @@ public final class FunctionObject implements TruffleObject {
         this.argumentCount = argumentCount;
         this.methodTarget = methodTarget;
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
+    }
+
+    public FunctionObject withMethodTarget(Object methodTarget) {
+        return new FunctionObject(this.callTarget, this.argumentCount, methodTarget);
     }
 
     /**

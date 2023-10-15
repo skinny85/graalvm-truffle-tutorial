@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.strings.ReadTruffleStringPropertyNode;
+import com.endoflineblog.truffle.part_13.runtime.ClassInstanceObject;
 import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -11,6 +12,7 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -30,6 +32,18 @@ public abstract class CommonReadPropertyNode extends Node {
             @Cached ReadTruffleStringPropertyNode readStringPropertyNode) {
         return readStringPropertyNode.executeReadTruffleStringProperty(
                 target, property);
+    }
+
+    /**
+     * The specialization for reading a property of a {@link com.endoflineblog.truffle.part_13.runtime.ClassInstanceObject}.
+     * Simply delegates to {@link PrototypePropertyReadNode}.
+     */
+    @Specialization(limit = "1")
+    protected Object readPropertyOfClassInstance(ClassInstanceObject target, Object property,
+            @CachedLibrary("target.classPrototypeObject") DynamicObjectLibrary objectLibrary,
+            @Cached PrototypePropertyReadNode readStringPropertyNode) {
+        return readStringPropertyNode.executePropertyRead(target, property,
+                target.classPrototypeObject, objectLibrary);
     }
 
     @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")

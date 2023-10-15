@@ -19,8 +19,7 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ClassInstanceObject implements TruffleObject {
-    // this can't be private, because it's used in specialization guard expressions
-    final ClassPrototypeObject classPrototypeObject;
+    public final ClassPrototypeObject classPrototypeObject;
 
     public ClassInstanceObject(ClassPrototypeObject classPrototypeObject) {
         this.classPrototypeObject = classPrototypeObject;

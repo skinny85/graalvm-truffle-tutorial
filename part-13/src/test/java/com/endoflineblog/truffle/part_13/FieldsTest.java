@@ -43,11 +43,8 @@ public class FieldsTest {
                 "    } " +
                 "} " +
                 "let a = new A; " +
-                "a.returnThis(); "
+                "a === a.returnThis(); "
         );
-        // ToDo fix, as this is incorrect behavior
-        assertTrue(result.isNull());
-        assertEquals("undefined", result.toString());
-//        assertTrue(result.asBoolean());
+        assertTrue(result.asBoolean());
     }
 }

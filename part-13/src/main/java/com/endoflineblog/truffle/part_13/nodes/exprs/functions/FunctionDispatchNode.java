@@ -62,22 +62,17 @@ public abstract class FunctionDispatchNode extends Node {
     private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
         // create a new array of arguments, reserving the first one for 'this',
         // which means we need to offset the remaining arguments by one
-        int extendedArgumentsLength = function.argumentCount +
-                (function.methodTarget == null ? 1 : 0);
+        int extendedArgumentsLength = function.argumentCount + 1;
         Object[] ret = new Object[extendedArgumentsLength];
-        for (int i = 0; i < extendedArgumentsLength; i++) {
-            if (i == 0) {
-                // for 'this', if we don't have a method target, we need to use 'undefined'
-                ret[i] = function.methodTarget == null ? Undefined.INSTANCE : function.methodTarget;
-            } else {
-                // we need to offset the arguments by one
-                int j = i - 1;
-                ret[i] = j < arguments.length
-                        ? arguments[j]
-                        // if a function was called with fewer arguments than it declares,
-                        // we fill them with `undefined`
-                        : Undefined.INSTANCE;
-            }
+        // the first argument to a subroutine call is always 'this',
+        // which is 'undefined' for global functions
+        ret[0] = function.methodTarget;
+        for (int i = 1; i < extendedArgumentsLength; i++) {
+            // we need to offset the provided arguments by one, because of 'this'
+            int j = i - 1;
+            // if a function was called with fewer arguments than it declares,
+            // we fill them with `undefined`
+            ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
         }
         return ret;
     }

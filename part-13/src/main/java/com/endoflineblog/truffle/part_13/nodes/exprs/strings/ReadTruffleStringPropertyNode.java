@@ -86,7 +86,8 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     }
 
     protected FunctionObject createCharAtMethodObject(TruffleString truffleString) {
-        return new FunctionObject(currentLanguageContext().stringPrototype.charAtMethod, 2, truffleString);
+        // we don't count 'this' when determining how many arguments a given method takes
+        return new FunctionObject(currentLanguageContext().stringPrototype.charAtMethod, 1, truffleString);
     }
 
     /** Accessing any other string property should return 'undefined'. */
