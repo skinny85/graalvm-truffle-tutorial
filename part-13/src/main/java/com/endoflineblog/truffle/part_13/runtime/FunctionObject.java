@@ -39,22 +39,45 @@ public final class FunctionObject implements TruffleObject {
      */
     public final Object methodTarget;
 
+    /**
+     * Whether the given method uses 'this' in its implementation.
+     * If this is 'false', we perform an optimization where we don't set the receiver of the method.
+     *
+     * @see #withMethodTarget
+     */
+    private final boolean usesThis;
+
     private final FunctionDispatchNode functionDispatchNode;
 
     public FunctionObject(CallTarget callTarget, int argumentCount) {
-        this(callTarget, argumentCount, Undefined.INSTANCE);
+        this(callTarget, argumentCount, false);
+    }
+
+    public FunctionObject(CallTarget callTarget, int argumentCount,
+            boolean usesThis) {
+        this(callTarget, argumentCount, Undefined.INSTANCE, usesThis);
     }
 
     public FunctionObject(CallTarget callTarget, int argumentCount,
             Object methodTarget) {
+        this(callTarget, argumentCount, methodTarget, true);
+    }
+
+    private FunctionObject(CallTarget callTarget, int argumentCount,
+            Object methodTarget, boolean usesThis) {
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
         this.methodTarget = methodTarget;
+        this.usesThis = usesThis;
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
     }
 
     public FunctionObject withMethodTarget(Object methodTarget) {
-        return new FunctionObject(this.callTarget, this.argumentCount, methodTarget);
+        return this.usesThis
+                ? new FunctionObject(this.callTarget, this.argumentCount, methodTarget)
+                // optimization: if a given subroutine does not use 'this',
+                // do not set the receiver, as it won't be used anyway
+                : this;
     }
 
     /**

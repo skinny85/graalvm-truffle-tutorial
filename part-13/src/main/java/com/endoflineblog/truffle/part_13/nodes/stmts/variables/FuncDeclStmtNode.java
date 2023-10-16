@@ -39,11 +39,13 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 @NodeField(name = "frameDescriptor", type = FrameDescriptor.class)
 @NodeField(name = "funcBody", type = UserFuncBodyStmtNode.class)
 @NodeField(name = "argumentCount", type = int.class)
+@NodeField(name = "functionUsesThis", type = boolean.class)
 public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
     protected abstract String getFuncName();
     protected abstract FrameDescriptor getFrameDescriptor();
     protected abstract UserFuncBodyStmtNode getFuncBody();
     protected abstract int getArgumentCount();
+    protected abstract boolean isFunctionUsesThis();
 
     @CompilationFinal
     private FunctionObject cachedFunction;
@@ -58,7 +60,7 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
             var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.getFrameDescriptor(), this.getFuncBody());
             var callTarget = funcRootNode.getCallTarget();
 
-            this.cachedFunction = new FunctionObject(callTarget, this.getArgumentCount());
+            this.cachedFunction = new FunctionObject(callTarget, this.getArgumentCount(), this.isFunctionUsesThis());
         }
 
         // we allow functions to be redefined, to comply with JavaScript semantics

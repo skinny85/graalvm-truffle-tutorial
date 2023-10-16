@@ -140,6 +140,13 @@ public final class EasyScriptTruffleParser {
      */
     private int localVariablesCounter;
 
+    /**
+     * A field that tracks whether a given function references 'this'.
+     * It allows an optimization where we don't set the receiver of method calls
+     * which don't use 'this', as that sometimes allows eliminating the entire object allocation.
+     */
+    private boolean functionUsesThis;
+
     private EasyScriptTruffleParser(Shape objectShape, Shape arrayShape) {
         this.objectShape = objectShape;
         this.arrayShape = arrayShape;
@@ -354,6 +361,7 @@ public final class EasyScriptTruffleParser {
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.state = ParserState.FUNC_DEF;
         this.localScopes = new Stack<>();
+        this.functionUsesThis = false;
 
         var localVariables = new HashMap<String, FrameMember>();
         // add each parameter to the map, with the correct index
@@ -371,14 +379,16 @@ public final class EasyScriptTruffleParser {
         List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(subroutineDecl.stmt());
 
         FrameDescriptor frameDescriptor = this.frameDescriptor.build();
+        boolean functionUsesThis = this.functionUsesThis;
         // bring back the old state
         this.frameDescriptor = previousFrameDescriptor;
         this.state = previousParserState;
         this.localScopes = previousLocalScopes;
+        this.functionUsesThis = false;
 
         return FuncDeclStmtNodeGen.create(containerObjectExpr,
                 subroutineDecl.name.getText(),
-                frameDescriptor, new UserFuncBodyStmtNode(funcStmts), argumentCount);
+                frameDescriptor, new UserFuncBodyStmtNode(funcStmts), argumentCount, functionUsesThis);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
@@ -496,7 +506,7 @@ public final class EasyScriptTruffleParser {
         if (expr6 instanceof EasyScriptParser.LiteralExpr6Context) {
             return this.parseLiteralExpr((EasyScriptParser.LiteralExpr6Context) expr6);
         } else if (expr6 instanceof EasyScriptParser.ThisExpr6Context) {
-            return new ThisExprNode();
+            return this.parseNewExpr();
         } else if (expr6 instanceof EasyScriptParser.ReferenceExpr6Context) {
             return this.parseReference(((EasyScriptParser.ReferenceExpr6Context) expr6).ID().getText());
         } else if (expr6 instanceof EasyScriptParser.ArrayLiteralExpr6Context) {
@@ -530,6 +540,11 @@ public final class EasyScriptTruffleParser {
                     stringLiteral.substring(1, stringLiteral.length() - 1)));
         }
         return new UndefinedLiteralExprNode();
+    }
+
+    private EasyScriptExprNode parseNewExpr() {
+        this.functionUsesThis = true;
+        return new ThisExprNode();
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
