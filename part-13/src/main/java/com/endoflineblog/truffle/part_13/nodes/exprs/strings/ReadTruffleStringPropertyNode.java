@@ -1,20 +1,20 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.strings;
 
 import com.endoflineblog.truffle.part_13.nodes.EasyScriptNode;
+import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PrototypePropertyReadNode;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
-import com.endoflineblog.truffle.part_13.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
-import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * An AST node that represents reading properties of strings.
  * Identical to the class with the same name from part 11.
  */
-@ImportStatic(EasyScriptTruffleStrings.class)
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";
     protected static final String CHAR_AT_PROP = "charAt";
@@ -50,51 +50,11 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
         return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 
-    /**
-     * The specialization used when accessing the {@code charAt}
-     * property of a string, in code like {@code "abc".charAt}
-     * or {@code "abc"['charAt']}.
-     * This is the "fast" version of the specialization,
-     * which caches the created {@link FunctionObject},
-     * instead of creating a new object each time the node is executed.
-     */
-    @Specialization(guards = {
-            "CHAR_AT_PROP.equals(propertyName)",
-            "same(charAtMethod.methodTarget, truffleString)"
-    })
-    protected FunctionObject readCharAtPropertyCached(
-            @SuppressWarnings("unused") TruffleString truffleString,
-            @SuppressWarnings("unused") String propertyName,
-            @Cached("createCharAtMethodObject(truffleString)") FunctionObject charAtMethod) {
-        return charAtMethod;
-    }
-
-    /**
-     * The "slow" specialization version of reading the {@code charAt}
-     * property that we switch to when {@link #readCharAtPropertyCached}
-     * encounters more than 3 different string targets
-     * (3 is the default instantiation limit for specializations in Truffle).
-     * In that case, we no longer cache the {@link FunctionObject}
-     * representing a given method,
-     * but simply create a new object each time the node is executed.
-     */
-    @Specialization(guards = "CHAR_AT_PROP.equals(propertyName)", replaces = "readCharAtPropertyCached")
-    protected FunctionObject readCharAtPropertyUncached(
-            TruffleString truffleString,
-            @SuppressWarnings("unused") String propertyName) {
-        return createCharAtMethodObject(truffleString);
-    }
-
-    protected FunctionObject createCharAtMethodObject(TruffleString truffleString) {
-        // we don't count 'this' when determining how many arguments a given method takes
-        return new FunctionObject(currentLanguageContext().stringPrototype.charAtMethod, 1, truffleString);
-    }
-
-    /** Accessing any other string property should return 'undefined'. */
     @Fallback
-    protected Undefined readUnknownProperty(
-            @SuppressWarnings("unused") TruffleString truffleString,
-            @SuppressWarnings("unused") Object property) {
-        return Undefined.INSTANCE;
+    protected Object readNonLengthProperty(TruffleString truffleString, Object property,
+            @CachedLibrary(limit = "1") DynamicObjectLibrary objectLibrary,
+            @Cached PrototypePropertyReadNode prototypePropertyReadNode) {
+        return prototypePropertyReadNode.executePropertyRead(truffleString, property,
+                this.currentLanguageContext().stringPrototype, objectLibrary);
     }
 }

@@ -10,9 +10,9 @@ import com.endoflineblog.truffle.part_13.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_13.parsing.EasyScriptTruffleParser;
 import com.endoflineblog.truffle.part_13.parsing.ParsingResult;
 import com.endoflineblog.truffle.part_13.runtime.ArrayObject;
+import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_13.runtime.MathObject;
-import com.endoflineblog.truffle.part_13.runtime.StringPrototype;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
@@ -63,10 +63,12 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var context = new EasyScriptLanguageContext(this.rootShape, this.createStringPrototype());
+        var objectLibrary = DynamicObjectLibrary.getUncached();
+
+        var context = new EasyScriptLanguageContext(this.rootShape,
+                this.createStringPrototype(objectLibrary));
         var globalScopeObject = context.globalScopeObject;
 
-        var objectLibrary = DynamicObjectLibrary.getUncached();
         // the 1 flag indicates Math is a constant, and cannot be reassigned
         objectLibrary.putConstant(globalScopeObject, "Math", MathObject.create(this,
             this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
@@ -80,17 +82,30 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return context.globalScopeObject;
     }
 
-    private StringPrototype createStringPrototype() {
-        return new StringPrototype(
-                this.createCallTarget(CharAtMethodBodyExprNodeFactory.getInstance(),
-                        // built-in method implementation Nodes already have an argument for `this`,
-                        // so there's no need to offset the method arguments
-                        /* offsetArguments */ false));
+    private ClassPrototypeObject createStringPrototype(DynamicObjectLibrary objectLibrary) {
+        var stringPrototype = new ClassPrototypeObject(this.rootShape, "String");
+        objectLibrary.putConstant(stringPrototype, "charAt",
+                this.defineBuiltInMethod(CharAtMethodBodyExprNodeFactory.getInstance()),
+                0);
+        return stringPrototype;
     }
 
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         return new FunctionObject(this.createCallTarget(nodeFactory, /* offsetArguments */ true),
                 nodeFactory.getExecutionSignature().size());
+    }
+
+    private FunctionObject defineBuiltInMethod(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
+        return new FunctionObject(
+                // built-in method implementation Nodes already have an argument for `this`,
+                // so there's no need to offset the method arguments
+                this.createCallTarget(nodeFactory, /* offsetArguments */ false),
+                // we always add an extra argument for 'this' inside FunctionDispatchNode,
+                // but built-in methods already have 'this' in their specializations -
+                // for that reason, we make the FunctionObject have one argument less than the specializations take
+                nodeFactory.getExecutionSignature().size() - 1,
+                // built-in methods use 'this' (it's the first argument of all specializations)
+                /* usesThis */ true);
     }
 
     private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory,

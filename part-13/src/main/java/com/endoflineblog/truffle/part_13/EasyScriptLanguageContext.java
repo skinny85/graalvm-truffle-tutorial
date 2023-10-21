@@ -1,7 +1,7 @@
 package com.endoflineblog.truffle.part_13;
 
+import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.GlobalScopeObject;
-import com.endoflineblog.truffle.part_13.runtime.StringPrototype;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
@@ -27,9 +27,9 @@ public final class EasyScriptLanguageContext {
      * The object containing the {@code CallTarget}s
      * for the built-in methods of strings.
      */
-    public final StringPrototype stringPrototype;
+    public final ClassPrototypeObject stringPrototype;
 
-    public EasyScriptLanguageContext(Shape globalScopeShape, StringPrototype stringPrototype) {
+    public EasyScriptLanguageContext(Shape globalScopeShape, ClassPrototypeObject stringPrototype) {
         this.globalScopeObject = new GlobalScopeObject(globalScopeShape);
         this.stringPrototype = stringPrototype;
     }
