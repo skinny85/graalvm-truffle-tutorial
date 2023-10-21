@@ -21,7 +21,7 @@ public abstract class NewExprNode extends EasyScriptExprNode {
     protected EasyScriptExprNode constructorExpr;
 
     @Children
-    protected final EasyScriptExprNode[] args;
+    private final EasyScriptExprNode[] args;
 
     protected NewExprNode(EasyScriptExprNode constructorExpr, List<EasyScriptExprNode> args) {
         this.constructorExpr = constructorExpr;
