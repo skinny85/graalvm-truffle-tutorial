@@ -492,9 +492,7 @@ public final class EasyScriptTruffleParser {
             return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
         } else {
             return frameMember instanceof FunctionArgument
-                    // an int means this is a function parameter
                     ? new ReadFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex)
-                    // this means this is a local variable
                     : LocalVarReferenceExprNodeGen.create(((LocalVariable) frameMember).variableIndex);
         }
     }
