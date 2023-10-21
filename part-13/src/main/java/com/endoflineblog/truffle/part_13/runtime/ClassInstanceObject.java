@@ -1,5 +1,7 @@
 package com.endoflineblog.truffle.part_13.runtime;
 
+import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PrototypePropertyReadNode;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -47,9 +49,10 @@ public final class ClassInstanceObject implements TruffleObject {
     }
 
     @ExportMessage
-    Object readMember(String member, @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary)
+    Object readMember(String member, @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary,
+            @Cached(uncached = "create()") PrototypePropertyReadNode prototypePropertyReadNode)
             throws UnknownIdentifierException {
-        Object value = dynamicObjectLibrary.getOrDefault(this.classPrototypeObject, member, null);
+        Object value = prototypePropertyReadNode.executePropertyRead(this, member, this.classPrototypeObject, dynamicObjectLibrary);
         if (value == null) {
             throw UnknownIdentifierException.create(member);
         }

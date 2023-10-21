@@ -34,18 +34,6 @@ public abstract class CommonReadPropertyNode extends Node {
                 target, property);
     }
 
-    /**
-     * The specialization for reading a property of a {@link com.endoflineblog.truffle.part_13.runtime.ClassInstanceObject}.
-     * Simply delegates to {@link PrototypePropertyReadNode}.
-     */
-    @Specialization(limit = "1")
-    protected Object readPropertyOfClassInstance(ClassInstanceObject target, Object property,
-            @CachedLibrary("target.classPrototypeObject") DynamicObjectLibrary objectLibrary,
-            @Cached PrototypePropertyReadNode readStringPropertyNode) {
-        return readStringPropertyNode.executePropertyRead(target, property,
-                target.classPrototypeObject, objectLibrary);
-    }
-
     @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
     protected Object readProperty(Object target, String propertyName,
             @CachedLibrary("target") InteropLibrary interopLibrary) {

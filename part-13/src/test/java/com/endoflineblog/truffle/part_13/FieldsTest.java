@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldsTest {
@@ -46,5 +47,22 @@ public class FieldsTest {
                 "a === a.returnThis(); "
         );
         assertTrue(result.asBoolean());
+    }
+
+    @Test
+    void methods_can_be_called_through_polyglot_api() {
+        Value a = this.context.eval("ezs", "" +
+                "class A { " +
+                "    returnThis() { " +
+                "        return this; " +
+                "    } " +
+                "} " +
+                "new A;"
+        );
+        assertTrue(a.hasMember("returnThis"));
+        Value returnThis = a.getMember("returnThis");
+
+        Value result = returnThis.execute();
+        assertFalse(result.isNull());
     }
 }
