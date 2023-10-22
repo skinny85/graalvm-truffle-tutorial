@@ -18,8 +18,12 @@ import com.oracle.truffle.api.library.CachedLibrary;
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
 public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
+    /**
+     * A specialization for reading an integer index of an array,
+     * in code like {@code [1, 2][1]}.
+     */
     @Specialization(guards = "arrayInteropLibrary.isArrayElementReadable(array, index)", limit = "1")
-    protected Object readIntIndex(Object array, int index,
+    protected Object readIntIndexOfArray(Object array, int index,
             @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
         try {
             return arrayInteropLibrary.readArrayElement(array, index);
@@ -28,6 +32,10 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
         }
     }
 
+    /**
+     * Reading any property of {@code undefined}
+     * results in an error in JavaScript.
+     */
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
     protected Object indexUndefined(@SuppressWarnings("unused") Object target,
             Object index,
@@ -35,6 +43,11 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
         throw new EasyScriptException("Cannot read properties of undefined (reading '" + index + "')");
     }
 
+    /**
+     * Accessing a property of anything that is not {@code undefined}
+     * but doesn't have any members returns simply {@code undefined}
+     * in JavaScript.
+     */
     @Fallback
     protected Object readNonArrayOrNonIntIndex(@SuppressWarnings("unused") Object array,
             @SuppressWarnings("unused") Object index) {

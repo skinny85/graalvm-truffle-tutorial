@@ -118,33 +118,35 @@ we abandon caching, and instead switch to always creating a new `FunctionObject`
 
 With `ReadTruffleStringPropertyNode` now in place,
 we can use it in the existing property access Nodes.
-For direct access, in code like `"abc".length`,
-we add a new specialization to the
-[`PropertyReadExprNode` class](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/properties/PropertyReadExprNode.java)
-for when the first argument is a `TruffleString`,
-which simply delegates to `ReadTruffleStringPropertyNode`,
+Since introducing strings to our language now makes it possible to access an object's property in two different ways
+(with "direct" access, in code like `a.propName`,
+and with "indexed" access, in code like `a['propName']`),
+we create a new class,
+[`ObjectPropertyReadNode`](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/properties/ObjectPropertyReadNode.java),
+that contains the common logic of reading a property of an object.
+Its first specialization covers the situation where the target of the read is a `TruffleString`,
+in which case we simply delegate to `ReadTruffleStringPropertyNode`,
 obtained through the `@Cached` annotation,
-as it's a stateless Node.
+as it's a stateless Node;
+the remaining 3 specializations were moved from the `PropertyReadExprNode` class,
+[as it was in the previous part of the series](../part-10/src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/properties/PropertyReadExprNode.java).
+
+Because of this refactoring,
+we can change the
+[`PropertyReadExprNode` class](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/properties/PropertyReadExprNode.java)
+to simply delegate to `ObjectPropertyReadNode`.
 
 For indexed property access,
-we need to add two specializations for `TruffleString` to the
-[`ArrayIndexReadExprNode` class](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/arrays/ArrayIndexReadExprNode.java).
-The first one covers the case where the index is a string too,
+we also use `ObjectPropertyReadNode`,
+this time from the [`ArrayIndexReadExprNode` class](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/arrays/ArrayIndexReadExprNode.java),
+but with one additional catch:
+we introduce a specialization that handles the situation when the index expression evaluates to a `TruffleString`,
 in code like `"a"['length']` - in that case,
 we need to convert `'length'` from a `TruffleString` to a Java string,
-which is what `ReadTruffleStringPropertyNode` expects
+which is what `ObjectPropertyReadNode` expects
 (we use the [Interop library](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html)
 for that purpose - even though `TruffleString` is not a `TruffleObject`,
 `InteropLibrary.isString()` still returns `true` for it).
-The second specialization covers non-string indexes,
-which is mostly integers, in code like `"abc"[1]`,
-which should return `'b'` - `ReadTruffleStringPropertyNode` covers that case already,
-so we can simply delegate to it without having to do any conversions.
-
-And lastly, we need to add a third specialization to `ArrayIndexReadExprNode`
-to handle reading string properties of non-`TruffleString` objects,
-which happens in code like `[1, 2, 3]['length']`.
-In this case, we simply use the `readMember()` message from `InteropLibrary`.
 
 ## Benchmark
 
@@ -174,19 +176,20 @@ it's 20 times slower for EasyScript, and 200 times slower for JavaScript
 You can change the implementation shown here to get different performance numbers.
 
 The first possible change is to handle `TruffleString` property names,
-in addition to Java strings, in `ReadTruffleStringPropertyNode`,
-which also allows you to get rid of the first added specialization in `ArrayIndexReadExprNode`.
+in addition to Java strings, in `ReadTruffleStringPropertyNode`.
 This makes the code in `ReadTruffleStringPropertyNode`
 contain a lot of duplication, as basically every property specialization needs to be written twice -
 once for Java strings, and once for `TruffleString`s.
 However, this improves the performance of the "index access" variant of the benchmark by 10x,
 making it only 2x slower than the "direct access" variant.
 
-The second possible change is to switch completely to `TruffleString`s in `ReadTruffleStringPropertyNode`.
-This will require changes in the first specialization in `PropertyReadExprNode`
-to convert a Java string to a `TruffleString`.
-However, it has the advantage of eliminating duplication in `ReadTruffleStringPropertyNode`.
-This change makes both variants have identical performance -
+The second possible change is to switch completely to `TruffleString`s
+as property names in `ReadTruffleStringPropertyNode`.
+This will require changes in `PropertyReadExprNode`
+to convert the property name from a Java string to a `TruffleString`.
+However, it has the advantage of eliminating the duplication in `ReadTruffleStringPropertyNode` mentioned above,
+when supporting both kinds of strings as property names.
+This change makes both variants of the benchmark have identical performance -
 unfortunately, it's the same performance as for the "index access"
 variant from above when changing `ReadTruffleStringPropertyNode`
 to handle both Java strings and `TruffleString`s,

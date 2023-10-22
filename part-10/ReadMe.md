@@ -15,7 +15,8 @@ These new expressions are added to the
 The Nodes implementing those expressions are
 [`ArrayLiteralExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/arrays/ArrayLiteralExprNode.java),
 [`ArrayIndexReadExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/arrays/ArrayIndexReadExprNode.java)
-and [`ArrayIndexWriteExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/arrays/ArrayIndexWriteExprNode.java).
+and [`ArrayIndexWriteExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/arrays/ArrayIndexWriteExprNode.java),
+respectively.
 Accessing of the array elements is performed through a
 [Truffle library](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/TruffleLibraries),
 [`InteropLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html),
