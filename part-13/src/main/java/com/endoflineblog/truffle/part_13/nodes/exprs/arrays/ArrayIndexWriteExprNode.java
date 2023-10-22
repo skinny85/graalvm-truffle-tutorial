@@ -2,6 +2,8 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.arrays;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonWritePropertyNode;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -21,7 +23,7 @@ import com.oracle.truffle.api.library.CachedLibrary;
 @NodeChild("rvalueExpr")
 public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
     @Specialization(guards = "arrayInteropLibrary.isArrayElementWritable(array, index)", limit = "2")
-    protected Object writeIntIndex(Object array, int index, Object rvalue,
+    protected Object writeIntIndexOfArray(Object array, int index, Object rvalue,
             @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
         try {
             arrayInteropLibrary.writeArrayElement(array, index, rvalue);
@@ -31,16 +33,29 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
         return rvalue;
     }
 
-    @Specialization(guards = "interopLibrary.isNull(target)", limit = "2")
-    protected Object indexUndefined(@SuppressWarnings("unused") Object target,
-            Object index, @SuppressWarnings("unused") Object rvalue,
-            @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary) {
-        throw new EasyScriptException("Cannot set properties of undefined (setting '" + index + "')");
+    /**
+     * A specialization for writing a string property of an object,
+     * in code like {@code [1, 2]['abc'] = 3}.
+     */
+    @Specialization(guards = "propertyNameInteropLibrary.isString(propertyName)", limit = "2")
+    protected Object writeStringPropertyOfObject(Object target, Object propertyName, Object rvalue,
+            @CachedLibrary("propertyName") InteropLibrary propertyNameInteropLibrary,
+            @Cached CommonWritePropertyNode commonWritePropertyNode) {
+        try {
+            return commonWritePropertyNode.executeWriteProperty(target,
+                    propertyNameInteropLibrary.asString(propertyName), rvalue);
+        } catch (UnsupportedMessageException e) {
+            throw new EasyScriptException(this, e.getMessage());
+        }
     }
 
+    /**
+     * A specialization for writing a non-string property of an object,
+     * in code like {@code "a"[0]}, or {@code [1, 2][undefined]}.
+     */
     @Fallback
-    protected Object writeNonArrayOrNonIntIndex(@SuppressWarnings("unused") Object array,
-            @SuppressWarnings("unused") Object index, Object rvalue) {
-        return rvalue;
+    protected Object writeNonStringPropertyOfObject(Object target, Object index, Object rvalue,
+            @Cached CommonWritePropertyNode commonWritePropertyNode) {
+        return commonWritePropertyNode.executeWriteProperty(target, index, rvalue);
     }
 }

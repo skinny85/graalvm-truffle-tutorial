@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_13.parsing;
 
+import com.endoflineblog.truffle.part_13.EasyScriptTruffleLanguage;
 import com.endoflineblog.truffle.part_13.common.DeclarationKind;
 import com.endoflineblog.truffle.part_13.common.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
@@ -31,6 +32,7 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.objects.ClassDeclExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.objects.NewExprNodeGen;
 import com.endoflineblog.truffle.part_13.nodes.exprs.objects.ThisExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNodeGen;
+import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyWriteExprNodeGen;
 import com.endoflineblog.truffle.part_13.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_13.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_13.nodes.exprs.variables.LocalVarAssignmentExprNode;
@@ -397,6 +399,8 @@ public final class EasyScriptTruffleParser {
         }
         if (expr1 instanceof EasyScriptParser.AssignmentExpr1Context) {
             return parseAssignmentExpr((EasyScriptParser.AssignmentExpr1Context) expr1);
+        } else if (expr1 instanceof EasyScriptParser.PropertyWriteExpr1Context) {
+            return this.parsePropertyWriteExpr((EasyScriptParser.PropertyWriteExpr1Context) expr1);
         } else if (expr1 instanceof EasyScriptParser.ArrayIndexWriteExpr1Context) {
             return this.parseArrayIndexWriteExpr((EasyScriptParser.ArrayIndexWriteExpr1Context) expr1);
         } else {
@@ -421,6 +425,13 @@ public final class EasyScriptTruffleParser {
                 return LocalVarAssignmentExprNodeGen.create(initializerExpr, localVariable.variableIndex);
             }
         }
+    }
+
+    private EasyScriptExprNode parsePropertyWriteExpr(EasyScriptParser.PropertyWriteExpr1Context propertyWriteExpr) {
+        return PropertyWriteExprNodeGen.create(
+                this.parseExpr5(propertyWriteExpr.object),
+                this.parseExpr1(propertyWriteExpr.rvalue),
+                propertyWriteExpr.ID().getText());
     }
 
     private EasyScriptExprNode parseArrayIndexWriteExpr(EasyScriptParser.ArrayIndexWriteExpr1Context arrayIndexWriteExpr) {
@@ -567,6 +578,7 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parseNewExpr(EasyScriptParser.NewExpr6Context newExpr) {
         return NewExprNodeGen.create(
+                this.objectShape,
                 this.parseExpr6(newExpr.constr),
                 newExpr.expr1().stream()
                         .map(this::parseExpr1)

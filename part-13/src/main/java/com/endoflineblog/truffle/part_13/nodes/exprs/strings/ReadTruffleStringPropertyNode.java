@@ -7,8 +7,6 @@ import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -17,7 +15,6 @@ import com.oracle.truffle.api.strings.TruffleString;
  */
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";
-    protected static final String CHAR_AT_PROP = "charAt";
 
     /** The abstract {@code execute*()} method for this node. */
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
@@ -52,9 +49,8 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
 
     @Fallback
     protected Object readNonLengthProperty(TruffleString truffleString, Object property,
-            @CachedLibrary(limit = "1") DynamicObjectLibrary objectLibrary,
             @Cached PrototypePropertyReadNode prototypePropertyReadNode) {
         return prototypePropertyReadNode.executePropertyRead(truffleString, property,
-                this.currentLanguageContext().stringPrototype, objectLibrary);
+                this.currentLanguageContext().stringPrototype);
     }
 }

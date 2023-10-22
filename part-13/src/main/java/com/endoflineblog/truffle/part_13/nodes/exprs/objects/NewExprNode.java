@@ -9,6 +9,7 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
+import com.oracle.truffle.api.object.Shape;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
  * The Node for handling {@code new} expressions.
  */
 public abstract class NewExprNode extends EasyScriptExprNode {
+    private final Shape classInstanceShape;
+
     @Child
     @Executed
     protected EasyScriptExprNode constructorExpr;
@@ -23,7 +26,8 @@ public abstract class NewExprNode extends EasyScriptExprNode {
     @Children
     private final EasyScriptExprNode[] args;
 
-    protected NewExprNode(EasyScriptExprNode constructorExpr, List<EasyScriptExprNode> args) {
+    protected NewExprNode(Shape classInstanceShape, EasyScriptExprNode constructorExpr, List<EasyScriptExprNode> args) {
+        this.classInstanceShape = classInstanceShape;
         this.constructorExpr = constructorExpr;
         this.args = args.toArray(EasyScriptExprNode[]::new);
     }
@@ -35,7 +39,7 @@ public abstract class NewExprNode extends EasyScriptExprNode {
     @Specialization
     protected Object instantiateObject(VirtualFrame frame, ClassPrototypeObject classPrototypeObject) {
         this.consumeArguments(frame);
-        return new ClassInstanceObject(classPrototypeObject);
+        return new ClassInstanceObject(this.classInstanceShape, classPrototypeObject);
     }
 
     /**

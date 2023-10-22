@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -64,5 +66,31 @@ public class FieldsTest {
 
         Value result = returnThis.execute();
         assertFalse(result.isNull());
+    }
+
+    @Test
+    void class_instances_support_write_properties() {
+        Value result = this.context.eval("ezs", "" +
+                "class A { } " +
+                "let a = new A; " +
+                "a.p = 15; " +
+                "a.p;"
+        );
+        assertEquals(15, result.asInt());
+    }
+
+    @Test
+    void class_instances_have_members_of_prototype_but_not_as_keys() {
+        Value obj = this.context.eval("ezs", "" +
+                "class obj { " +
+                "    a() { } " +
+                "} " +
+                "let o = new obj; " +
+                "o['b'] = 'c'; " +
+                "o"
+        );
+        assertTrue(obj.hasMember("a"));
+        assertTrue(obj.hasMember("b"));
+        assertEquals(Set.of("b"), obj.getMemberKeys());
     }
 }

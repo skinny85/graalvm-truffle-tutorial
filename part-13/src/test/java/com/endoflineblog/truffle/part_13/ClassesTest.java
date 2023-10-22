@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,7 +52,7 @@ public class ClassesTest {
                 "new A;");
 
         assertTrue(result.hasMembers());
-        assertEquals(Set.of("a"), result.getMemberKeys());
+        assertEquals(Collections.emptySet(), result.getMemberKeys());
         assertTrue(result.hasMember("a"));
         Value methodA = result.getMember("a");
         assertTrue(methodA.canExecute());
