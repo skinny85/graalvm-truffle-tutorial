@@ -14,7 +14,7 @@ import com.oracle.truffle.api.dsl.Specialization;
  * {@link ObjectPropertyReadNode} class, in order to reduce the duplication between this class,
  * and {@link com.endoflineblog.truffle.part_11.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  */
-@NodeChild("target")
+@NodeChild("targetExpr")
 @NodeField(name = "propertyName", type = String.class)
 public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract String getPropertyName();

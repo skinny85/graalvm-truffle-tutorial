@@ -11,7 +11,7 @@ import com.oracle.truffle.api.dsl.Specialization;
  * Used in code like {@code t.myProp}.
  * Identical to the class with the same name from part 11.
  */
-@NodeChild("target")
+@NodeChild("targetExpr")
 @NodeField(name = "propertyName", type = String.class)
 public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract String getPropertyName();

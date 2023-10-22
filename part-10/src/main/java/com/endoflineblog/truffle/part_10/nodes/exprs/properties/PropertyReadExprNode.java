@@ -17,7 +17,7 @@ import com.oracle.truffle.api.library.CachedLibrary;
  * Used to implement the {@code length} property of arrays.
  * Uses the {@link InteropLibrary#readMember} method in its implementation.
  */
-@NodeChild("target")
+@NodeChild("targetExpr")
 @NodeField(name = "propertyName", type = String.class)
 public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract String getPropertyName();
