@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldsTest {
@@ -186,5 +187,62 @@ public class FieldsTest {
                 "countWithThisInFor(" + input + ");"
         );
         assertEquals(input, result.asInt());
+    }
+
+    @Test
+    void global_functions_have_writeable_properties() {
+        Value result = this.context.eval("ezs", "" +
+                "function f() { } " +
+                "f.f = f; " +
+                "f.f"
+        );
+        assertFalse(result.isNull());
+    }
+
+    @Test
+    void properties_of_Math_can_be_reassigned() {
+        Value result = this.context.eval("ezs", "" +
+                "function neg(n) { " +
+                "    return -n; " +
+                "} " +
+                "Math.abs = neg; " +
+                "Math.abs(3)"
+        );
+        assertEquals(-3, result.asInt());
+    }
+
+    @Test
+    void Math_can_be_reassigned() {
+        Value result = this.context.eval("ezs", "" +
+                "class MyMath { " +
+                "    abs(n) { " +
+                "        return n; " +
+                "    } " +
+                "} " +
+                "Math = new MyMath(); " +
+                "Math.abs(-3)"
+        );
+        assertEquals(-3, result.asInt());
+    }
+
+    @Test
+    void arrays_have_directly_writable_properties() {
+        Value result = this.context.eval("ezs", "" +
+                "let arr = [1, 2, 3]; " +
+                "arr.xyz = true; " +
+                "arr.xyz"
+        );
+        assertTrue(result.asBoolean());
+    }
+
+    @Test
+    public void arrays_have_indexed_writeable_properties() {
+        Value result = this.context.eval("ezs", "" +
+                "const arr = [0, 1, 2]; " +
+                "const result = arr['prop'] = 5; " +
+                "[result, arr.prop]"
+        );
+        assertEquals(5, result.getArrayElement(0).asInt());
+        assertEquals(5, result.getArrayElement(1).asInt());
     }
 }

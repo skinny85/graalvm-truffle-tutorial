@@ -8,7 +8,7 @@ import com.oracle.truffle.api.object.Shape;
 
 /**
  * A {@link DynamicObject} that represents the prototype of a user-defined class.
- * Each {@link ClassInstanceObject instance of a class}
+ * Each {@link JavaScriptObject instance of a class}
  * points to the prototype of its class,
  * and all property reads of the instance delegate to this prototype object to get a reference to the class' instance method.
  * An instance of this class is created when parsing a class declaration,

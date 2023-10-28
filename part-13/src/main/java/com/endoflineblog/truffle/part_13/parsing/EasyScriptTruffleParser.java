@@ -83,7 +83,7 @@ import java.util.stream.Collectors;
  * @see com.endoflineblog.truffle.part_13.EasyScriptTruffleLanguage
  */
 public final class EasyScriptTruffleParser {
-    public static ParsingResult parse(Reader program, Shape objectShape, Shape arrayShape) throws IOException {
+    public static ParsingResult parse(Reader program, Shape objectShape) throws IOException {
         var lexer = new EasyScriptLexer(CharStreams.fromReader(program));
         // remove the default console error listener
         lexer.removeErrorListeners();
@@ -92,14 +92,14 @@ public final class EasyScriptTruffleParser {
         parser.removeErrorListeners();
         // throw an exception when a parsing error is encountered
         parser.setErrorHandler(new BailErrorStrategy());
-        var easyScriptTruffleParser = new EasyScriptTruffleParser(objectShape, arrayShape);
+        var easyScriptTruffleParser = new EasyScriptTruffleParser(objectShape);
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
         return new ParsingResult(
                 new BlockStmtNode(stmts),
                 easyScriptTruffleParser.frameDescriptor.build());
     }
 
-    private final Shape objectShape, arrayShape;
+    private final Shape objectShape;
 
     private enum ParserState { TOP_LEVEL, NESTED_SCOPE_IN_TOP_LEVEL, FUNC_DEF }
 
@@ -142,9 +142,8 @@ public final class EasyScriptTruffleParser {
      */
     private int localVariablesCounter;
 
-    private EasyScriptTruffleParser(Shape objectShape, Shape arrayShape) {
+    private EasyScriptTruffleParser(Shape objectShape) {
         this.objectShape = objectShape;
-        this.arrayShape = arrayShape;
         this.state = ParserState.TOP_LEVEL;
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.localScopes = new Stack<>();
@@ -563,7 +562,6 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parseNewExpr(EasyScriptParser.NewExpr6Context newExpr) {
         return NewExprNodeGen.create(
-                this.objectShape,
                 this.parseExpr6(newExpr.constr),
                 newExpr.expr1().stream()
                         .map(this::parseExpr1)
@@ -571,7 +569,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private ArrayLiteralExprNode parseArrayLiteralExpr(EasyScriptParser.ArrayLiteralExpr6Context arrayLiteralExpr) {
-        return new ArrayLiteralExprNode(this.arrayShape, arrayLiteralExpr.expr1().stream()
+        return new ArrayLiteralExprNode(arrayLiteralExpr.expr1().stream()
                 .map(arrayElExpr -> this.parseExpr1(arrayElExpr))
                 .collect(Collectors.toList()));
     }

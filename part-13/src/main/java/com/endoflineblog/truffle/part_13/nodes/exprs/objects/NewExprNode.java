@@ -2,8 +2,8 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.objects;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_13.runtime.ClassInstanceObject;
 import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
+import com.endoflineblog.truffle.part_13.runtime.JavaScriptObject;
 import com.oracle.truffle.api.dsl.Executed;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -17,8 +17,6 @@ import java.util.List;
  * The Node for handling {@code new} expressions.
  */
 public abstract class NewExprNode extends EasyScriptExprNode {
-    private final Shape classInstanceShape;
-
     @Child
     @Executed
     protected EasyScriptExprNode constructorExpr;
@@ -26,8 +24,7 @@ public abstract class NewExprNode extends EasyScriptExprNode {
     @Children
     private final EasyScriptExprNode[] args;
 
-    protected NewExprNode(Shape classInstanceShape, EasyScriptExprNode constructorExpr, List<EasyScriptExprNode> args) {
-        this.classInstanceShape = classInstanceShape;
+    protected NewExprNode(EasyScriptExprNode constructorExpr, List<EasyScriptExprNode> args) {
         this.constructorExpr = constructorExpr;
         this.args = args.toArray(EasyScriptExprNode[]::new);
     }
@@ -39,7 +36,7 @@ public abstract class NewExprNode extends EasyScriptExprNode {
     @Specialization
     protected Object instantiateObject(VirtualFrame frame, ClassPrototypeObject classPrototypeObject) {
         this.consumeArguments(frame);
-        return new ClassInstanceObject(this.classInstanceShape, classPrototypeObject);
+        return new JavaScriptObject(this.currentLanguageContext().shapesAndPrototypes.rootShape, classPrototypeObject);
     }
 
     /**

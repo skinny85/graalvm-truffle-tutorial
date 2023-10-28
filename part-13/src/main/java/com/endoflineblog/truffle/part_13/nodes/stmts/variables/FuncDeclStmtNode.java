@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_13.nodes.stmts.variables;
 
+import com.endoflineblog.truffle.part_13.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_13.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_13.nodes.stmts.EasyScriptStmtNode;
@@ -15,6 +16,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.Shape;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
@@ -58,7 +60,9 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
             var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.getFrameDescriptor(), this.getFuncBody());
             var callTarget = funcRootNode.getCallTarget();
 
-            this.cachedFunction = new FunctionObject(callTarget, this.getArgumentCount());
+            ShapesAndPrototypes shapesAndPrototypes = this.currentLanguageContext().shapesAndPrototypes;
+            this.cachedFunction = new FunctionObject(shapesAndPrototypes.rootShape,
+                    shapesAndPrototypes.functionPrototype, callTarget, this.getArgumentCount());
         }
 
         // we allow functions to be redefined, to comply with JavaScript semantics

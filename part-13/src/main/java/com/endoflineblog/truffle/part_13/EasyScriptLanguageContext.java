@@ -1,11 +1,9 @@
 package com.endoflineblog.truffle.part_13;
 
-import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
-import com.endoflineblog.truffle.part_13.runtime.GlobalScopeObject;
+import com.endoflineblog.truffle.part_13.common.ShapesAndPrototypes;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.Shape;
 
 /**
  * The class of the context for the
@@ -22,15 +20,10 @@ public final class EasyScriptLanguageContext {
     }
 
     public final DynamicObject globalScopeObject;
+    public final ShapesAndPrototypes shapesAndPrototypes;
 
-    /**
-     * The object containing the {@code CallTarget}s
-     * for the built-in methods of strings.
-     */
-    public final ClassPrototypeObject stringPrototype;
-
-    public EasyScriptLanguageContext(Shape globalScopeShape, ClassPrototypeObject stringPrototype) {
-        this.globalScopeObject = new GlobalScopeObject(globalScopeShape);
-        this.stringPrototype = stringPrototype;
+    public EasyScriptLanguageContext(DynamicObject globalScopeObject, ShapesAndPrototypes shapesAndPrototypes) {
+        this.globalScopeObject = globalScopeObject;
+        this.shapesAndPrototypes = shapesAndPrototypes;
     }
 }

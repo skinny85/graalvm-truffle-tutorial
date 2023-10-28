@@ -1,10 +1,10 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.arrays;
 
+import com.endoflineblog.truffle.part_13.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_13.runtime.ArrayObject;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.object.Shape;
 
 import java.util.List;
 
@@ -14,12 +14,10 @@ import java.util.List;
  * Identical to the class with the same name from part 11.
  */
 public final class ArrayLiteralExprNode extends EasyScriptExprNode {
-    private final Shape arrayShape;
     @Children
     private final EasyScriptExprNode[] arrayElementExprs;
 
-    public ArrayLiteralExprNode(Shape arrayShape, List<EasyScriptExprNode> arrayElementExprs) {
-        this.arrayShape = arrayShape;
+    public ArrayLiteralExprNode(List<EasyScriptExprNode> arrayElementExprs) {
         this.arrayElementExprs = arrayElementExprs.toArray(new EasyScriptExprNode[]{});
     }
 
@@ -30,6 +28,8 @@ public final class ArrayLiteralExprNode extends EasyScriptExprNode {
         for (var i = 0; i < this.arrayElementExprs.length; i++) {
             arrayElements[i] = this.arrayElementExprs[i].executeGeneric(frame);
         }
-        return new ArrayObject(this.arrayShape, arrayElements);
+        ShapesAndPrototypes shapesAndPrototypes = this.currentLanguageContext().shapesAndPrototypes;
+        return new ArrayObject(shapesAndPrototypes.arrayShape,
+                shapesAndPrototypes.arrayPrototype, arrayElements);
     }
 }

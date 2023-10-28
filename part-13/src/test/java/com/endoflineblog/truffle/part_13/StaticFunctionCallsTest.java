@@ -198,18 +198,4 @@ public class StaticFunctionCallsTest {
             assertEquals("Identifier 'Math' has already been declared", e.getMessage());
         }
     }
-
-    @Test
-    public void Math_cannot_be_reassigned() {
-        try {
-            this.context.eval("ezs",
-                    "Math = -5;"
-            );
-            fail("expected PolyglotException to be thrown");
-        } catch (PolyglotException e) {
-            assertTrue(e.isGuestException());
-            assertFalse(e.isInternalError());
-            assertEquals("Assignment to constant variable 'Math'", e.getMessage());
-        }
-    }
 }

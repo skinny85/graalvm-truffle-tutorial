@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_13.runtime;
 
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
@@ -14,7 +13,7 @@ import com.oracle.truffle.api.object.Shape;
  * Identical to the class with the same name from part 11.
  */
 @ExportLibrary(InteropLibrary.class)
-public final class ArrayObject extends DynamicObject {
+public final class ArrayObject extends JavaScriptObject {
     /**
      * The field that signifies this {@link DynamicObject}
      * always has a property called {@code length}.
@@ -26,8 +25,8 @@ public final class ArrayObject extends DynamicObject {
 
     private Object[] arrayElements;
 
-    public ArrayObject(Shape arrayShape, Object[] arrayElements) {
-        super(arrayShape);
+    public ArrayObject(Shape arrayShape, ClassPrototypeObject arrayPrototype, Object[] arrayElements) {
+        super(arrayShape, arrayPrototype);
         this.setArrayElements(arrayElements, DynamicObjectLibrary.getUncached());
     }
 
@@ -84,30 +83,6 @@ public final class ArrayObject extends DynamicObject {
             newArrayElements[(int) index] = value;
             this.setArrayElements(newArrayElements, objectLibrary);
         }
-    }
-
-    @ExportMessage
-    boolean hasMembers() {
-        return true;
-    }
-
-    @ExportMessage
-    boolean isMemberReadable(String member) {
-        return "length".equals(member);
-    }
-
-    @ExportMessage
-    Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) throws UnknownIdentifierException {
-        switch (member) {
-            case "length": return objectLibrary.getOrDefault(this, "length", 0);
-            default: throw UnknownIdentifierException.create(member);
-        }
-    }
-
-    @ExportMessage
-    Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
-        return new MemberNamesObject(new String[]{"length"});
     }
 
     private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {

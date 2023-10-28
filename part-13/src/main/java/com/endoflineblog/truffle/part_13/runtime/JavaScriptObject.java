@@ -20,10 +20,10 @@ import com.oracle.truffle.api.object.Shape;
  * we only support instance methods of classes, not fields.
  */
 @ExportLibrary(InteropLibrary.class)
-public final class ClassInstanceObject extends DynamicObject {
+public class JavaScriptObject extends DynamicObject {
     public final ClassPrototypeObject classPrototypeObject;
 
-    public ClassInstanceObject(Shape shape, ClassPrototypeObject classPrototypeObject) {
+    public JavaScriptObject(Shape shape, ClassPrototypeObject classPrototypeObject) {
         super(shape);
 
         this.classPrototypeObject = classPrototypeObject;

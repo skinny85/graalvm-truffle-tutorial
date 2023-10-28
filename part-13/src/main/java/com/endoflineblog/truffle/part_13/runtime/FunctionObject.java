@@ -6,25 +6,27 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchN
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchNodeGen;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The object that represents a function in EasyScript.
  * Almost identical to the class with the same name from part 11,
- * the only difference is adding {@link ClassInstanceObject}
+ * the only difference is adding {@link JavaScriptObject}
  * to the list of allowed EasyScript values when calling this function through the GraalVM polyglot API.
  */
 @ExportLibrary(InteropLibrary.class)
-public final class FunctionObject implements TruffleObject {
+public final class FunctionObject extends JavaScriptObject {
     public final CallTarget callTarget;
     public final int argumentCount;
 
     private final FunctionDispatchNode functionDispatchNode;
 
-    public FunctionObject(CallTarget callTarget, int argumentCount) {
+    public FunctionObject(Shape shape, ClassPrototypeObject functionPrototype, CallTarget callTarget, int argumentCount) {
+        super(shape, functionPrototype);
+
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
@@ -64,10 +66,8 @@ public final class FunctionObject implements TruffleObject {
         return EasyScriptTypeSystemGen.isImplicitDouble(argument) ||
                 EasyScriptTypeSystemGen.isBoolean(argument) ||
                 argument == Undefined.INSTANCE ||
-                argument instanceof ArrayObject ||
                 argument instanceof TruffleString ||
                 argument instanceof String ||
-                argument instanceof ClassInstanceObject ||
-                argument instanceof FunctionObject;
+                argument instanceof JavaScriptObject;
     }
 }

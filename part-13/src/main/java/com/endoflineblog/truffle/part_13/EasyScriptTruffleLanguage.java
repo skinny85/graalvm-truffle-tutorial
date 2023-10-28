@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_13;
 
+import com.endoflineblog.truffle.part_13.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
@@ -12,11 +13,13 @@ import com.endoflineblog.truffle.part_13.parsing.ParsingResult;
 import com.endoflineblog.truffle.part_13.runtime.ArrayObject;
 import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.FunctionObject;
-import com.endoflineblog.truffle.part_13.runtime.MathObject;
+import com.endoflineblog.truffle.part_13.runtime.GlobalScopeObject;
+import com.endoflineblog.truffle.part_13.runtime.JavaScriptObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
@@ -52,10 +55,12 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
      */
     private final Shape rootShape = Shape.newBuilder().build();
 
+    private final ClassPrototypeObject functionPrototype = new ClassPrototypeObject(this.rootShape, "Function");
+
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         ParsingResult parsingResult = EasyScriptTruffleParser.parse(
-                request.getSource().getReader(), this.rootShape, this.arrayShape);
+                request.getSource().getReader(), this.rootShape);
         var programRootNode = new StmtBlockRootNode(this, parsingResult.topLevelFrameDescriptor,
                 parsingResult.programStmtBlock);
         return programRootNode.getCallTarget();
@@ -64,22 +69,41 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
         var objectLibrary = DynamicObjectLibrary.getUncached();
-
-        var context = new EasyScriptLanguageContext(this.rootShape,
-                this.createStringPrototype(objectLibrary));
-        var globalScopeObject = context.globalScopeObject;
-
-        // the 1 flag indicates Math is a constant, and cannot be reassigned
-        objectLibrary.putConstant(globalScopeObject, "Math", MathObject.create(this,
-            this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
-            this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance())), 1);
-
-        return context;
+        return new EasyScriptLanguageContext(
+                this.createGlobalScopeObject(objectLibrary),
+                this.createShapesAndPrototypes(objectLibrary));
     }
 
     @Override
     protected Object getScope(EasyScriptLanguageContext context) {
         return context.globalScopeObject;
+    }
+
+    private DynamicObject createGlobalScopeObject(DynamicObjectLibrary objectLibrary) {
+        var globalScopeObject = new GlobalScopeObject(this.rootShape);
+        // the 0 flag indicates Math is a variable, and can be reassigned
+        objectLibrary.putConstant(globalScopeObject, "Math",
+                this.createMathObject(objectLibrary), 0);
+        return globalScopeObject;
+    }
+
+    private Object createMathObject(DynamicObjectLibrary objectLibrary) {
+        var mathPrototype = new ClassPrototypeObject(this.rootShape, "Math");
+        var mathObject = new JavaScriptObject(this.rootShape, mathPrototype);
+        objectLibrary.putConstant(mathObject, "abs",
+                this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
+                0);
+        objectLibrary.putConstant(mathObject, "pow",
+                this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance()),
+                0);
+        return mathObject;
+    }
+
+    private ShapesAndPrototypes createShapesAndPrototypes(DynamicObjectLibrary objectLibrary) {
+        var arrayPrototype = new ClassPrototypeObject(this.rootShape, "Array");
+        return new ShapesAndPrototypes(this.rootShape, this.arrayShape,
+                this.functionPrototype, arrayPrototype,
+                this.createStringPrototype(objectLibrary));
     }
 
     private ClassPrototypeObject createStringPrototype(DynamicObjectLibrary objectLibrary) {
@@ -91,12 +115,13 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     }
 
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
-        return new FunctionObject(this.createCallTarget(nodeFactory, /* offsetArguments */ true),
+        return new FunctionObject(this.rootShape, this.functionPrototype,
+                this.createCallTarget(nodeFactory, /* offsetArguments */ true),
                 nodeFactory.getExecutionSignature().size());
     }
 
     private FunctionObject defineBuiltInMethod(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
-        return new FunctionObject(
+        return new FunctionObject(this.rootShape, this.functionPrototype,
                 // built-in method implementation Nodes already have an argument for `this`,
                 // so there's no need to offset the method arguments
                 this.createCallTarget(nodeFactory, /* offsetArguments */ false),
