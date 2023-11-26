@@ -70,19 +70,33 @@ public final class ArrayObject extends JavaScriptObject {
     @ExportMessage
     void writeArrayElement(long index, Object value,
             @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        if (this.isArrayElementModifiable(index)) {
-            this.arrayElements[(int) index] = value;
-        } else {
+        if (!this.isArrayElementModifiable(index)) {
             // in JavaScript, it's legal to write past the array size
-            Object[] newArrayElements = new Object[(int) index + 1];
-            for (int i = 0; i < index; i++) {
-                newArrayElements[i] = i < this.arrayElements.length
-                        ? this.arrayElements[i]
-                        : Undefined.INSTANCE;
-            }
-            newArrayElements[(int) index] = value;
-            this.setArrayElements(newArrayElements, objectLibrary);
+            this.resetArray(index + 1, objectLibrary);
         }
+        this.arrayElements[(int) index] = value;
+    }
+
+    @Override
+    @ExportMessage
+    void writeMember(String member, Object value,
+            @CachedLibrary("this") DynamicObjectLibrary dynamicObjectLibrary) {
+        if ("length".equals(member)) {
+            int length = (int) value;
+            this.resetArray(length, dynamicObjectLibrary);
+        } else {
+            super.writeMember(member, value, dynamicObjectLibrary);
+        }
+    }
+
+    private void resetArray(long length, DynamicObjectLibrary objectLibrary) {
+        Object[] newArrayElements = new Object[(int) length];
+        for (int i = 0; i < length; i++) {
+            newArrayElements[i] = i < this.arrayElements.length
+                    ? this.arrayElements[i]
+                    : Undefined.INSTANCE;
+        }
+        this.setArrayElements(newArrayElements, objectLibrary);
     }
 
     private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {

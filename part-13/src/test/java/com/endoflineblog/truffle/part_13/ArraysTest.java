@@ -194,6 +194,19 @@ public class ArraysTest {
     }
 
     @Test
+    public void length_property_assignment_resets_the_elements() {
+        Value result = this.context.eval("ezs", "" +
+                "const array = [1, 2, 3]; " +
+                "array.length = 1; " +
+                "array['length'] = 3; " +
+                "array[2]; "
+        );
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
     public void reading_an_index_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",
