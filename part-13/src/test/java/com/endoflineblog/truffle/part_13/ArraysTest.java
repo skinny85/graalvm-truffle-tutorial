@@ -207,6 +207,37 @@ public class ArraysTest {
     }
 
     @Test
+    public void writing_negative_array_length_is_an_error() {
+        try {
+            this.context.eval("ezs", "" +
+                    "const array = [1, 2, 3]; " +
+                    "array.length = -1; "
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Invalid array length: -1", e.getMessage());
+        }
+    }
+
+    @Test
+    public void writing_a_non_int_array_length_is_an_error() {
+        try {
+            this.context.eval("ezs", "" +
+                    "const array = [1, 2, 3];" +
+                    " array.propName = undefined; " +
+                    "array['length'] = undefined; "
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Invalid array length: undefined", e.getMessage());
+        }
+    }
+
+    @Test
     public void reading_an_index_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",

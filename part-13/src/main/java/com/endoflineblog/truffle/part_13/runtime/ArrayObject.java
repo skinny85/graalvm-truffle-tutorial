@@ -1,5 +1,8 @@
 package com.endoflineblog.truffle.part_13.runtime;
 
+import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
+import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
@@ -14,6 +17,9 @@ import com.oracle.truffle.api.object.Shape;
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ArrayObject extends JavaScriptObject {
+    // must be package-private, since it's used in specialization guard expressions
+    static final String LENGTH_PROP = "length";
+
     /**
      * The field that signifies this {@link DynamicObject}
      * always has a property called {@code length}.
@@ -77,15 +83,27 @@ public final class ArrayObject extends JavaScriptObject {
         this.arrayElements[(int) index] = value;
     }
 
-    @Override
     @ExportMessage
-    void writeMember(String member, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary dynamicObjectLibrary) {
-        if ("length".equals(member)) {
-            int length = (int) value;
-            this.resetArray(length, dynamicObjectLibrary);
-        } else {
-            super.writeMember(member, value, dynamicObjectLibrary);
+    static class WriteMember {
+        @Specialization(guards = {"LENGTH_PROP.equals(member)", "length >= 0"})
+        static void writeNonNegativeIntLength(ArrayObject arrayObject,
+                @SuppressWarnings("unused") String member, int length,
+                @CachedLibrary("arrayObject") DynamicObjectLibrary dynamicObjectLibrary) {
+            arrayObject.resetArray(length, dynamicObjectLibrary);
+        }
+
+        @Specialization(guards = "LENGTH_PROP.equals(member)")
+        static void writeNegativeOrNonIntLength(
+                @SuppressWarnings("unused") ArrayObject arrayObject,
+                @SuppressWarnings("unused") String member,
+                Object length) {
+            throw new EasyScriptException("Invalid array length: " + length);
+        }
+
+        @Fallback
+        static void writeNonLength(ArrayObject arrayObject, String member, Object value,
+                @CachedLibrary(limit = "1") DynamicObjectLibrary dynamicObjectLibrary) {
+            arrayObject.writeMember(member, value, dynamicObjectLibrary);
         }
     }
 
@@ -101,6 +119,6 @@ public final class ArrayObject extends JavaScriptObject {
 
     private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {
         this.arrayElements = arrayElements;
-        objectLibrary.putInt(this, "length", arrayElements.length);
+        this.writeMember(LENGTH_PROP, arrayElements.length, objectLibrary);
     }
 }
