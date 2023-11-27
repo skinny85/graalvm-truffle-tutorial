@@ -127,6 +127,17 @@ public class StringsTest {
     }
 
     @Test
+    public void indexed_property_writes_to_strings_have_no_effect() {
+        Value result = this.context.eval("ezs", "" +
+                "const str = 'abc'; " +
+                "const result = str['length'] = 5; " +
+                "[result, str.length]"
+        );
+        assertEquals(5, result.getArrayElement(0).asInt());
+        assertEquals(3, result.getArrayElement(1).asInt());
+    }
+
+    @Test
     public void ezs_strings_in_polyglot_context_have_no_members() {
         Value result = this.context.eval("ezs", " 'a' ");
 
@@ -196,7 +207,7 @@ public class StringsTest {
     @Test
     public void strings_have_a_charAt_method() {
         Value result = this.context.eval("ezs",
-                 " 'abc'.charAt(2)"
+                " 'abc'.charAt(2)"
         );
         assertEquals("c", result.asString());
     }
@@ -257,7 +268,7 @@ public class StringsTest {
 
     @Test
     void string_properties_work_after_reading_non_existing_property() {
-        Value add = this.context.eval("ezs", "" +
+        this.context.eval("ezs", "" +
                 "function readProp(str, prop) { " +
                 "    return str[prop]; " +
                 "} " +
