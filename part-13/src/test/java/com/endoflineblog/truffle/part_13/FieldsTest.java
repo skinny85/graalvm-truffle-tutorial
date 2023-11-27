@@ -245,4 +245,25 @@ public class FieldsTest {
         assertEquals(5, result.getArrayElement(0).asInt());
         assertEquals(5, result.getArrayElement(1).asInt());
     }
+
+    @Test
+    public void non_string_properties_are_converted_to_strings() {
+        Value result = this.context.eval("ezs", "" +
+                "class A { } " +
+                "const a = new A(); " +
+                "a[true] = 35; " +
+                "a[1 + 2 === 3]"
+        );
+        assertEquals(35, result.asInt());
+    }
+
+    @Test
+    public void negative_array_indexes_are_converted_to_strings() {
+        Value result = this.context.eval("ezs", "" +
+                "let a = [9]; " +
+                "a[-1] = 45; " +
+                "a[-1]; "
+        );
+        assertEquals(45, result.asInt());
+    }
 }

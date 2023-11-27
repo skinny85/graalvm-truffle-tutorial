@@ -132,19 +132,6 @@ public class ArraysTest {
     }
 
     @Test
-    public void negative_indexes_are_ignored_on_write() {
-        Value array = this.context.eval("ezs", "" +
-                "let a = [9]; " +
-                "a[-1] = 45; " +
-                "a"
-        );
-
-        assertEquals(1, array.getArraySize());
-        assertEquals(9, array.getArrayElement(0).asInt());
-        assertFalse(array.hasMember("-1"));
-    }
-
-    @Test
     public void non_stable_array_reads_work_correctly() {
         Value result = this.context.eval("ezs", "" +
                 "function readFirstArrayEl(array) { " +

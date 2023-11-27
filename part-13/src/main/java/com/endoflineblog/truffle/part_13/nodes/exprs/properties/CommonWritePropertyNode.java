@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
+import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -28,6 +29,13 @@ public abstract class CommonWritePropertyNode extends Node {
         return rvalue;
     }
 
+    @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
+    protected Object writeNonStringProperty(Object target, Object property, Object rvalue,
+            @CachedLibrary("target") InteropLibrary interopLibrary) {
+        return this.writeProperty(target, EasyScriptTruffleStrings.toString(property),
+                rvalue, interopLibrary);
+    }
+
     /**
      * Attempting to write any property of {@code undefined}
      * results in an error in JavaScript.
@@ -41,7 +49,7 @@ public abstract class CommonWritePropertyNode extends Node {
 
     /**
      * Writing a property of anything that is not {@code undefined}
-     * but doesn't have any members simply returns the
+     * but doesn't have any members simply returns the right-hand side of the assignment.
      */
     @Fallback
     protected Object writePropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
