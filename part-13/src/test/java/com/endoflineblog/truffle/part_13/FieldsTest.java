@@ -111,4 +111,28 @@ public class FieldsTest {
         );
         assertTrue(result.isNull());
     }
+
+    @Test
+    public void benchmark_returns_its_input() {
+        var input = 100;
+        Value result = this.context.eval("ezs", "" +
+                "class Counter { " +
+                "    setCount(count) { " +
+                "        this.count = count; " +
+                "    } " +
+                "    getCount() { " +
+                "        return this.count; " +
+                "    } " +
+                "} " +
+                "function countWithThisInFor(n) { " +
+                "    const counter = new Counter(); " +
+                "    for (let i = 1; i <= n; i = i + 1) { " +
+                "        counter.setCount(i); " +
+                "    } " +
+                "    return counter.getCount(); " +
+                "} " +
+                "countWithThisInFor(" + input + ");"
+        );
+        assertEquals(input, result.asInt());
+    }
 }
