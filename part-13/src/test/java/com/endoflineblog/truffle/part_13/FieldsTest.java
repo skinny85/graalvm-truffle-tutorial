@@ -80,6 +80,20 @@ public class FieldsTest {
     }
 
     @Test
+    void instance_properties_override_class_ones() {
+        Value result = this.context.eval("ezs", "" +
+                "class A { " +
+                "    p() { return 'class'; } " +
+                "} " +
+                "function p() { return 'instance'; } " +
+                "let a = new A; " +
+                "a.p = p; " +
+                "(new A).p() + '_' + a.p();"
+        );
+        assertEquals("class_instance", result.asString());
+    }
+
+    @Test
     void class_instances_have_members_of_prototype_but_not_as_keys() {
         Value obj = this.context.eval("ezs", "" +
                 "class obj { " +
