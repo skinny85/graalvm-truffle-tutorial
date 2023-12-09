@@ -93,4 +93,22 @@ public class FieldsTest {
         assertTrue(obj.hasMember("b"));
         assertEquals(Set.of("b"), obj.getMemberKeys());
     }
+
+    @Test
+    public void reading_property_after_write_to_object_works() {
+        Value result = this.context.eval("ezs", "" +
+                "class Counter { " +
+                "    reset() { " +
+                "        this.counter = 0; " +
+                "    } " +
+                "} " +
+                "function callReset(counter) { " +
+                "    counter.reset(); " +
+                "} " +
+                "const counter = new Counter(); " +
+                "callReset(counter); " +
+                "callReset(counter); "
+        );
+        assertTrue(result.isNull());
+    }
 }
