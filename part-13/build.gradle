@@ -6,6 +6,7 @@ plugins {
 dependencies {
     antlr "org.antlr:antlr4:$antlr_version"
     implementation "org.graalvm.js:js:$graal_version"
+    implementation "org.graalvm.truffle:truffle-sl:$graal_version"
     implementation "org.graalvm.tools:profiler:$graal_version"
     implementation "org.apache.commons:commons-text:1.10.0"
 }

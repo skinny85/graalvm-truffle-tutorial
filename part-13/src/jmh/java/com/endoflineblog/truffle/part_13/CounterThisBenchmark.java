@@ -24,15 +24,29 @@ public class CounterThisBenchmark extends TruffleBenchmark {
 
         this.truffleContext.eval("js", COUNTER_CLASS);
         this.truffleContext.eval("js", COUNT_WITH_THIS_IN_FOR);
+
+        this.truffleContext.eval("sl", "" +
+                "function countWithThisInFor(n) { " +
+                "    counter = new(); " +
+                "    i = 1; " +
+                "    while (i <= n) { " +
+                "        counter.count = i; " +
+                "        i = i + 1; " +
+                "    } " +
+                "    return counter.count; " +
+                "}"
+        );
     }
 
     private static final String COUNT_WITH_THIS_IN_FOR = "" +
             "function countWithThisInFor(n) { " +
             "    const counter = new Counter(); " +
             "    for (let i = 1; i <= n; i = i + 1) { " +
-            "        counter.setCount(i); " +
+//            "        counter.setCount(i); " +
+            "        counter.count = i; " +
             "    } " +
-            "    return counter.getCount(); " +
+//            "    return counter.getCount(); " +
+            "    return counter.count; " +
             "}";
 
     @Benchmark
@@ -43,5 +57,14 @@ public class CounterThisBenchmark extends TruffleBenchmark {
     @Benchmark
     public int count_with_this_in_for_js() {
         return this.truffleContext.eval("js", "countWithThisInFor(" + INPUT + ");").asInt();
+    }
+
+    @Benchmark
+    public int count_with_this_in_for_sl() {
+        return this.truffleContext.eval("sl", "" +
+                "function main() { " +
+                "    return countWithThisInFor(" + INPUT + ");" +
+                "}"
+        ).asInt();
     }
 }

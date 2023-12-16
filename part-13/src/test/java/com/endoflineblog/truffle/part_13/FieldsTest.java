@@ -141,11 +141,35 @@ public class FieldsTest {
                 "function countWithThisInFor(n) { " +
                 "    const counter = new Counter(); " +
                 "    for (let i = 1; i <= n; i = i + 1) { " +
-                "        counter.setCount(i); " +
+                "        counter.count = i; " +
+//                "        counter.setCount(i); " +
                 "    } " +
-                "    return counter.getCount(); " +
+                "    return counter.count; " +
+//                "    return counter.getCount(); " +
                 "} " +
                 "countWithThisInFor(" + input + ");"
+        );
+        assertEquals(input, result.asInt());
+    }
+
+    @Test
+    public void simplelang_benchmark_returns_its_input() {
+        var input = 100;
+        this.context.eval("sl", "" +
+                "function countWithThisInFor(n) { " +
+                "    counter = new(); " +
+                "    i = 1; " +
+                "    while (i <= n) { " +
+                "        counter.count = i; " +
+                "        i = i + 1; " +
+                "    } " +
+                "    return counter.count; " +
+                "}");
+
+        Value result = this.context.eval("sl", "" +
+                "function main() { " +
+                "    return countWithThisInFor(" + input + ");" +
+                "}"
         );
         assertEquals(input, result.asInt());
     }
