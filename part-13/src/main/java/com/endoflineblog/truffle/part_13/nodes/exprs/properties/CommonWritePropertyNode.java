@@ -23,12 +23,10 @@ public abstract class CommonWritePropertyNode extends Node {
             @CachedLibrary("target") InteropLibrary interopLibrary) {
         try {
             interopLibrary.writeMember(target, propertyName, rvalue);
-            return rvalue;
-        } catch (UnknownIdentifierException e) {
-            return Undefined.INSTANCE;
-        } catch (UnsupportedMessageException | UnsupportedTypeException e) {
+        } catch (UnsupportedMessageException | UnsupportedTypeException | UnknownIdentifierException e) {
             throw new EasyScriptException(this, e.getMessage());
         }
+        return rvalue;
     }
 
     /**

@@ -95,7 +95,7 @@ public final class ClassInstanceObject extends DynamicObject {
     @ExportMessage
     void writeMember(String member, Object value,
             @CachedLibrary("this") DynamicObjectLibrary dynamicObjectLibrary) {
-        this.writtenToAssumption.invalidate();
+//        this.writtenToAssumption.invalidate();
         dynamicObjectLibrary.put(this, member, value);
     }
 }
