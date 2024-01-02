@@ -1,8 +1,5 @@
 package com.endoflineblog.truffle.part_13.runtime;
 
-import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PrototypePropertyReadNode;
-import com.oracle.truffle.api.Assumption;
-import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -12,7 +9,6 @@ import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
-import com.oracle.truffle.api.utilities.CyclicAssumption;
 
 /**
  * A {@link TruffleObject} that represents an instance of a user-defined class.
@@ -26,17 +22,11 @@ import com.oracle.truffle.api.utilities.CyclicAssumption;
 @ExportLibrary(InteropLibrary.class)
 public final class ClassInstanceObject extends DynamicObject {
     public final ClassPrototypeObject classPrototypeObject;
-    private final CyclicAssumption writtenToAssumption;
 
     public ClassInstanceObject(Shape shape, ClassPrototypeObject classPrototypeObject) {
         super(shape);
 
         this.classPrototypeObject = classPrototypeObject;
-        this.writtenToAssumption = new CyclicAssumption("classInstanceWasNotWrittenTo");
-    }
-
-    public Assumption getObjectWasWrittenToAssumption() {
-        return this.writtenToAssumption.getAssumption();
     }
 
     @Override
@@ -63,9 +53,15 @@ public final class ClassInstanceObject extends DynamicObject {
     }
 
     @ExportMessage
-    Object readMember(String member, @Cached(uncached = "create()") PrototypePropertyReadNode prototypePropertyReadNode)
+    Object readMember(String member,
+            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary)
             throws UnknownIdentifierException {
-        Object value = prototypePropertyReadNode.executePropertyRead(this, member, this.classPrototypeObject);
+        // since ClassInstanceObject is mutable, we need to check it first, before the prototype
+        Object value = thisObjectLibrary.getOrDefault(this, member, null);
+        if (value == null) {
+            value = prototypeObjectLibrary.getOrDefault(this.classPrototypeObject, member, null);
+        }
         if (value == null) {
             throw UnknownIdentifierException.create(member);
         }
@@ -95,7 +91,6 @@ public final class ClassInstanceObject extends DynamicObject {
     @ExportMessage
     void writeMember(String member, Object value,
             @CachedLibrary("this") DynamicObjectLibrary dynamicObjectLibrary) {
-//        this.writtenToAssumption.invalidate();
         dynamicObjectLibrary.put(this, member, value);
     }
 }

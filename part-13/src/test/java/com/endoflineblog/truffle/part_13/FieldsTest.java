@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FieldsTest {
@@ -52,7 +51,7 @@ public class FieldsTest {
     }
 
     @Test
-    void methods_can_be_called_through_polyglot_api() {
+    void this_is_always_undefined_when_called_through_the_polyglot_api() {
         Value a = this.context.eval("ezs", "" +
                 "class A { " +
                 "    returnThis() { " +
@@ -65,7 +64,7 @@ public class FieldsTest {
         Value returnThis = a.getMember("returnThis");
 
         Value result = returnThis.execute();
-        assertFalse(result.isNull());
+        assertTrue(result.isNull());
     }
 
     @Test
@@ -127,6 +126,23 @@ public class FieldsTest {
     }
 
     @Test
+    public void reading_same_property_after_writing_it_works() {
+        Value result = this.context.eval("ezs", "" +
+                "class Obj { } " +
+                "function readX(input) { " +
+                "    return input.x; " +
+                "} " +
+                "const obj = new Obj(); " +
+                "obj.x = 1; " +
+                "let x1 = readX(obj); " +
+                "obj.x = 3; " +
+                "var x2 = readX(obj); " +
+                "x1 + x2;"
+        );
+        assertEquals(4, result.asInt());
+    }
+
+    @Test
     public void benchmark_returns_its_input() {
         var input = 100;
         Value result = this.context.eval("ezs", "" +
@@ -144,8 +160,9 @@ public class FieldsTest {
                 "        counter.count = i; " +
 //                "        counter.setCount(i); " +
                 "    } " +
-                "    return counter.count; " +
+//                "    return counter.count; " +
 //                "    return counter.getCount(); " +
+                "    return counter['getCount'](); " +
                 "} " +
                 "countWithThisInFor(" + input + ");"
         );

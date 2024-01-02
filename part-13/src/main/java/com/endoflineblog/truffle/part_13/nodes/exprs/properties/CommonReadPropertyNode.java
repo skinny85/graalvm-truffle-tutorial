@@ -34,13 +34,6 @@ public abstract class CommonReadPropertyNode extends Node {
                 target, property);
     }
 
-    @Specialization
-    protected Object readPropertyOfClassInstanceObject(ClassInstanceObject classInstanceObject, Object property,
-            @Cached PrototypePropertyReadNode prototypePropertyReadNode) {
-        return prototypePropertyReadNode.executePropertyRead(classInstanceObject, property,
-                classInstanceObject.classPrototypeObject);
-    }
-
     @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
     protected Object readProperty(Object target, String propertyName,
             @CachedLibrary("target") InteropLibrary interopLibrary) {

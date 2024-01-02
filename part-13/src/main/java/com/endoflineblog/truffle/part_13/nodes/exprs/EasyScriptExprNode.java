@@ -48,4 +48,29 @@ public abstract class EasyScriptExprNode extends EasyScriptNode {
     public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
         return EasyScriptTypeSystemGen.expectDouble(this.executeGeneric(frame));
     }
+
+    /**
+     * A more fine-grained alternative to {@link #executeGeneric}
+     * that is used for function and method calls.
+     * It returns the value that should be used as the receiver of the given function call
+     * (the {@code this} variable).
+     * Used in {@link com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionCallExprNode},
+     * alongside {@link #evaluateAsFunction}.
+     */
+    public Object evaluateAsReceiver(VirtualFrame frame) {
+        // by default, almost no expressions have a method receiver -
+        // the exception is property access
+        return Undefined.INSTANCE;
+    }
+
+    /**
+     * A more fine-grained alternative to {@link #executeGeneric}
+     * that is used for function and method calls.
+     * Used in {@link com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionCallExprNode},
+     * alongside {@link #evaluateAsReceiver}.
+     */
+    public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
+        // by default, the function is simply the result of executing the expression
+        return this.executeGeneric(frame);
+    }
 }

@@ -103,9 +103,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                 // we always add an extra argument for 'this' inside FunctionDispatchNode,
                 // but built-in methods already have 'this' in their specializations -
                 // for that reason, we make the FunctionObject have one argument less than the specializations take
-                nodeFactory.getExecutionSignature().size() - 1,
-                // built-in methods use 'this' (it's the first argument of all specializations)
-                /* usesThis */ true);
+                nodeFactory.getExecutionSignature().size() - 1);
     }
 
     private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory,

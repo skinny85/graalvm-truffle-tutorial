@@ -32,13 +32,14 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
-        Object function = this.targetFunction.executeGeneric(frame);
+        Object receiver = this.targetFunction.evaluateAsReceiver(frame);
+        Object function = this.targetFunction.evaluateAsFunction(frame, receiver);
 
         Object[] argumentValues = new Object[this.callArguments.length];
         for (int i = 0; i < this.callArguments.length; i++) {
             argumentValues[i] = this.callArguments[i].executeGeneric(frame);
         }
 
-        return this.dispatchNode.executeDispatch(function, argumentValues);
+        return this.dispatchNode.executeDispatch(function, argumentValues, receiver);
     }
 }

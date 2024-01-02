@@ -15,7 +15,7 @@ import com.oracle.truffle.api.nodes.Node;
  * Identical to the class with the same name from part 11.
  */
 public abstract class FunctionDispatchNode extends Node {
-    public abstract Object executeDispatch(Object function, Object[] arguments);
+    public abstract Object executeDispatch(Object function, Object[] arguments, Object receiver);
 
     /**
      * A specialization that calls the given target directly.
@@ -27,8 +27,9 @@ public abstract class FunctionDispatchNode extends Node {
     protected static Object dispatchDirectly(
             FunctionObject function,
             Object[] arguments,
+            Object receiver,
             @Cached("create(function.callTarget)") DirectCallNode directCallNode) {
-        return directCallNode.call(extendArguments(arguments, function));
+        return directCallNode.call(extendArguments(arguments, receiver, function));
     }
 
     /**
@@ -44,8 +45,9 @@ public abstract class FunctionDispatchNode extends Node {
     protected static Object dispatchIndirectly(
             FunctionObject function,
             Object[] arguments,
+            Object receiver,
             @Cached IndirectCallNode indirectCallNode) {
-        return indirectCallNode.call(function.callTarget, extendArguments(arguments, function));
+        return indirectCallNode.call(function.callTarget, extendArguments(arguments, receiver, function));
     }
 
     /**
@@ -55,18 +57,19 @@ public abstract class FunctionDispatchNode extends Node {
     @Fallback
     protected static Object targetIsNotAFunction(
             Object nonFunction,
-            @SuppressWarnings("unused") Object[] arguments) {
+            @SuppressWarnings("unused") Object[] arguments,
+            @SuppressWarnings("unused") Object receiver) {
         throw new EasyScriptException("'" + nonFunction + "' is not a function");
     }
 
-    private static Object[] extendArguments(Object[] arguments, FunctionObject function) {
+    private static Object[] extendArguments(Object[] arguments, Object receiver, FunctionObject function) {
         // create a new array of arguments, reserving the first one for 'this',
         // which means we need to offset the remaining arguments by one
         int extendedArgumentsLength = function.argumentCount + 1;
         Object[] ret = new Object[extendedArgumentsLength];
         // the first argument to a subroutine call is always 'this',
         // which is 'undefined' for global functions
-        ret[0] = function.methodTarget;
+        ret[0] = receiver;
         for (int i = 1; i < extendedArgumentsLength; i++) {
             // we need to offset the provided arguments by one, because of 'this'
             int j = i - 1;

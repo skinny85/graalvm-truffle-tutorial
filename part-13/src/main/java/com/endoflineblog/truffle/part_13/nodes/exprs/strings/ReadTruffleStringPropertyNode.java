@@ -1,12 +1,14 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.strings;
 
 import com.endoflineblog.truffle.part_13.nodes.EasyScriptNode;
-import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PrototypePropertyReadNode;
+import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -48,9 +50,12 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     }
 
     @Fallback
-    protected Object readNonLengthProperty(TruffleString truffleString, Object property,
-            @Cached PrototypePropertyReadNode prototypePropertyReadNode) {
-        return prototypePropertyReadNode.executePropertyRead(truffleString, property,
-                this.currentLanguageContext().stringPrototype);
+    protected Object readNonLengthProperty(
+            @SuppressWarnings("unused") TruffleString truffleString,
+            Object property,
+            @Cached("currentLanguageContext().stringPrototype") ClassPrototypeObject stringPrototype,
+            @CachedLibrary(limit = "1") DynamicObjectLibrary stringPrototypeObjectLibrary) {
+        return stringPrototypeObjectLibrary.getOrDefault(stringPrototype, property,
+                Undefined.INSTANCE);
     }
 }
