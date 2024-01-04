@@ -42,11 +42,8 @@ public class CounterThisBenchmark extends TruffleBenchmark {
             "function countWithThisInFor(n) { " +
             "    const counter = new Counter(); " +
             "    for (let i = 1; i <= n; i = i + 1) { " +
-            "        counter.count = i; " +
-//            "        counter.setCount(i); " +
+            "        counter.setCount(i); " +
             "    } " +
-//            "    return counter.count; " +
-//            "    return counter.getCount(); " +
             "    return counter['getCount'](); " +
             "}";
 
