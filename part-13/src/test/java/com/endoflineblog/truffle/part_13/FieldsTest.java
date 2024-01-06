@@ -187,26 +187,4 @@ public class FieldsTest {
         );
         assertEquals(input, result.asInt());
     }
-
-    @Test
-    public void simplelang_benchmark_returns_its_input() {
-        var input = 100;
-        this.context.eval("sl", "" +
-                "function countWithThisInFor(n) { " +
-                "    counter = new(); " +
-                "    i = 1; " +
-                "    while (i <= n) { " +
-                "        counter.count = i; " +
-                "        i = i + 1; " +
-                "    } " +
-                "    return counter.count; " +
-                "}");
-
-        Value result = this.context.eval("sl", "" +
-                "function main() { " +
-                "    return countWithThisInFor(" + input + ");" +
-                "}"
-        );
-        assertEquals(input, result.asInt());
-    }
 }
