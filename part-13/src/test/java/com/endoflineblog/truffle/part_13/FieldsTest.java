@@ -143,6 +143,28 @@ public class FieldsTest {
     }
 
     @Test
+    public void invoking_functions_inside_arrays_works() {
+        Value result = this.context.eval("ezs", "" +
+                "function double(n) { return n + n; } " +
+                "let arr = [double, double, double]; " +
+                "arr[1](2); "
+        );
+        assertEquals(4, result.asInt());
+    }
+
+    @Test
+    public void this_gets_populated_in_array_index_reads() {
+        Value result = this.context.eval("ezs", "" +
+                "function index0OfThis() { " +
+                "    return this[0]; " +
+                "} " +
+                "let arr = [index0OfThis]; " +
+                "arr[0]() === index0OfThis; "
+        );
+        assertTrue(result.asBoolean());
+    }
+
+    @Test
     public void benchmark_returns_its_input() {
         var input = 100;
         Value result = this.context.eval("ezs", "" +
@@ -157,7 +179,7 @@ public class FieldsTest {
                 "function countWithThisInFor(n) { " +
                 "    const counter = new Counter(); " +
                 "    for (let i = 1; i <= n; i = i + 1) { " +
-                "        counter.setCount(i); " +
+                "        counter['setCount'](i); " +
                 "    } " +
                 "    return counter['getCount'](); " +
                 "} " +
