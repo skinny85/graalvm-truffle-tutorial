@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -167,6 +168,14 @@ public class ArraysTest {
         );
 
         assertEquals(123, result.asInt());
+    }
+
+    @Test
+    public void unknown_array_member_read_through_GraalVM_interop_returns_null() {
+        Value arr = this.context.eval("ezs", "[0, 1, 2];");
+        assertTrue(arr.hasMembers());
+        Value doesNotExist = arr.getMember("doesNotExist");
+        assertNull(doesNotExist);
     }
 
     @Test

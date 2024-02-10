@@ -12,6 +12,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -133,6 +134,16 @@ public class ClassesTest {
         Value invokeM = ezsBindings.getMember("invokeM");
 
         assertEquals(14, invokeM.execute(m, 13).asInt());
+    }
+
+    @Test
+    public void unknown_class_instance_member_read_through_GraalVM_interop_returns_null() {
+        Value obj = this.context.eval("ezs", "" +
+                "class A { }; " +
+                "new A;");
+        assertTrue(obj.hasMembers());
+        Value doesNotExist = obj.getMember("doesNotExist");
+        assertNull(doesNotExist);
     }
 
     @Test

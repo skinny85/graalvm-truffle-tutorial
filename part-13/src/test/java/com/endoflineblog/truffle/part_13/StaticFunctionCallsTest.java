@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -197,5 +198,13 @@ public class StaticFunctionCallsTest {
             assertFalse(e.isInternalError());
             assertEquals("Identifier 'Math' has already been declared", e.getMessage());
         }
+    }
+
+    @Test
+    public void unknown_function_member_read_through_GraalVM_interop_returns_null() {
+        Value abs = this.context.eval("ezs", "Math.abs;");
+        assertTrue(abs.hasMembers());
+        Value doesNotExist = abs.getMember("doesNotExist");
+        assertNull(doesNotExist);
     }
 }

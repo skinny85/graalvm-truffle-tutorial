@@ -212,4 +212,16 @@ public class StaticFunctionCallsTest {
             assertEquals("Assignment to constant variable 'Math'", e.getMessage());
         }
     }
+
+    @Test
+    public void unknown_function_member_read_through_GraalVM_interop_throws() {
+        Value abs = this.context.eval("ezs", "Math.abs;");
+        assertFalse(abs.hasMembers());
+        try {
+            abs.getMember("doesNotExist");
+            fail("Expected Function.getMember() to throw");
+        } catch (UnsupportedOperationException e) {
+            // nothing to do here
+        }
+    }
 }

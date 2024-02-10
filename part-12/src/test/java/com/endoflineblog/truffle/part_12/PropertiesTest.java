@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -92,5 +93,13 @@ public class PropertiesTest {
         );
         assertTrue(result.isNull());
         assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    public void unknown_Math_member_read_through_GraalVM_interop_returns_null() {
+        Value Math = this.context.eval("ezs", "Math;");
+        assertTrue(Math.hasMembers());
+        Value doesNotExist = Math.getMember("doesNotExist");
+        assertNull(doesNotExist);
     }
 }

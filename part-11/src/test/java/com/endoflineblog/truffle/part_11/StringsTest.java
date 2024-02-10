@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a set of unit tests for testing strings in EasyScript.
@@ -261,6 +262,18 @@ public class StringsTest {
 
         assertTrue(result.isNull());
         assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    public void unknown_string_member_read_through_GraalVM_interop_throws() {
+        Value str = this.context.eval("ezs", "'my-string'");
+        assertFalse(str.hasMembers());
+        try {
+            str.getMember("doesNotExist");
+            fail("expected String.getMember() to throw");
+        } catch (UnsupportedOperationException e) {
+            // nothing to do here
+        }
     }
 
     @Test
