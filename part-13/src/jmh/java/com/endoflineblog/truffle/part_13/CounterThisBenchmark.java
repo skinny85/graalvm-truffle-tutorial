@@ -7,8 +7,11 @@ public class CounterThisBenchmark extends TruffleBenchmark {
 
     private static final String COUNTER_CLASS = "" +
             "class Counter { " +
-            "    setCount(count) { " +
-            "        this.count = count; " +
+            "    constructor() { " +
+            "        this.count = 0; " +
+            "    } " +
+            "    increment() { " +
+            "        this.count = this.count + 1; " +
             "    } " +
             "    getCount() { " +
             "        return this.count; " +
@@ -29,8 +32,8 @@ public class CounterThisBenchmark extends TruffleBenchmark {
     private static final String COUNT_WITH_THIS_IN_FOR = "" +
             "function countWithThisInFor(n) { " +
             "    const counter = new Counter(); " +
-            "    for (let i = 1; i <= n; i = i + 1) { " +
-            "        counter['setCount'](i); " +
+            "    for (let i = 0; i < n; i = i + 1) { " +
+            "        counter['increment'](); " +
             "    } " +
             "    return counter['getCount'](); " +
             "}";

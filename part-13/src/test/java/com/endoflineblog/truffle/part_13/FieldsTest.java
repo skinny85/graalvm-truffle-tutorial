@@ -170,8 +170,11 @@ public class FieldsTest {
         var input = 100;
         Value result = this.context.eval("ezs", "" +
                 "class Counter { " +
-                "    setCount(count) { " +
-                "        this.count = count; " +
+                "    constructor() { " +
+                "        this.count = 0; " +
+                "    } " +
+                "    increment() { " +
+                "        this.count = this.count + 1; " +
                 "    } " +
                 "    getCount() { " +
                 "        return this.count; " +
@@ -179,8 +182,8 @@ public class FieldsTest {
                 "} " +
                 "function countWithThisInFor(n) { " +
                 "    const counter = new Counter(); " +
-                "    for (let i = 1; i <= n; i = i + 1) { " +
-                "        counter['setCount'](i); " +
+                "    for (let i = 0; i < n; i = i + 1) { " +
+                "        counter['increment'](); " +
                 "    } " +
                 "    return counter['getCount'](); " +
                 "} " +
@@ -265,5 +268,19 @@ public class FieldsTest {
                 "a[-1]; "
         );
         assertEquals(45, result.asInt());
+    }
+
+    @Test
+    public void constructors_are_invoked_through_new() {
+        Value result = this.context.eval("ezs", "" +
+                "class A { " +
+                "    constructor(x) { " +
+                "        this.x = x; " +
+                "    } " +
+                "} " +
+                "let a = new A(13); " +
+                "a.x"
+        );
+        assertEquals(13, result.asInt());
     }
 }

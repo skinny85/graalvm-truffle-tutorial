@@ -2,14 +2,18 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.objects;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchNode;
+import com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchNodeGen;
 import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
+import com.endoflineblog.truffle.part_13.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_13.runtime.JavaScriptObject;
 import com.oracle.truffle.api.dsl.Executed;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.object.Shape;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 import java.util.List;
 
@@ -24,19 +28,33 @@ public abstract class NewExprNode extends EasyScriptExprNode {
     @Children
     private final EasyScriptExprNode[] args;
 
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    private FunctionDispatchNode constructorDispatchNode;
+
     protected NewExprNode(EasyScriptExprNode constructorExpr, List<EasyScriptExprNode> args) {
         this.constructorExpr = constructorExpr;
         this.args = args.toArray(EasyScriptExprNode[]::new);
+        this.constructorDispatchNode = FunctionDispatchNodeGen.create();
     }
 
     /**
      * The specialization for when the constructor expression evaluates to a
      * {@link ClassPrototypeObject}.
      */
-    @Specialization
-    protected Object instantiateObject(VirtualFrame frame, ClassPrototypeObject classPrototypeObject) {
-        this.consumeArguments(frame);
-        return new JavaScriptObject(this.currentLanguageContext().shapesAndPrototypes.rootShape, classPrototypeObject);
+    @Specialization(limit = "2")
+    protected Object instantiateObject(VirtualFrame frame, ClassPrototypeObject classPrototypeObject,
+            @CachedLibrary("classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary) {
+        var object = new JavaScriptObject(this.currentLanguageContext().shapesAndPrototypes.rootShape, classPrototypeObject);
+        var constructor = dynamicObjectLibrary.getOrDefault(classPrototypeObject, "constructor", null);
+        if (constructor instanceof FunctionObject) {
+            var args = this.executeArguments(frame);
+            FunctionObject boundConstructor = (FunctionObject) constructor;
+            this.constructorDispatchNode.executeDispatch(boundConstructor, args, object);
+        } else {
+            this.consumeArguments(frame);
+        }
+        return object;
     }
 
     /**
@@ -59,5 +77,14 @@ public abstract class NewExprNode extends EasyScriptExprNode {
         for (int i = 0; i < this.args.length; i++) {
             this.args[i].executeGeneric(frame);
         }
+    }
+
+    @ExplodeLoop
+    private Object[] executeArguments(VirtualFrame frame) {
+        var args = new Object[this.args.length];
+        for (int i = 0; i < this.args.length; i++) {
+            args[i] = this.args[i].executeGeneric(frame);
+        }
+        return args;
     }
 }
