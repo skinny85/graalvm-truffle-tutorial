@@ -139,14 +139,16 @@ to simply delegate to `ObjectPropertyReadNode`.
 For indexed property access,
 we also use `ObjectPropertyReadNode`,
 this time from the [`ArrayIndexReadExprNode` class](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/arrays/ArrayIndexReadExprNode.java),
-but with one additional catch:
-we introduce a specialization that handles the situation when the index expression evaluates to a `TruffleString`,
-in code like `"a"['length']` - in that case,
+but with an important addition:
+we introduce specializations that handle the case when the index expression evaluates to a `TruffleString`
+(in code like `"a"['length']`) - when that happens,
 we need to convert `'length'` from a `TruffleString` to a Java string,
-which is what `ObjectPropertyReadNode` expects
-(we use the [Interop library](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html)
-for that purpose - even though `TruffleString` is not a `TruffleObject`,
-`InteropLibrary.isString()` still returns `true` for it).
+which is what `ObjectPropertyReadNode` expects.
+We use the [`TruffleString.ToJavaStringNode` class](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/strings/TruffleString.ToJavaStringNode.html)
+for that purpose.
+We make sure to cache the Java `String` we create from the `TruffleString`,
+but if a given indexed property access sees more than two different keys,
+we switch to an uncached specialization instead.
 
 ## Benchmark
 
@@ -160,40 +162,19 @@ Here are the results I get on my laptop:
 
 ```
 Benchmark                                                  Mode  Cnt       Score      Error  Units
-StringLengthBenchmark.count_while_char_at_direct_prop_ezs  avgt    5     561.843 ±   21.548  us/op
-StringLengthBenchmark.count_while_char_at_direct_prop_js   avgt    5     562.462 ±   22.676  us/op
-StringLengthBenchmark.count_while_char_at_index_prop_ezs   avgt    5   11768.628 ± 5860.201  us/op
-StringLengthBenchmark.count_while_char_at_index_prop_js    avgt    5  112616.532 ± 3718.521  us/op
+StringLengthBenchmark.count_while_char_at_direct_prop_ezs  avgt    5     577.467 ±   11.463  us/op
+StringLengthBenchmark.count_while_char_at_direct_prop_js   avgt    5     582.202 ±   22.043  us/op
+StringLengthBenchmark.count_while_char_at_index_prop_ezs   avgt    5     575.608 ±   13.571  us/op
+StringLengthBenchmark.count_while_char_at_index_prop_js    avgt    5  126432.537 ± 5631.640  us/op
 ```
 
-While the "direct access" benchmark is consistently fast for both JavaScript and EasyScript,
-it's a different story with the "index access" benchmark:
-it's 20 times slower for EasyScript, and 200 times slower for JavaScript
-(I assume that's a bug in the implementation).
-
-## Code variants
-
-You can change the implementation shown here to get different performance numbers.
-
-The first possible change is to handle `TruffleString` property names,
-in addition to Java strings, in `ReadTruffleStringPropertyNode`.
-This makes the code in `ReadTruffleStringPropertyNode`
-contain a lot of duplication, as basically every property specialization needs to be written twice -
-once for Java strings, and once for `TruffleString`s.
-However, this improves the performance of the "index access" variant of the benchmark by 10x,
-making it only 2x slower than the "direct access" variant.
-
-The second possible change is to switch completely to `TruffleString`s
-as property names in `ReadTruffleStringPropertyNode`.
-This will require changes in `PropertyReadExprNode`
-to convert the property name from a Java string to a `TruffleString`.
-However, it has the advantage of eliminating the duplication in `ReadTruffleStringPropertyNode` mentioned above,
-when supporting both kinds of strings as property names.
-This change makes both variants of the benchmark have identical performance -
-unfortunately, it's the same performance as for the "index access"
-variant from above when changing `ReadTruffleStringPropertyNode`
-to handle both Java strings and `TruffleString`s,
-which means this change makes the "direct access" benchmark 2x slower.
+As we can see, there is no difference in performance between indexed and direct property access in EasyScript,
+mainly because of the caching we implemented in
+[`ArrayIndexReadExprNode`](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/arrays/ArrayIndexReadExprNode.java).
+However, indexed property access in the GraalVM JavaScript implementation is over 200
+times slower than direct property access.
+I've [opened an issue about this to the project](https://github.com/oracle/graaljs/issues/719),
+and apparently it's a bug, fixed in GraalVM release `23.1.0`.
 
 ---
 
