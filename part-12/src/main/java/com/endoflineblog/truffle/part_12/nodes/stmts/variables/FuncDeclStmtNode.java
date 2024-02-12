@@ -48,7 +48,7 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
     @CompilationFinal
     private FunctionObject cachedFunction;
 
-    @Specialization(limit = "1")
+    @Specialization(limit = "2")
     protected Object declareFunction(DynamicObject containerObject,
             @CachedLibrary("containerObject") DynamicObjectLibrary objectLibrary) {
         if (this.cachedFunction == null) {

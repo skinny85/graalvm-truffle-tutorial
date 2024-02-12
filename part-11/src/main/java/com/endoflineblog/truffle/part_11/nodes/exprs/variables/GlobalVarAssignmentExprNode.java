@@ -21,7 +21,7 @@ import com.oracle.truffle.api.object.Property;
 public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
-    @Specialization(limit = "1")
+    @Specialization(limit = "2")
     protected Object assignVariable(DynamicObject globalScopeObject, Object value,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         String variableId = this.getName();

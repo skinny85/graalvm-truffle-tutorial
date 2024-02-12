@@ -31,7 +31,7 @@ public abstract class ObjectPropertyReadNode extends Node {
                 target, property);
     }
 
-    @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "1")
+    @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
     protected Object readProperty(Object target, String propertyName,
             @CachedLibrary("target") InteropLibrary interopLibrary) {
         try {
@@ -47,7 +47,7 @@ public abstract class ObjectPropertyReadNode extends Node {
      * Reading any property of {@code undefined}
      * results in an error in JavaScript.
      */
-    @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
+    @Specialization(guards = "interopLibrary.isNull(target)", limit = "2")
     protected Object readPropertyOfUndefined(@SuppressWarnings("unused") Object target, Object property,
             @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary) {
         throw new EasyScriptException("Cannot read properties of undefined (reading '" + property + "')");

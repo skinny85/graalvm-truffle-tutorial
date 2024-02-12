@@ -35,7 +35,7 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     @CompilationFinal
     private boolean checkVariableExists = true;
 
-    @Specialization(limit = "1")
+    @Specialization(limit = "2")
     protected Object createVariable(DynamicObject globalScopeObject, Object value,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         var variableId = this.getName();

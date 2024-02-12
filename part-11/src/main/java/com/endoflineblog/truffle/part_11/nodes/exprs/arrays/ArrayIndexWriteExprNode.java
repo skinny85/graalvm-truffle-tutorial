@@ -20,7 +20,7 @@ import com.oracle.truffle.api.library.CachedLibrary;
 @NodeChild("indexExpr")
 @NodeChild("rvalueExpr")
 public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
-    @Specialization(guards = "arrayInteropLibrary.isArrayElementWritable(array, index)", limit = "1")
+    @Specialization(guards = "arrayInteropLibrary.isArrayElementWritable(array, index)", limit = "2")
     protected Object writeIntIndex(Object array, int index, Object rvalue,
             @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
         try {
@@ -31,7 +31,7 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
         return rvalue;
     }
 
-    @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
+    @Specialization(guards = "interopLibrary.isNull(target)", limit = "2")
     protected Object indexUndefined(@SuppressWarnings("unused") Object target,
             Object index, @SuppressWarnings("unused") Object rvalue,
             @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary) {

@@ -28,7 +28,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * A specialization for reading an integer index of an array,
      * in code like {@code [1, 2][1]}.
      */
-    @Specialization(guards = "arrayInteropLibrary.isArrayElementReadable(array, index)", limit = "1")
+    @Specialization(guards = "arrayInteropLibrary.isArrayElementReadable(array, index)", limit = "2")
     protected Object readIntIndexOfArray(Object array, int index,
             @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
         try {
@@ -42,7 +42,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * A specialization for reading a string property of an object,
      * in code like {@code [1, 2]['length']}, or {@code "a"['length']}.
      */
-    @Specialization(guards = "propertyNameInteropLibrary.isString(propertyName)", limit = "1")
+    @Specialization(guards = "propertyNameInteropLibrary.isString(propertyName)", limit = "2")
     protected Object readStringPropertyOfObject(Object target, Object propertyName,
             @CachedLibrary("propertyName") InteropLibrary propertyNameInteropLibrary,
             @Cached ObjectPropertyReadNode objectPropertyReadNode) {

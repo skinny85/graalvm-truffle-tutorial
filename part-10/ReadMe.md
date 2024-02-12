@@ -25,6 +25,9 @@ However, we now use it directly, getting an instance of it with the
 [`@CachedLibrary` annotation](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/library/CachedLibrary.html).
 Using `@CachedLibrary` forces you to provide the `limit`
 attribute of the `@Specialization` annotation.
+It's good practice to always set `limit` equal to `2`
+when using `@CachedLibrary` in a `@Specialization` method,
+as setting it to `1` sometimes makes the code slower for some unknown reason.
 
 The implementations of those Nodes use the
 [`ArrayObject` class](src/main/java/com/endoflineblog/truffle/part_10/runtime/ArrayObject.java).

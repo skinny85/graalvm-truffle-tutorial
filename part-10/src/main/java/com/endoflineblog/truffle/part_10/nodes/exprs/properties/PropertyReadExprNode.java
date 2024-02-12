@@ -22,7 +22,7 @@ import com.oracle.truffle.api.library.CachedLibrary;
 public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract String getPropertyName();
 
-    @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "1")
+    @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
     protected Object readProperty(Object target,
             @CachedLibrary("target") InteropLibrary interopLibrary) {
         try {
@@ -38,7 +38,7 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
      * Reading any property of {@code undefined}
      * results in an error in JavaScript.
      */
-    @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
+    @Specialization(guards = "interopLibrary.isNull(target)", limit = "2")
     protected Object readPropertyOfUndefined(@SuppressWarnings("unused") Object target,
             @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary) {
         throw new EasyScriptException("Cannot read properties of undefined (reading '" + this.getPropertyName() + "')");
