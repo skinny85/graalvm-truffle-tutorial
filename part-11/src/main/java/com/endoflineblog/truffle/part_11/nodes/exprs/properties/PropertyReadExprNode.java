@@ -11,7 +11,7 @@ import com.oracle.truffle.api.dsl.Specialization;
  * Used in code like {@code t.myProp}.
  * Similar to the class with the same name from part 10,
  * the only difference is that we moved most of the functionality to the
- * {@link ObjectPropertyReadNode} class, in order to reduce the duplication between this class,
+ * {@link CommonReadPropertyNode} class, in order to reduce the duplication between this class,
  * and {@link com.endoflineblog.truffle.part_11.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  */
 @NodeChild("targetExpr")
@@ -21,7 +21,7 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
 
     @Specialization
     protected Object readProperty(Object target,
-            @Cached ObjectPropertyReadNode objectPropertyReadNode) {
-        return objectPropertyReadNode.executePropertyRead(target, this.getPropertyName());
+            @Cached CommonReadPropertyNode commonReadPropertyNode) {
+        return commonReadPropertyNode.executeReadProperty(target, this.getPropertyName());
     }
 }

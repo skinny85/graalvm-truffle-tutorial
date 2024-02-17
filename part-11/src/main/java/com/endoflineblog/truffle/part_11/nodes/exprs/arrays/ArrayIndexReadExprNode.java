@@ -2,7 +2,7 @@ package com.endoflineblog.truffle.part_11.nodes.exprs.arrays;
 
 import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_11.nodes.exprs.properties.ObjectPropertyReadNode;
+import com.endoflineblog.truffle.part_11.nodes.exprs.properties.CommonReadPropertyNode;
 import com.endoflineblog.truffle.part_11.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -62,8 +62,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
             @Cached("propertyName") @SuppressWarnings("unused") TruffleString cachedPropertyName,
             @Cached @SuppressWarnings("unused") TruffleString.ToJavaStringNode toJavaStringNode,
             @Cached("toJavaStringNode.execute(cachedPropertyName)") String javaStringPropertyName,
-            @Cached ObjectPropertyReadNode objectPropertyReadNode) {
-        return objectPropertyReadNode.executePropertyRead(target, javaStringPropertyName);
+            @Cached CommonReadPropertyNode commonReadPropertyNode) {
+        return commonReadPropertyNode.executeReadProperty(target, javaStringPropertyName);
     }
 
     /**
@@ -75,8 +75,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     @Specialization(replaces = "readTruffleStringPropertyOfObjectCached")
     protected Object readTruffleStringPropertyOfObjectUncached(Object target, TruffleString propertyName,
             @Cached TruffleString.ToJavaStringNode toJavaStringNode,
-            @Cached ObjectPropertyReadNode objectPropertyReadNode) {
-        return objectPropertyReadNode.executePropertyRead(target,
+            @Cached CommonReadPropertyNode commonReadPropertyNode) {
+        return commonReadPropertyNode.executeReadProperty(target,
                 toJavaStringNode.execute(propertyName));
     }
 
@@ -86,7 +86,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      */
     @Fallback
     protected Object readNonTruffleStringPropertyOfObject(Object target, Object index,
-            @Cached ObjectPropertyReadNode objectPropertyReadNode) {
-        return objectPropertyReadNode.executePropertyRead(target, index);
+            @Cached CommonReadPropertyNode commonReadPropertyNode) {
+        return commonReadPropertyNode.executeReadProperty(target, index);
     }
 }

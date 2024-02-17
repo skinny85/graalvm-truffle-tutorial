@@ -122,7 +122,7 @@ Since introducing strings to our language now makes it possible to access an obj
 (with "direct" access, in code like `a.propName`,
 and with "indexed" access, in code like `a['propName']`),
 we create a new class,
-[`ObjectPropertyReadNode`](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/properties/ObjectPropertyReadNode.java),
+[`CommonReadPropertyNode`](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/properties/CommonReadPropertyNode.java),
 that contains the common logic of reading a property of an object.
 Its first specialization covers the situation where the target of the read is a `TruffleString`,
 in which case we simply delegate to `ReadTruffleStringPropertyNode`,
@@ -134,16 +134,16 @@ the remaining 3 specializations were moved from the `PropertyReadExprNode` class
 Because of this refactoring,
 we can change the
 [`PropertyReadExprNode` class](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/properties/PropertyReadExprNode.java)
-to simply delegate to `ObjectPropertyReadNode`.
+to simply delegate to `CommonReadPropertyNode`.
 
 For indexed property access,
-we also use `ObjectPropertyReadNode`,
+we also use `CommonReadPropertyNode`,
 this time from the [`ArrayIndexReadExprNode` class](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/arrays/ArrayIndexReadExprNode.java),
 but with an important addition:
 we introduce specializations that handle the case when the index expression evaluates to a `TruffleString`
 (in code like `"a"['length']`) - when that happens,
 we need to convert `'length'` from a `TruffleString` to a Java string,
-which is what `ObjectPropertyReadNode` expects.
+which is what `CommonReadPropertyNode` expects.
 We use the [`TruffleString.ToJavaStringNode` class](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/strings/TruffleString.ToJavaStringNode.html)
 for that purpose.
 We make sure to cache the Java `String` we create from the `TruffleString`,
@@ -162,10 +162,10 @@ Here are the results I get on my laptop:
 
 ```
 Benchmark                                                  Mode  Cnt       Score      Error  Units
-StringLengthBenchmark.count_while_char_at_direct_prop_ezs  avgt    5     577.467 ±   11.463  us/op
-StringLengthBenchmark.count_while_char_at_direct_prop_js   avgt    5     582.202 ±   22.043  us/op
-StringLengthBenchmark.count_while_char_at_index_prop_ezs   avgt    5     575.608 ±   13.571  us/op
-StringLengthBenchmark.count_while_char_at_index_prop_js    avgt    5  126432.537 ± 5631.640  us/op
+StringLengthBenchmark.count_while_char_at_direct_prop_ezs  avgt    5     576.093 ±    5.992  us/op
+StringLengthBenchmark.count_while_char_at_direct_prop_js   avgt    5     576.772 ±    3.865  us/op
+StringLengthBenchmark.count_while_char_at_index_prop_ezs   avgt    5     576.813 ±    7.087  us/op
+StringLengthBenchmark.count_while_char_at_index_prop_js    avgt    5  112404.250 ± 1012.309  us/op
 ```
 
 As we can see, there is no difference in performance between indexed and direct property access in EasyScript,

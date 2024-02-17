@@ -1,8 +1,8 @@
-package com.endoflineblog.truffle.part_12.nodes.exprs.properties;
+package com.endoflineblog.truffle.part_11.nodes.exprs.properties;
 
-import com.endoflineblog.truffle.part_12.exceptions.EasyScriptException;
-import com.endoflineblog.truffle.part_12.nodes.exprs.strings.ReadTruffleStringPropertyNode;
-import com.endoflineblog.truffle.part_12.runtime.Undefined;
+import com.endoflineblog.truffle.part_11.exceptions.EasyScriptException;
+import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPropertyNode;
+import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -14,12 +14,11 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
- * A Node for reading a property of a JavaScript object.
- * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_12.nodes.exprs.arrays.ArrayIndexReadExprNode}.
- * Identical to the class with the same name from part 11.
+ * A Node containing the shared logic of reading a property of a JavaScript object.
+ * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_11.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  */
-public abstract class ObjectPropertyReadNode extends Node {
-    public abstract Object executePropertyRead(Object target, Object property);
+public abstract class CommonReadPropertyNode extends Node {
+    public abstract Object executeReadProperty(Object target, Object property);
 
     /**
      * The specialization for reading a property of a {@link TruffleString}.
