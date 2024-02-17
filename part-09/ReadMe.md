@@ -29,10 +29,10 @@ The initial numbers I get on my laptop when executing the benchmark command
 
 ```
 Benchmark                              Mode  Cnt     Score     Error  Units
-FibonacciBenchmark.recursive_ezs_eval  avgt    5  6028.256 ± 421.844  us/op
+FibonacciBenchmark.recursive_eval_ezs  avgt    5  6028.256 ± 421.844  us/op
+FibonacciBenchmark.recursive_eval_js   avgt    5    78.143 ±   3.453  us/op
+FibonacciBenchmark.recursive_eval_sl   avgt    5    55.662 ±   3.395  us/op
 FibonacciBenchmark.recursive_java      avgt    5    38.383 ±   1.046  us/op
-FibonacciBenchmark.recursive_js_eval   avgt    5    78.143 ±   3.453  us/op
-FibonacciBenchmark.recursive_sl_eval   avgt    5    55.662 ±   3.395  us/op
 ```
 
 Clearly, our interpreter needs some work to catch up to the performance of the JavaScript and SimpleLanguage implementations.
@@ -82,7 +82,7 @@ With these changes, re-running the benchmark produces the following numbers:
 
 ```
 Benchmark                              Mode  Cnt    Score   Error  Units
-FibonacciBenchmark.recursive_ezs_eval  avgt    5  102.190 ± 1.099  us/op
+FibonacciBenchmark.recursive_eval_ezs  avgt    5  102.190 ± 1.099  us/op
 ```
 
 We have achieved almost a 60x speedup compared to the version from [part 8](../part-08).
@@ -110,7 +110,7 @@ you can add the appropriate JVM arguments in the benchmark configuration:
             "-Dgraal.PrintGraph=Network"
     })
     @Benchmark
-    public int recursive_ezs_eval() {
+    public int recursive_eval_ezs() {
         return this.truffleContext.eval("ezs", FIBONACCI_JS_PROGRAM).asInt();
     }
 ```

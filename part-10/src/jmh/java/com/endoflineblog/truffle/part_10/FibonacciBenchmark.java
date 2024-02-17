@@ -17,17 +17,17 @@ public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_PROGRAM = FIBONACCI_JS_FUNCTION + "fib(20);";
 
     @Benchmark
-    public int recursive_ezs_eval() {
+    public int recursive_eval_ezs() {
         return this.truffleContext.eval("ezs", FIBONACCI_JS_PROGRAM).asInt();
     }
 
     @Benchmark
-    public int recursive_js_eval() {
+    public int recursive_eval_js() {
         return this.truffleContext.eval("js", FIBONACCI_JS_PROGRAM).asInt();
     }
 
     @Benchmark
-    public int recursive_sl_eval() {
+    public int recursive_eval_sl() {
         return this.truffleContext.eval("sl", FIBONACCI_JS_FUNCTION +
                 "function main() { " +
                 "    return fib(20); " +

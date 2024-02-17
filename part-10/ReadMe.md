@@ -165,8 +165,8 @@ As it turns out, this simplified code is twice as fast on the Fibonacci benchmar
 
 ```
 Benchmark                              Mode  Cnt   Score   Error  Units
-FibonacciBenchmark.recursive_ezs_eval  avgt    5  49.806 ± 0.835  us/op
+FibonacciBenchmark.recursive_eval_ezs  avgt    5  49.806 ± 0.835  us/op
+FibonacciBenchmark.recursive_eval_js   avgt    5  72.937 ± 2.110  us/op
+FibonacciBenchmark.recursive_eval_sl   avgt    5  52.396 ± 0.964  us/op
 FibonacciBenchmark.recursive_java      avgt    5  35.726 ± 0.497  us/op
-FibonacciBenchmark.recursive_js_eval   avgt    5  72.937 ± 2.110  us/op
-FibonacciBenchmark.recursive_sl_eval   avgt    5  52.396 ± 0.964  us/op
 ```

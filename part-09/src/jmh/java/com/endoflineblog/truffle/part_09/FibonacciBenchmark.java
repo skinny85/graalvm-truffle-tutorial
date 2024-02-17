@@ -9,10 +9,10 @@ import org.openjdk.jmh.annotations.Benchmark;
  * but also for the JavaScript implementation built-in into GraalVM,
  * for Java, and also for SimpleLanguage.
  *
- * @see #recursive_ezs_eval
- * @see #recursive_js_eval
+ * @see #recursive_eval_ezs
+ * @see #recursive_eval_js
+ * @see #recursive_eval_sl
  * @see #recursive_java
- * @see #recursive_sl_eval
  */
 public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_FUNCTION = "" +
@@ -25,17 +25,17 @@ public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_PROGRAM = FIBONACCI_JS_FUNCTION + "fib(20);";
 
     @Benchmark
-    public int recursive_ezs_eval() {
+    public int recursive_eval_ezs() {
         return this.truffleContext.eval("ezs", FIBONACCI_JS_PROGRAM).asInt();
     }
 
     @Benchmark
-    public int recursive_js_eval() {
+    public int recursive_eval_js() {
         return this.truffleContext.eval("js", FIBONACCI_JS_PROGRAM).asInt();
     }
 
     @Benchmark
-    public int recursive_sl_eval() {
+    public int recursive_eval_sl() {
         return this.truffleContext.eval("sl", FIBONACCI_JS_FUNCTION +
                 "function main() { " +
                 "    return fib(20); " +
