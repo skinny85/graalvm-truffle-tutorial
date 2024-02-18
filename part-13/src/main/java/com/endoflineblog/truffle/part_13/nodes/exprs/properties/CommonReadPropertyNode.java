@@ -8,7 +8,6 @@ import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
@@ -22,20 +21,6 @@ import com.oracle.truffle.api.strings.TruffleString;
  */
 public abstract class CommonReadPropertyNode extends Node {
     public abstract Object executeReadProperty(Object target, Object property);
-
-    /**
-     * A specialization for reading an integer index of an array,
-     * in code like {@code [1, 2][1]}.
-     */
-    @Specialization(guards = "arrayInteropLibrary.isArrayElementReadable(array, index)", limit = "2")
-    protected Object readIntIndexOfArray(Object array, int index,
-            @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
-        try {
-            return arrayInteropLibrary.readArrayElement(array, index);
-        } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
-            throw new EasyScriptException(this, e.getMessage());
-        }
-    }
 
     /**
      * The specialization for reading a property of a {@link TruffleString}.
