@@ -73,8 +73,21 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
         }
 
         /**
-         * A specialization for reading a non-string property of an object,
-         * in code like {@code "a"[0]}, or {@code [1, 2][undefined]}.
+         * A specialization for reading a non-string property of an object
+         * in code like {@code a[undefined]}.
+         * The index is converted to a string in that case.
+         */
+        @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
+        protected Object readNonStringProperty(Object target, Object property,
+                @CachedLibrary("target") InteropLibrary interopLibrary,
+                @Cached CommonReadPropertyNode commonReadPropertyNode) {
+            return commonReadPropertyNode.executeReadProperty(
+                    target, EasyScriptTruffleStrings.toString(property));
+        }
+
+        /**
+         * A specialization for reading a non-string property of a target without members
+         * (including arrays), in code like {@code "a"[0]}.
          */
         @Fallback
         protected Object readNonTruffleStringPropertyOfObject(Object target, Object index,

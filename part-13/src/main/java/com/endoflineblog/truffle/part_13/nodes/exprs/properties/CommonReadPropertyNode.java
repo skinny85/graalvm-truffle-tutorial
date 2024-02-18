@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.strings.ReadTruffleStringPropertyNode;
-import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -43,13 +42,6 @@ public abstract class CommonReadPropertyNode extends Node {
         } catch (UnsupportedMessageException e) {
             throw new EasyScriptException(this, e.getMessage());
         }
-    }
-
-    @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
-    protected Object readNonStringProperty(Object target, Object property,
-            @CachedLibrary("target") InteropLibrary interopLibrary) {
-        return this.readProperty(target, EasyScriptTruffleStrings.toString(property),
-                interopLibrary);
     }
 
     /**
