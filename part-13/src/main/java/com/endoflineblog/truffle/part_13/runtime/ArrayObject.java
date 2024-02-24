@@ -102,7 +102,7 @@ public final class ArrayObject extends JavaScriptObject {
 
         @Fallback
         static void writeNonLength(ArrayObject arrayObject, String member, Object value,
-                @CachedLibrary(limit = "1") DynamicObjectLibrary dynamicObjectLibrary) {
+                @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
             arrayObject.writeMember(member, value, dynamicObjectLibrary);
         }
     }
