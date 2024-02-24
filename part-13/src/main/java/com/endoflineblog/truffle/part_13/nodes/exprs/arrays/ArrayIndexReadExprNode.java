@@ -4,7 +4,6 @@ import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonReadPropertyNode;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
-import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.ImportStatic;
@@ -99,12 +98,13 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     protected abstract EasyScriptExprNode getArrayExpr();
     protected abstract EasyScriptExprNode getIndexExpr();
 
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private InnerNode innerNode;
+    private InnerNode innerNode = ArrayIndexReadExprNodeGen.InnerNodeGen.create();
 
     @Specialization
     protected Object readIndexOrProperty(Object target, Object indexOrProperty) {
-        return this.getOrCreateInnerNode().executeIndexRead(target, indexOrProperty);
+        return this.innerNode.executeIndexRead(target, indexOrProperty);
     }
 
     @Override
@@ -116,14 +116,5 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
         Object property = this.getIndexExpr().executeGeneric(frame);
         return this.readIndexOrProperty(receiver, property);
-    }
-
-    private InnerNode getOrCreateInnerNode() {
-        if (this.innerNode == null) {
-            CompilerDirectives.transferToInterpreterAndInvalidate();
-            this.innerNode = ArrayIndexReadExprNodeGen.InnerNodeGen.create();
-            this.insert(innerNode);
-        }
-        return this.innerNode;
     }
 }

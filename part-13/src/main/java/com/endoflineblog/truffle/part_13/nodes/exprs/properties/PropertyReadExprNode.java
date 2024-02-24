@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
-import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -17,12 +16,13 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     protected abstract EasyScriptExprNode getTargetExpr();
     protected abstract String getPropertyName();
 
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
-    private CommonReadPropertyNode commonReadPropertyNode;
+    private CommonReadPropertyNode commonReadPropertyNode = CommonReadPropertyNodeGen.create();
 
     @Specialization
     protected Object readProperty(Object target) {
-        return this.getOrCreateCommonReadPropertyNode().executeReadProperty(
+        return this.commonReadPropertyNode.executeReadProperty(
                 target, this.getPropertyName());
     }
 
@@ -34,14 +34,5 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     @Override
     public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
         return this.readProperty(receiver);
-    }
-
-    private CommonReadPropertyNode getOrCreateCommonReadPropertyNode() {
-        if (this.commonReadPropertyNode == null) {
-            CompilerDirectives.transferToInterpreterAndInvalidate();
-            this.commonReadPropertyNode = CommonReadPropertyNodeGen.create();
-            this.insert(commonReadPropertyNode);
-        }
-        return this.commonReadPropertyNode;
     }
 }
