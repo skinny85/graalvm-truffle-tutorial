@@ -54,7 +54,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
             @SuppressWarnings("unused") TruffleString truffleString,
             Object property,
             @Cached("currentLanguageContext().shapesAndPrototypes.stringPrototype") ClassPrototypeObject stringPrototype,
-            @CachedLibrary(limit = "1") DynamicObjectLibrary stringPrototypeObjectLibrary) {
+            @CachedLibrary(limit = "2") DynamicObjectLibrary stringPrototypeObjectLibrary) {
         return stringPrototypeObjectLibrary.getOrDefault(stringPrototype, property,
                 Undefined.INSTANCE);
     }

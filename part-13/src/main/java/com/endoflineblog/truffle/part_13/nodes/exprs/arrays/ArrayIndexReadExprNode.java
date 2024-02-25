@@ -77,7 +77,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
          * The index is converted to a string in that case.
          */
         @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
-        protected Object readNonStringProperty(Object target, Object property,
+        protected Object readNonTruffleStringPropertyOfObject(Object target, Object property,
                 @CachedLibrary("target") InteropLibrary interopLibrary,
                 @Cached CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(
@@ -89,7 +89,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
          * (including arrays), in code like {@code "a"[0]}.
          */
         @Fallback
-        protected Object readNonTruffleStringPropertyOfObject(Object target, Object index,
+        protected Object readNonTruffleStringPropertyOfNonObject(Object target, Object index,
                 @Cached CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(target, index);
         }
