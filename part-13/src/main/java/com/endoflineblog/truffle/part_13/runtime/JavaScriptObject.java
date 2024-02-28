@@ -21,7 +21,8 @@ import com.oracle.truffle.api.object.Shape;
  */
 @ExportLibrary(InteropLibrary.class)
 public class JavaScriptObject extends DynamicObject {
-    public final ClassPrototypeObject classPrototypeObject;
+    // this can't be private, because it's used in specialization guard expressions
+    final ClassPrototypeObject classPrototypeObject;
 
     public JavaScriptObject(Shape shape, ClassPrototypeObject classPrototypeObject) {
         super(shape);
