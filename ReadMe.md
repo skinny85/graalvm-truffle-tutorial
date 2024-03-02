@@ -66,3 +66,4 @@ $ ./gradlew build
 * [Part 10 - arrays, read-only properties](part-10)
 * [Part 11 - strings, static method calls](part-11)
 * [Part 12 - classes 1: methods, `new` operator](part-12)
+* [Part 13 - classes 2: fields, this, constructors](part-13)
