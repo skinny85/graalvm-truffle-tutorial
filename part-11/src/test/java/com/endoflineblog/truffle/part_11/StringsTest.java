@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a set of unit tests for testing strings in EasyScript.
@@ -110,7 +111,7 @@ public class StringsTest {
     }
 
     @Test
-    public void property_writes_through_indexing_are_ignored() {
+    public void array_property_writes_through_indexing_are_ignored() {
         Value result = this.context.eval("ezs", "" +
                 "const arr = [0, 1, 2]; " +
                 "const result = arr['length'] = 5; " +
@@ -135,6 +136,17 @@ public class StringsTest {
                 "l[l]"
         );
         assertEquals(6, result.asInt());
+    }
+
+    @Test
+    public void indexed_property_writes_to_strings_have_no_effect() {
+        Value result = this.context.eval("ezs", "" +
+                "const str = 'abc'; " +
+                "const result = str['length'] = 5; " +
+                "[result, str.length]"
+        );
+        assertEquals(5, result.getArrayElement(0).asInt());
+        assertEquals(3, result.getArrayElement(1).asInt());
     }
 
     @Test
@@ -207,7 +219,7 @@ public class StringsTest {
     @Test
     public void strings_have_a_charAt_method() {
         Value result = this.context.eval("ezs",
-                 " 'abc'.charAt(2)"
+                " 'abc'.charAt(2)"
         );
         assertEquals("c", result.asString());
     }
@@ -253,6 +265,18 @@ public class StringsTest {
     }
 
     @Test
+    public void unknown_string_member_read_through_GraalVM_interop_throws() {
+        Value str = this.context.eval("ezs", "'my-string'");
+        assertFalse(str.hasMembers());
+        try {
+            str.getMember("doesNotExist");
+            fail("expected String.getMember() to throw");
+        } catch (UnsupportedOperationException e) {
+            // nothing to do here
+        }
+    }
+
+    @Test
     public void methods_correctly_resolve_their_targets() {
         Value result = this.context.eval("ezs", "" +
                 "function firstChar(str) { " +
@@ -268,7 +292,7 @@ public class StringsTest {
 
     @Test
     void string_properties_work_after_reading_non_existing_property() {
-        Value add = this.context.eval("ezs", "" +
+        this.context.eval("ezs", "" +
                 "function readProp(str, prop) { " +
                 "    return str[prop]; " +
                 "} " +
