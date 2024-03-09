@@ -12,9 +12,20 @@ import com.oracle.truffle.api.nodes.Node;
 
 /**
  * A helper Node that contains specialization for functions calls.
- * Identical to the class with the same name from part 11.
+ * Very similar to the class with the same name from part 12,
+ * the main difference is adding a third argument, {@code receiver},
+ * to {@link #executeDispatch}, which represents {@code this},
+ * which we always pass as the first argument to the underlying function
+ * in {@link #extendArguments}, so that
+ * {@link com.endoflineblog.truffle.part_13.nodes.exprs.objects.ThisExprNode}
+ * works correctly.
  */
 public abstract class FunctionDispatchNode extends Node {
+    /**
+     * The execution method for this Node.
+     * The {@code receiver} parameter will be passed as {@code this}
+     * to the underlying function.
+     */
     public abstract Object executeDispatch(Object function, Object[] arguments, Object receiver);
 
     /**
@@ -74,7 +85,7 @@ public abstract class FunctionDispatchNode extends Node {
             // we need to offset the provided arguments by one, because of 'this'
             int j = i - 1;
             // if a function was called with fewer arguments than it declares,
-            // we fill them with `undefined`
+            // we fill the remaining ones with `undefined`
             ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
         }
         return ret;

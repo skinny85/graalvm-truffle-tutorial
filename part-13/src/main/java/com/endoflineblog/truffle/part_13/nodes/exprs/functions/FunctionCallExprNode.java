@@ -9,7 +9,12 @@ import java.util.List;
 /**
  * The Node representing the expression of calling a function in EasyScript,
  * for example {@code Math.pow(2, 3)}.
- * Identical to the class with the same name from part 11.
+ * Very similar to the class with the same name from part 12,
+ * the main difference is that it's now using the new
+ * {@link EasyScriptExprNode#evaluateAsReceiver} and
+ * {@link EasyScriptExprNode#evaluateAsFunction} methods,
+ * and passes the extra 'receiver' argument to
+ * {@link FunctionDispatchNode#executeDispatch}.
  */
 public final class FunctionCallExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")

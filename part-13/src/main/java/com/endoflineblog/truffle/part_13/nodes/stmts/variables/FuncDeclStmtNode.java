@@ -16,25 +16,12 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
-import com.oracle.truffle.api.object.Shape;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
- * Very similar to the class with the same name from part 11,
- * the only difference is that we change the name of the first sub-expression
- * (the one that determines in which object to store the resulting function)
- * from {@code globalScopeObjectExpr} to {@code containerObjectExpr},
- * and its type (from {@link com.endoflineblog.truffle.part_13.nodes.exprs.GlobalScopeObjectExprNode}
- * to {@link EasyScriptExprNode}).
- * We change this because, in this part of the series, in addition to
- * {@link com.endoflineblog.truffle.part_13.nodes.exprs.GlobalScopeObjectExprNode},
- * we also pass to this class' static factory method a
- * {@link com.endoflineblog.truffle.part_13.nodes.exprs.DynamicObjectReferenceExprNode},
- * which is how we handle methods inside class declarations
- * (the referenced {@link DynamicObject} is the {@link com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject}
- * in this case).
- * Other than those name and type changes,
- * the implementation itself is identical to part 11.
+ * Almost identical to the class with the same name from part 12,
+ * the only difference is using the new {@link ShapesAndPrototypes}
+ * class to create the {@link FunctionObject} instance.
  */
 @NodeChild(value = "containerObjectExpr", type = EasyScriptExprNode.class)
 @NodeField(name = "funcName", type = String.class)

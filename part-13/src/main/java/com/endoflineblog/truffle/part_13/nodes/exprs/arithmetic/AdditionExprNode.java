@@ -11,7 +11,7 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The Node representing number addition.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 public abstract class AdditionExprNode extends BinaryOperationExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)

@@ -11,7 +11,9 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The abstract common ancestor of all expression Nodes in EasyScript.
- * Identical to the class with the same name from part 11.
+ * Very similar to the class with the same name from part 12,
+ * the only differences are the two new methods,
+ * {@link #evaluateAsReceiver} and {@link #evaluateAsFunction}.
  */
 @TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends EasyScriptNode {
@@ -56,6 +58,9 @@ public abstract class EasyScriptExprNode extends EasyScriptNode {
      * (the {@code this} variable).
      * Used in {@link com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionCallExprNode},
      * alongside {@link #evaluateAsFunction}.
+     * The default implementation returns {@link Undefined#INSTANCE},
+     * and is overridden only in {@link com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNode}
+     * and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexReadExprNode}.
      */
     public Object evaluateAsReceiver(VirtualFrame frame) {
         // by default, almost no expressions have a method receiver -
@@ -68,6 +73,9 @@ public abstract class EasyScriptExprNode extends EasyScriptNode {
      * that is used for function and method calls.
      * Used in {@link com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionCallExprNode},
      * alongside {@link #evaluateAsReceiver}.
+     * The default implementation is to delegate to {@link #executeGeneric},
+     * and is overridden only in {@link com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNode}
+     * and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexReadExprNode}.
      */
     public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
         // by default, the function is simply the result of executing the expression

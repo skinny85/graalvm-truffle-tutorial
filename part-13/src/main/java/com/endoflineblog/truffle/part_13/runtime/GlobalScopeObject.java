@@ -14,7 +14,7 @@ import com.oracle.truffle.api.object.Shape;
 /**
  * This is the Truffle interop object that represents the global-level scope
  * that contains all global variables.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject extends DynamicObject {

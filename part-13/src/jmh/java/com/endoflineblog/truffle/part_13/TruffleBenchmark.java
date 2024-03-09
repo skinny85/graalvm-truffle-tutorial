@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The common superclass of all JMH benchmarks.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 @Warmup(iterations = 5, time = 1)
 @Measurement(iterations = 5, time = 1)

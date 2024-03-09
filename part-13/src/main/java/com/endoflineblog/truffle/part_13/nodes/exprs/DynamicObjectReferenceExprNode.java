@@ -10,6 +10,7 @@ import com.oracle.truffle.api.object.DynamicObject;
  * to the constructor of this class,
  * and then passing the instance created from that constructor to
  * {@link com.endoflineblog.truffle.part_13.nodes.stmts.variables.FuncDeclStmtNode}.
+ * Identical to the class with the same name from part 12.
  */
 public final class DynamicObjectReferenceExprNode extends EasyScriptExprNode {
     private final DynamicObject dynamicObject;

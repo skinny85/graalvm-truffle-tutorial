@@ -13,7 +13,7 @@ import com.oracle.truffle.api.object.Property;
 
 /**
  * A Node that represents the expression of assigning a value to a global variable in EasyScript.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeChild(value = "assignmentExpr")

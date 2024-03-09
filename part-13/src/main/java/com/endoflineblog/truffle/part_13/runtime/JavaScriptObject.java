@@ -11,13 +11,12 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 /**
- * A {@link TruffleObject} that represents an instance of a user-defined class.
- * Instances of this class are created in the
- * {@link com.endoflineblog.truffle.part_13.nodes.exprs.objects.NewExprNode 'new' operator expression Node}.
- * It contains a pointer to the {@link ClassPrototypeObject prototype object of the class it belongs to},
- * and it delegates all member reads from the {@link InteropLibrary}
- * to that prototype, since, in this part of the series,
- * we only support instance methods of classes, not fields.
+ * A {@link TruffleObject} that is the base class of all objects in EasyScript,
+ * including user-defined class instances, and built-in objects like arrays and functions.
+ * Very similar to {@code ClassInstanceObject} from part 12,
+ * but with added support for writing properties,
+ * using the {@link InteropLibrary} interface,
+ * that is invoked in {@link com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonWritePropertyNode}.
  */
 @ExportLibrary(InteropLibrary.class)
 public class JavaScriptObject extends DynamicObject {

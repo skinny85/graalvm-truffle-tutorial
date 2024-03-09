@@ -8,7 +8,7 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * Node class representing the lesser or equal ({@code <=}) operator.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 public abstract class LesserOrEqualExprNode extends BinaryOperationExprNode {
     @Specialization

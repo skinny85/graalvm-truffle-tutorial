@@ -9,6 +9,8 @@ import com.oracle.truffle.api.dsl.Specialization;
 /**
  * The Node for reading properties of objects.
  * Used in code like {@code t.myProp = 3}.
+ * Very similar to {@link PropertyReadExprNode}.
+ * Simply delegates to {@link CommonWritePropertyNode}.
  */
 @NodeChild("targetExpr")
 @NodeField(name = "propertyName", type = String.class)

@@ -5,7 +5,9 @@ import com.oracle.truffle.api.object.Shape;
 
 /**
  * This class holds the {@link Shape}s and {@link ClassPrototypeObject}s
- * that are used by various EasyScript {@link com.oracle.truffle.api.nodes.Node}s.
+ * that are used by various EasyScript {@link com.oracle.truffle.api.nodes.Node}s,
+ * such as {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayLiteralExprNode}
+ * and {@link com.endoflineblog.truffle.part_13.nodes.stmts.variables.FuncDeclStmtNode}.
  * They get access to this class through the
  * {@link com.endoflineblog.truffle.part_13.EasyScriptLanguageContext EasyScript TruffleLanguage context}.
  */

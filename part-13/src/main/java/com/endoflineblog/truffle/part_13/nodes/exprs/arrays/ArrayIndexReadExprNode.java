@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.arrays;
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonReadPropertyNode;
+import com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonWritePropertyNode;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -20,10 +21,25 @@ import com.oracle.truffle.api.strings.TruffleString;
 /**
  * The Node representing reading array indexes
  * (like {@code a[1]}).
+ * Very similar to the class with the same name from part 12,
+ * the main difference is introducing a nested class,
+ * {@link InnerNode}, that contains the specializations that were previously
+ * in the class itself, so that we only have a single specialization in the main class,
+ * which can be called from {@link #evaluateAsFunction},
+ * similarly to {@link com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNode}.
  */
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
 public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
+    /**
+     * The Node that contains the specializations that in previous parts were in
+     * {@link ArrayIndexReadExprNode}.
+     * Very similar to {@link ArrayIndexReadExprNode} from part 12,
+     * the main difference is that we add an extra specialization,
+     * {@link #readNonTruffleStringPropertyOfObject},
+     * that converts the index to a string if it's not one,
+     * similar to {@link ArrayIndexWriteExprNode#writeNonStringProperty}.
+     */
     @ImportStatic(EasyScriptTruffleStrings.class)
     static abstract class InnerNode extends Node {
         abstract Object executeIndexRead(Object array, Object index);
@@ -33,7 +49,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
          * in code like {@code [1, 2][1]}.
          */
         @Specialization(guards = "arrayInteropLibrary.isArrayElementReadable(array, index)", limit = "2")
-        protected Object readIntIndexOfArray(Object array, int index,
+        protected Object readIntIndexOfArray(
+                Object array, int index,
                 @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
             try {
                 return arrayInteropLibrary.readArrayElement(array, index);
@@ -77,8 +94,9 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
          * The index is converted to a string in that case.
          */
         @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
-        protected Object readNonTruffleStringPropertyOfObject(Object target, Object property,
-                @CachedLibrary("target") InteropLibrary interopLibrary,
+        protected Object readNonTruffleStringPropertyOfObject(
+                Object target, Object property,
+                @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary,
                 @Cached CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(
                     target, EasyScriptTruffleStrings.toString(property));
@@ -89,7 +107,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
          * (including arrays), in code like {@code "a"[0]}.
          */
         @Fallback
-        protected Object readNonTruffleStringPropertyOfNonObject(Object target, Object index,
+        protected Object readNonTruffleStringPropertyOfNonObject(
+                Object target, Object index,
                 @Cached CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(target, index);
         }

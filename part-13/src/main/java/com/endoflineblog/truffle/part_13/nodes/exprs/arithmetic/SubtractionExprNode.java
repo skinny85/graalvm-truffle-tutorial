@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 /**
  * The Node representing number subtraction.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 public abstract class SubtractionExprNode extends BinaryOperationExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)

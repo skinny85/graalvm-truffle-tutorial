@@ -12,7 +12,7 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the expression of referencing a global variable in EasyScript.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeField(name = "name", type = String.class)

@@ -8,7 +8,9 @@ import com.oracle.truffle.api.object.DynamicObject;
 /**
  * The class of the context for the
  * {@link EasyScriptTruffleLanguage TruffleLanguage implementaton in this part of the series}.
- * Identical to the class with the same name from part 11.
+ * Very similar to the class with the same name from part 12,
+ * the only difference being that the {@link ShapesAndPrototypes}
+ * object is now accessible from here, instead of just the string prototype.
  */
 public final class EasyScriptLanguageContext {
     private static final TruffleLanguage.ContextReference<EasyScriptLanguageContext> REF =
@@ -20,6 +22,11 @@ public final class EasyScriptLanguageContext {
     }
 
     public final DynamicObject globalScopeObject;
+
+    /**
+     * The object containing the shapes and prototypes,
+     * both for user-defined class instances, and for built-in objects.
+     */
     public final ShapesAndPrototypes shapesAndPrototypes;
 
     public EasyScriptLanguageContext(DynamicObject globalScopeObject, ShapesAndPrototypes shapesAndPrototypes) {

@@ -2,6 +2,9 @@ package com.endoflineblog.truffle.part_13;
 
 import org.openjdk.jmh.annotations.Benchmark;
 
+/**
+ * A benchmark measuring the performance of storing state inside class instances.
+ */
 public class CounterThisBenchmark extends TruffleBenchmark {
     private static final int INPUT = 1_000_000;
 

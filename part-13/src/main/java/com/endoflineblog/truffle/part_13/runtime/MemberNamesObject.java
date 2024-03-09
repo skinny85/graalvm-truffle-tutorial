@@ -8,7 +8,7 @@ import com.oracle.truffle.api.library.ExportMessage;
 
 /**
  * The class that implements a simple collection of member names of a {@link TruffleObject}.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 @ExportLibrary(InteropLibrary.class)
 final class MemberNamesObject implements TruffleObject {

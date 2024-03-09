@@ -27,14 +27,31 @@ import java.util.stream.IntStream;
 
 /**
  * The {@link TruffleLanguage} implementation for this part of the article series.
- * Very similar to the class with the same name from part 11,
- * the only difference is that we rename the field {@code globalScopeShape}
- * to {@code rootShape}, as it's now used as the {@link Shape}
- * of the {@link com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject}
- * {@link com.oracle.truffle.api.object.DynamicObject},
- * in addition to the {@link com.endoflineblog.truffle.part_13.runtime.GlobalScopeObject},
- * and we also pass it to the
- * {@link com.endoflineblog.truffle.part_13.parsing.EasyScriptTruffleParser#parse main parsing method}.
+ * Very similar to the class with the same name from part 12,
+ * with just a few small differences:
+ * <ul>
+ *     <li>
+ *         We make sure to initialize the new {@link ShapesAndPrototypes} class
+ *         with all of the shapes and prototypes we need,
+ *         now that we've made {@link FunctionObject} and {@link ArrayObject}
+ *         extend {@link JavaScriptObject},
+ *         and add to it the {@link EasyScriptLanguageContext Truffle language context}.
+ *     </li>
+ *     <li>
+ *         We offset arguments of built-in functions by 1,
+ *         while changing the reported number of arguments for built-in methods also by 1,
+ *         to account for the changes made in {@link com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchNode}
+ *         to support {@code this}.
+ *     </li>
+ *     <li>
+ *         We make {@code MathObject} just a regular {@link JavaScriptObject},
+ *         instead of a static object, since it now can have properties written to it.
+ *     </li>
+ *     <li>
+ *         We make the String prototype just a regular {@link ClassPrototypeObject},
+ *         instead of having a dedicated class for it.
+ *     </li>
+ * </ul>
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {

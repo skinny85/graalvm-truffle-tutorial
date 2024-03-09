@@ -11,7 +11,8 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.Node;
 
 /**
- * A Node for writing a property of a JavaScript object.
+ * A Node containing the shared logic of writing a property to a JavaScript object.
+ * Analogous to {@link CommonReadPropertyNode}.
  * Used by {@link PropertyWriteExprNode} and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexWriteExprNode}.
  */
 public abstract class CommonWritePropertyNode extends Node {

@@ -11,7 +11,7 @@ import com.oracle.truffle.api.strings.TruffleString;
 /**
  * An expression Node that represents the implementation of the built-in
  * {@code charAt()} method of strings.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 public abstract class CharAtMethodBodyExprNode extends BuiltInFunctionBodyExprNode {
     /**

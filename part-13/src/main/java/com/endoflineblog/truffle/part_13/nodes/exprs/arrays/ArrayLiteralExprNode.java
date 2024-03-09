@@ -11,7 +11,14 @@ import java.util.List;
 /**
  * The Node representing array literal expressions
  * (like {@code [1, 2, 3]}).
- * Identical to the class with the same name from part 11.
+ * Very similar to the class with the same name from part 12,
+ * the only minor difference is using the {@link ShapesAndPrototypes}
+ * class from {@link com.endoflineblog.truffle.part_13.EasyScriptLanguageContext}
+ * to get the {@link com.oracle.truffle.api.object.Shape}
+ * and {@link com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject}
+ * instance needed to create a new {@link ArrayObject},
+ * since it now can have properties written to it,
+ * and so it extends {@link com.endoflineblog.truffle.part_13.runtime.JavaScriptObject}.
  */
 public final class ArrayLiteralExprNode extends EasyScriptExprNode {
     @Children

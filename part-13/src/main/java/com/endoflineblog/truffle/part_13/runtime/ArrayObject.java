@@ -13,7 +13,11 @@ import com.oracle.truffle.api.object.Shape;
 
 /**
  * A Truffle {@link DynamicObject} that implements integer-indexed JavaScript arrays.
- * Identical to the class with the same name from part 11.
+ * Very similar to the class with the same name from part 12,
+ * the main differences are the special handling of writing the {@code length}
+ * property in the {@code WriteMember} class,
+ * and extending from {@link JavaScriptObject} instead of {@link DynamicObject}
+ * which contains the common logic of reading and writing properties.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ArrayObject extends JavaScriptObject {
@@ -83,6 +87,11 @@ public final class ArrayObject extends JavaScriptObject {
         this.arrayElements[(int) index] = value;
     }
 
+    /**
+     * The {@link InteropLibrary#writeMember}
+     * exported as a class, instead of a method.
+     * This allows using specializations for implementing the message.
+     */
     @ExportMessage
     static class WriteMember {
         @Specialization(guards = {"LENGTH_PROP.equals(member)", "length >= 0"})

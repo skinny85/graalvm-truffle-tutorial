@@ -10,7 +10,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * A Node that represents the assignment to a variable local to a function.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 @NodeChild("initializerExpr")
 @NodeField(name = "frameSlot", type = int.class)

@@ -19,6 +19,9 @@ import java.util.List;
 
 /**
  * The Node for handling {@code new} expressions.
+ * Very similar to the class with the same name from part 12,
+ * the only difference is adding support for invoking the constructor of the class
+ * if one has been defined.
  */
 public abstract class NewExprNode extends EasyScriptExprNode {
     @Child
@@ -48,6 +51,7 @@ public abstract class NewExprNode extends EasyScriptExprNode {
         var object = new JavaScriptObject(this.currentLanguageContext().shapesAndPrototypes.rootShape, classPrototypeObject);
         var constructor = dynamicObjectLibrary.getOrDefault(classPrototypeObject, "constructor", null);
         if (constructor instanceof FunctionObject) {
+            // instanceof always returns 'false' for 'null'
             var args = this.executeArguments(frame);
             FunctionObject boundConstructor = (FunctionObject) constructor;
             this.constructorDispatchNode.executeDispatch(boundConstructor, args, object);

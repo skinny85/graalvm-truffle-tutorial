@@ -7,7 +7,7 @@ import com.oracle.truffle.api.library.ExportMessage;
 
 /**
  * The class that represents the 'undefined' value in JavaScript.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class Undefined implements TruffleObject {

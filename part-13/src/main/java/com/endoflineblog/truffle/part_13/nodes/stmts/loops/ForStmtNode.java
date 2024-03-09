@@ -13,7 +13,7 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 
 /**
  * A Node that represents a {@code for} statement.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 public final class ForStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")

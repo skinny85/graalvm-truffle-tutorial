@@ -13,7 +13,12 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * An AST node that represents reading properties of strings.
- * Identical to the class with the same name from part 11.
+ * Similar to the class with the same name from part 12,
+ * the main difference being we read properties directly from the string prototype,
+ * accessed through the {@link com.endoflineblog.truffle.part_13.common.ShapesAndPrototypes}
+ * class, instead of having two separate specializations per property.
+ *
+ * @see #readNonLengthProperty
  */
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";

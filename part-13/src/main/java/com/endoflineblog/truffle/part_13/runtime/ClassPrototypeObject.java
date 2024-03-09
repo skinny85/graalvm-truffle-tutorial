@@ -7,14 +7,10 @@ import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.Shape;
 
 /**
- * A {@link DynamicObject} that represents the prototype of a user-defined class.
- * Each {@link JavaScriptObject instance of a class}
- * points to the prototype of its class,
- * and all property reads of the instance delegate to this prototype object to get a reference to the class' instance method.
- * An instance of this class is created when parsing a class declaration,
- * passed to the {@link com.endoflineblog.truffle.part_13.nodes.exprs.objects.ClassDeclExprNode class declaration Node},
- * and saved as a global variable with the name equal to the name of the class using the
- * {@link com.endoflineblog.truffle.part_13.nodes.stmts.variables.GlobalVarDeclStmtNode}.
+ * A {@link DynamicObject} that represents the prototype of class.
+ * That can be a user-defined class, or a built-in class,
+ * like for functions, or arrays.
+ * Identical to the class with the same name from part 12.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ClassPrototypeObject extends DynamicObject {

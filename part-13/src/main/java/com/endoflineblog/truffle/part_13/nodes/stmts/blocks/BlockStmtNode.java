@@ -13,7 +13,7 @@ import java.util.List;
  * for example those used as the branch of an {@code if} statement
  * (with the exception of the block for a user-defined function's body,
  * which is represented by {@link UserFuncBodyStmtNode}).
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  *
  * @see #executeStatement
  */

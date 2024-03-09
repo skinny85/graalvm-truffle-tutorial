@@ -5,7 +5,8 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * A class containing static helper methods for dealing with {@link TruffleString}s in EasyScript.
- * Identical to the class with the same name from part 11.
+ * Almost identical to the class with the same name from part 12,
+ * the only difference is the new {@link #toString(Object)} method.
  */
 public final class EasyScriptTruffleStrings {
     /** The string encoding used by EasyScript - UTF-16, same as JavaScript. */
@@ -47,6 +48,12 @@ public final class EasyScriptTruffleStrings {
         return o1.toString() + o2.toString();
     }
 
+    /**
+     * A method that converts any value to a string.
+     * Must be annotated with {@link TruffleBoundary}
+     * to not interfere with partial evaluation.
+     * similarly to the {@link #concatToStrings} method.
+     */
     @TruffleBoundary
     public static String toString(Object object) {
         return object.toString();

@@ -7,7 +7,7 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The AST node that represents a string literal expression in EasyScript.
- * Identical to the class with the same name from part 11.
+ * Identical to the class with the same name from part 12.
  */
 public final class StringLiteralExprNode extends EasyScriptExprNode {
     private final TruffleString value;

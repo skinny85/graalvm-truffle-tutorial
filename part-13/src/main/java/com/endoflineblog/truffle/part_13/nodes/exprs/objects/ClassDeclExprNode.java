@@ -12,6 +12,7 @@ import java.util.List;
  * The Node for handling a class declaration.
  * It simply handles methods inside the class by delegating to
  * {@link FuncDeclStmtNode}.
+ * Identical to the class with the same name from part 12.
  */
 public final class ClassDeclExprNode extends EasyScriptExprNode {
     @Children

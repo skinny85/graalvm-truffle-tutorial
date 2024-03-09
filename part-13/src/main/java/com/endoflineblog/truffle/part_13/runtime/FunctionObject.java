@@ -8,14 +8,17 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The object that represents a function in EasyScript.
- * Almost identical to the class with the same name from part 11,
- * the only difference is adding {@link JavaScriptObject}
- * to the list of allowed EasyScript values when calling this function through the GraalVM polyglot API.
+ * Very similar to the class with the same name from part 12,
+ * the main differences are the removal of the {@code methodTarget} field,
+ * since that has been moved into the {@link FunctionDispatchNode#executeDispatch} method,
+ * and extending from {@link JavaScriptObject}
+ * which contains the common logic of reading and writing properties.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject extends JavaScriptObject {
