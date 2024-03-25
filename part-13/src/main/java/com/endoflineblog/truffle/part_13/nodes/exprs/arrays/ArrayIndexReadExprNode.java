@@ -3,7 +3,6 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.arrays;
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonReadPropertyNode;
-import com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonWritePropertyNode;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -64,7 +63,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
          * in code like {@code [1, 2]['length']}, or {@code "a"['length']}.
          */
         @Specialization(guards = "equals(propertyName, cachedPropertyName, equalNode)", limit = "2")
-        protected Object readTruffleStringPropertyOfObjectCached(
+        protected Object readTruffleStringPropertyCached(
                 Object target,
                 @SuppressWarnings("unused") TruffleString propertyName,
                 @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
@@ -79,8 +78,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
          * The uncached variant of the specialization for reading a string property of an object,
          * in code like {@code [1, 2]['length']}, or {@code "a"['length']}.
          */
-        @Specialization(replaces = "readTruffleStringPropertyOfObjectCached")
-        protected Object readTruffleStringPropertyOfObjectUncached(
+        @Specialization(replaces = "readTruffleStringPropertyCached")
+        protected Object readTruffleStringPropertyUncached(
                 Object target, TruffleString propertyName,
                 @Cached TruffleString.ToJavaStringNode toJavaStringNode,
                 @Cached CommonReadPropertyNode commonReadPropertyNode) {

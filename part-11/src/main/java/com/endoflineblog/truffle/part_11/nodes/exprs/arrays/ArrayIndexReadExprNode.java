@@ -22,8 +22,8 @@ import com.oracle.truffle.api.strings.TruffleString;
  * the difference is we add extra specializations for when strings are used as the index,
  * in code like {@code a["b"]} (which, in JavaScript, is equivalent to {@code a.b}).
  *
- * @see #readTruffleStringPropertyOfObjectCached
- * @see #readTruffleStringPropertyOfObjectUncached
+ * @see #readTruffleStringPropertyCached
+ * @see #readTruffleStringPropertyUncached
  */
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
@@ -34,7 +34,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * in code like {@code [1, 2][1]}.
      */
     @Specialization(guards = "arrayInteropLibrary.isArrayElementReadable(array, index)", limit = "2")
-    protected Object readIntIndexOfArray(Object array, int index,
+    protected Object readIntIndexOfArray(
+            Object array, int index,
             @CachedLibrary("array") InteropLibrary arrayInteropLibrary) {
         try {
             return arrayInteropLibrary.readArrayElement(array, index);
@@ -52,12 +53,11 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * for a maximum of two different names.
      * If the given indexed property access sees more than two different names,
      * then we switch to the uncached variant,
-     * {@link #readTruffleStringPropertyOfObjectUncached}.
+     * {@link #readTruffleStringPropertyUncached}.
      */
     @Specialization(guards = "equals(propertyName, cachedPropertyName, equalNode)", limit = "2")
-    protected Object readTruffleStringPropertyOfObjectCached(
-            Object target,
-            @SuppressWarnings("unused") TruffleString propertyName,
+    protected Object readTruffleStringPropertyCached(
+            Object target, @SuppressWarnings("unused") TruffleString propertyName,
             @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
             @Cached("propertyName") @SuppressWarnings("unused") TruffleString cachedPropertyName,
             @Cached @SuppressWarnings("unused") TruffleString.ToJavaStringNode toJavaStringNode,
@@ -69,11 +69,12 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     /**
      * A specialization for reading a string property of an object,
      * in code like {@code [1, 2]['length']}, or {@code "a"['length']}.
-     * This is the uncached variant of the {@link #readTruffleStringPropertyOfObjectCached}
+     * This is the uncached variant of the {@link #readTruffleStringPropertyCached}
      * specialization, used when this indexed property access sees more than two different property names.
      */
-    @Specialization(replaces = "readTruffleStringPropertyOfObjectCached")
-    protected Object readTruffleStringPropertyOfObjectUncached(Object target, TruffleString propertyName,
+    @Specialization(replaces = "readTruffleStringPropertyCached")
+    protected Object readTruffleStringPropertyUncached(
+            Object target, TruffleString propertyName,
             @Cached TruffleString.ToJavaStringNode toJavaStringNode,
             @Cached CommonReadPropertyNode commonReadPropertyNode) {
         return commonReadPropertyNode.executeReadProperty(target,
@@ -85,7 +86,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
      * in code like {@code "a"[0]}, or {@code [1, 2][undefined]}.
      */
     @Fallback
-    protected Object readNonTruffleStringPropertyOfObject(Object target, Object index,
+    protected Object readNonTruffleStringPropertyOfObject(
+            Object target, Object index,
             @Cached CommonReadPropertyNode commonReadPropertyNode) {
         return commonReadPropertyNode.executeReadProperty(target, index);
     }
