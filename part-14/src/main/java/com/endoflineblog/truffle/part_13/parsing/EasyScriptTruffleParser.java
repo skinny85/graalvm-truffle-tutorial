@@ -53,6 +53,7 @@ import com.endoflineblog.truffle.part_13.nodes.stmts.variables.FuncDeclStmtNodeG
 import com.endoflineblog.truffle.part_13.nodes.stmts.variables.GlobalVarDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_13.parsing.antlr.EasyScriptLexer;
 import com.endoflineblog.truffle.part_13.parsing.antlr.EasyScriptParser;
+import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeChainObject;
 import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
@@ -128,6 +129,13 @@ public final class EasyScriptTruffleParser {
             this.declarationKind = declarationKind;
         }
     }
+    private static final class ClassPrototype extends FrameMember {
+        public final ClassPrototypeObject classPrototypeObject;
+
+        ClassPrototype(ClassPrototypeObject classPrototypeObject) {
+            this.classPrototypeObject = classPrototypeObject;
+        }
+    }
 
     /**
      * Map containing bindings for the function arguments and local variables when parsing function definitions
@@ -146,6 +154,8 @@ public final class EasyScriptTruffleParser {
         this.state = ParserState.TOP_LEVEL;
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.localScopes = new Stack<>();
+        // we add a global scope, in which we store the class prototypes
+        this.localScopes.push(new HashMap<>());
         this.localVariablesCounter = 0;
     }
 
@@ -325,8 +335,23 @@ public final class EasyScriptTruffleParser {
             throw new EasyScriptException("classes nested in functions are not supported in EasyScript");
         }
 
-        String className = classDeclStmt.ID().getText();
-        var classPrototype = new ClassPrototypeObject(this.objectShape, className);
+        String className = classDeclStmt.cls.getText();
+        String superClass = classDeclStmt.spr_cls == null
+                ? null
+                : classDeclStmt.spr_cls.getText();
+        ClassPrototypeObject classPrototype;
+        if (superClass == null) {
+            classPrototype = new ClassPrototypeObject(this.objectShape, className);
+        } else {
+            FrameMember frameMember = this.localScopes.get(0).get(superClass);
+            if (frameMember instanceof ClassPrototype) {
+                ClassPrototypeObject superClassPrototype = ((ClassPrototype) frameMember).classPrototypeObject;
+                classPrototype = new ClassPrototypeChainObject(this.objectShape, className, superClassPrototype);
+            } else {
+                throw new EasyScriptException("class '" + className + "' extends unknown class '" + superClass + "'");
+            }
+        }
+        this.localScopes.get(0).put(className, new ClassPrototype(classPrototype));
         List<FuncDeclStmtNode> classMethods = new ArrayList<>();
         for (var classMember : classDeclStmt.class_member()) {
             classMethods.add(this.parseSubroutineDecl(classMember.subroutine_decl(),
@@ -400,7 +425,7 @@ public final class EasyScriptTruffleParser {
         String variableId = assignmentExpr.ID().getText();
         FrameMember frameMember = this.findFrameMember(variableId);
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
-        if (frameMember == null) {
+        if (frameMember == null || frameMember instanceof ClassPrototype) {
             return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
         } else {
             if (frameMember instanceof FunctionArgument) {
@@ -543,7 +568,7 @@ public final class EasyScriptTruffleParser {
 
     private EasyScriptExprNode parseReference(String variableId) {
         FrameMember frameMember = this.findFrameMember(variableId);
-        if (frameMember == null) {
+        if (frameMember == null || frameMember instanceof ClassPrototype) {
             // we know for sure this is a reference to a global variable
             return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
         } else {

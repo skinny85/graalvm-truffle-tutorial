@@ -46,9 +46,9 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     boolean isMemberReadable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
+            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
             @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary) {
-        return instanceObjectLibrary.containsKey(this, member) ||
+        return thisObjectLibrary.containsKey(this, member) ||
                 prototypeObjectLibrary.containsKey(this.classPrototypeObject, member);
     }
 
@@ -76,21 +76,21 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     boolean isMemberModifiable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
+            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
             @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary) {
-        return this.isMemberReadable(member, instanceObjectLibrary, prototypeObjectLibrary);
+        return this.isMemberReadable(member, thisObjectLibrary, prototypeObjectLibrary);
     }
 
     @ExportMessage
     boolean isMemberInsertable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary) {
-        return !this.isMemberModifiable(member, instanceObjectLibrary, dynamicObjectLibrary);
+            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary) {
+        return !this.isMemberModifiable(member, thisObjectLibrary, prototypeObjectLibrary);
     }
 
     @ExportMessage
     void writeMember(String member, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary dynamicObjectLibrary) {
-        dynamicObjectLibrary.put(this, member, value);
+            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary) {
+        thisObjectLibrary.put(this, member, value);
     }
 }

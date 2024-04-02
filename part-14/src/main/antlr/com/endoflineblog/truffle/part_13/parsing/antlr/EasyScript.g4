@@ -17,7 +17,7 @@ stmt :         kind=('var' | 'let' | 'const') binding (',' binding)* ';'? #VarDe
      | 'for' '(' init=stmt? ';' cond=expr1? ';' updt=expr1? ')' body=stmt #ForStmt
      |                                                       'break' ';'? #BreakStmt
      |                                                    'continue' ';'? #ContinueStmt
-     |                              'class' ID '{' class_member* '}' ';'? #ClassDeclStmt
+     |  'class' cls=ID ('extends' spr_cls=ID)? '{' class_member* '}' ';'? #ClassDeclStmt
      ;
 binding : ID ('=' expr1)? ;
 class_member : subroutine_decl ;

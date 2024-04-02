@@ -13,7 +13,7 @@ import com.oracle.truffle.api.object.Shape;
  * Identical to the class with the same name from part 12.
  */
 @ExportLibrary(InteropLibrary.class)
-public final class ClassPrototypeObject extends DynamicObject {
+public class ClassPrototypeObject extends InteropDynamicObject {
     public final String className;
 
     public ClassPrototypeObject(Shape shape, String className) {

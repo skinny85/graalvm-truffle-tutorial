@@ -9,7 +9,7 @@ public class CounterThisBenchmark extends TruffleBenchmark {
     private static final int INPUT = 1_000_000;
 
     private static final String COUNTER_CLASS = "" +
-            "class CounterDirect { " +
+            "class DirectBase { " +
             "    constructor() { " +
             "        this.count = 0; " +
             "    } " +
@@ -20,7 +20,9 @@ public class CounterThisBenchmark extends TruffleBenchmark {
             "        return this.count; " +
             "    } " +
             "} " +
-            "class CounterIndexed { " +
+            "class CounterDirect extends DirectBase { " +
+            "} " +
+            "class IndexedBase { " +
             "    constructor() { " +
             "        this['count'] = 0; " +
             "    } " +
@@ -30,6 +32,8 @@ public class CounterThisBenchmark extends TruffleBenchmark {
             "    getCount() { " +
             "        return this['count']; " +
             "    } " +
+            "} " +
+            "class CounterIndexed extends IndexedBase { " +
             "}";
 
     @Override

@@ -11,9 +11,11 @@ import com.oracle.truffle.api.dsl.Executed;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.UnknownIdentifierException;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 import java.util.List;
 
@@ -47,9 +49,16 @@ public abstract class NewExprNode extends EasyScriptExprNode {
      */
     @Specialization(limit = "2")
     protected Object instantiateObject(VirtualFrame frame, ClassPrototypeObject classPrototypeObject,
-            @CachedLibrary("classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary) {
+            @CachedLibrary("classPrototypeObject") InteropLibrary interopPrototypeLibrary) {
         var object = new JavaScriptObject(this.currentLanguageContext().shapesAndPrototypes.rootShape, classPrototypeObject);
-        var constructor = dynamicObjectLibrary.getOrDefault(classPrototypeObject, "constructor", null);
+        Object constructor = null;
+        try {
+            constructor = interopPrototypeLibrary.readMember(classPrototypeObject, "constructor");
+        } catch (UnknownIdentifierException e) {
+            // fall through to below
+        } catch (UnsupportedMessageException e) {
+            throw new EasyScriptException(this, e.getMessage());
+        }
         if (constructor instanceof FunctionObject) {
             // instanceof always returns 'false' for 'null'
             var args = this.executeArguments(frame);
