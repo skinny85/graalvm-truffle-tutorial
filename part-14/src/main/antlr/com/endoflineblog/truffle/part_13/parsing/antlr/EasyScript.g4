@@ -46,6 +46,7 @@ expr5 : expr5 '.' ID                                       #PropertyReadExpr5
       ;
 expr6 : literal                                            #LiteralExpr6
       | 'this'                                             #ThisExpr6
+      | 'super'                                            #SuperExpr6
       | ID                                                 #ReferenceExpr6
       | '[' (expr1 (',' expr1)*)? ']'                      #ArrayLiteralExpr6
       | 'new' constr=expr6 ('('(expr1 (',' expr1)*)?')')?  #NewExpr6

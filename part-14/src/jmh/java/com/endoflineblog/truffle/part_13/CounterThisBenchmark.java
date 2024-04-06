@@ -21,6 +21,12 @@ public class CounterThisBenchmark extends TruffleBenchmark {
             "    } " +
             "} " +
             "class CounterDirect extends DirectBase { " +
+            "    increment() { " +
+            "        return super.increment(); " +
+            "    } " +
+            "    getCount() { " +
+            "        return super.getCount(); " +
+            "    } " +
             "} " +
             "class IndexedBase { " +
             "    constructor() { " +
@@ -34,6 +40,12 @@ public class CounterThisBenchmark extends TruffleBenchmark {
             "    } " +
             "} " +
             "class CounterIndexed extends IndexedBase { " +
+            "    increment() { " +
+            "        return super['increment'](); " +
+            "    } " +
+            "    getCount() { " +
+            "        return super['getCount'](); " +
+            "    } " +
             "}";
 
     @Override

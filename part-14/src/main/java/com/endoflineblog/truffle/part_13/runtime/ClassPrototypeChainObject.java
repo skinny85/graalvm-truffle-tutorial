@@ -11,7 +11,7 @@ import com.oracle.truffle.api.object.Shape;
 
 @ExportLibrary(InteropLibrary.class)
 public final class ClassPrototypeChainObject extends ClassPrototypeObject {
-    final ClassPrototypeObject superClassPrototype;
+    public final ClassPrototypeObject superClassPrototype;
 
     public ClassPrototypeChainObject(Shape shape, String className,
             ClassPrototypeObject superClassPrototype) {

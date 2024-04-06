@@ -41,6 +41,82 @@ public class InheritanceTest {
     }
 
     @Test
+    void super_reads_property_of_parent_prototype() {
+        Value result = this.context.eval("ezs", "" +
+                "class Base { " +
+                "    m() { " +
+                "        return 'Base'; " +
+                "    } " +
+                "} " +
+                "class Derived extends Base { " +
+                "    m() { " +
+                "        return 'Derived'; " +
+                "    } " +
+                "    callSuperM() { " +
+                "        return super.m(); " +
+                "    } " +
+                "    callThisM() { " +
+                "        return this.m(); " +
+                "    } " +
+                "} " +
+                "const obj = new Derived(); " +
+                "obj.callSuperM() + '_' + obj.callThisM();"
+        );
+
+        assertEquals("Base_Derived", result.asString());
+    }
+
+    @Test
+    void super_is_static_not_dynamic() {
+        Value result = this.context.eval("ezs", "" +
+                "class Base { " +
+                "    m() { " +
+                "        return 'Base'; " +
+                "    } " +
+                "} " +
+                "class Middle extends Base { " +
+                "    m() { " +
+                "        return 'Middle'; " +
+                "    } " +
+                "    callSuperM() { " +
+                "        return super.m(); " +
+                "    } " +
+                "} " +
+                "class Derived extends Middle { " +
+                "    m() {" +
+                "        return 'Derived'; " +
+                "    } " +
+                "} " +
+                "const obj = new Derived(); " +
+                "obj.callSuperM();"
+        );
+
+        assertEquals("Base", result.asString());
+    }
+
+    @Test
+    void writing_to_super_writes_to_this() {
+        Value result = this.context.eval("ezs", "" +
+                "class Base { " +
+                "    constructor() { " +
+                "        this.x = 11; " +
+                "    } " +
+                "} " +
+                "class Derived extends Base { " +
+                "    setSuperX(x) {" +
+                "        super.x = x; " +
+                "    } " +
+                "} " +
+                "const obj = new Derived(); " +
+                "let x = obj.x; " +
+                "obj.setSuperX(3); " +
+                "x + obj.x;"
+        );
+
+        assertEquals(14, result.asInt());
+    }
+
+    @Test
     void extending_non_existent_class_is_an_error() {
         try {
             this.context.eval("ezs",
@@ -69,6 +145,12 @@ public class InheritanceTest {
                 "    } " +
                 "} " +
                 "class Counter extends BaseCounter { " +
+                "    increment() { " +
+                "        return super.increment(); " +
+                "    } " +
+                "    getCount() { " +
+                "        return super['getCount'](); " +
+                "    } " +
                 "} " +
                 "function countWithThisInFor(n) { " +
                 "    const counter = new Counter(); " +

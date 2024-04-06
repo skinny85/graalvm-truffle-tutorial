@@ -29,6 +29,7 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.literals.StringLiteralExprN
 import com.endoflineblog.truffle.part_13.nodes.exprs.literals.UndefinedLiteralExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.objects.ClassDeclExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.objects.NewExprNodeGen;
+import com.endoflineblog.truffle.part_13.nodes.exprs.objects.SuperExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.objects.ThisExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyWriteExprNodeGen;
@@ -149,6 +150,13 @@ public final class EasyScriptTruffleParser {
      */
     private int localVariablesCounter;
 
+    /**
+     * The prototype of the class that we are currently parsing.
+     * Needed to make {@code super} static, instead of dynamic,
+     * like {@code this} is.
+     */
+    private ClassPrototypeObject currentClassPrototype;
+
     private EasyScriptTruffleParser(Shape objectShape) {
         this.objectShape = objectShape;
         this.state = ParserState.TOP_LEVEL;
@@ -157,6 +165,7 @@ public final class EasyScriptTruffleParser {
         // we add a global scope, in which we store the class prototypes
         this.localScopes.push(new HashMap<>());
         this.localVariablesCounter = 0;
+        this.currentClassPrototype = null;
     }
 
     private List<EasyScriptStmtNode> parseStmtsList(List<EasyScriptParser.StmtContext> stmts) {
@@ -352,11 +361,15 @@ public final class EasyScriptTruffleParser {
             }
         }
         this.localScopes.get(0).put(className, new ClassPrototype(classPrototype));
+        this.currentClassPrototype = classPrototype;
+
         List<FuncDeclStmtNode> classMethods = new ArrayList<>();
         for (var classMember : classDeclStmt.class_member()) {
             classMethods.add(this.parseSubroutineDecl(classMember.subroutine_decl(),
                     new DynamicObjectReferenceExprNode(classPrototype)));
         }
+
+        this.currentClassPrototype = null;
         return GlobalVarDeclStmtNodeGen.create(
                 GlobalScopeObjectExprNodeGen.create(),
                 new ClassDeclExprNode(classMethods, classPrototype),
@@ -531,6 +544,8 @@ public final class EasyScriptTruffleParser {
             return this.parseLiteralExpr((EasyScriptParser.LiteralExpr6Context) expr6);
         } else if (expr6 instanceof EasyScriptParser.ThisExpr6Context) {
             return new ThisExprNode();
+        } else if (expr6 instanceof EasyScriptParser.SuperExpr6Context) {
+            return this.parseSuperExpr();
         } else if (expr6 instanceof EasyScriptParser.ReferenceExpr6Context) {
             return this.parseReference(((EasyScriptParser.ReferenceExpr6Context) expr6).ID().getText());
         } else if (expr6 instanceof EasyScriptParser.ArrayLiteralExpr6Context) {
@@ -564,6 +579,17 @@ public final class EasyScriptTruffleParser {
                     stringLiteral.substring(1, stringLiteral.length() - 1)));
         }
         return new UndefinedLiteralExprNode();
+    }
+
+    private EasyScriptExprNode parseSuperExpr() {
+        if (this.currentClassPrototype == null) {
+            throw new EasyScriptException("'super' is only available in class declarations");
+        }
+        if (!(this.currentClassPrototype instanceof ClassPrototypeChainObject)) {
+            throw new EasyScriptException("Cannot use 'super' in class '" + this.currentClassPrototype.className +
+                    "' without a superclass");
+        }
+        return new SuperExprNode((ClassPrototypeChainObject) this.currentClassPrototype);
     }
 
     private EasyScriptExprNode parseReference(String variableId) {

@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.arrays;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_13.nodes.exprs.objects.SuperExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonReadPropertyNode;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
@@ -133,6 +134,13 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     @Override
     public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
         Object property = this.getIndexExpr().executeGeneric(frame);
-        return this.readIndexOrProperty(receiver, property);
+        EasyScriptExprNode arrayExpr = this.getArrayExpr();
+        // if we're reading a property of 'super',
+        // we know we need to look in its parent prototype,
+        // and not in 'this' (which will be used as the method receiver)
+        Object propertyTarget = arrayExpr instanceof SuperExprNode
+                ? ((SuperExprNode) arrayExpr).readParentPrototype()
+                : receiver;
+        return this.readIndexOrProperty(propertyTarget, property);
     }
 }
