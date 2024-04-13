@@ -8,6 +8,7 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.PowFunct
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.methods.CharAtMethodBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_13.nodes.root.BuiltInFuncRootNode;
 import com.endoflineblog.truffle.part_13.nodes.root.StmtBlockRootNode;
+import com.endoflineblog.truffle.part_13.nodes.stmts.blocks.BlockStmtNode;
 import com.endoflineblog.truffle.part_13.parsing.EasyScriptTruffleParser;
 import com.endoflineblog.truffle.part_13.parsing.ParsingResult;
 import com.endoflineblog.truffle.part_13.runtime.ArrayObject;
@@ -18,11 +19,13 @@ import com.endoflineblog.truffle.part_13.runtime.JavaScriptObject;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
+import java.util.Collections;
 import java.util.stream.IntStream;
 
 /**
@@ -88,7 +91,16 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         var objectLibrary = DynamicObjectLibrary.getUncached();
         return new EasyScriptLanguageContext(
                 this.createGlobalScopeObject(objectLibrary),
-                this.createShapesAndPrototypes(objectLibrary));
+                this.createShapesAndPrototypes(objectLibrary),
+                // empty function, used for default constructors
+                new FunctionObject(
+                        this.rootShape,
+                        this.functionPrototype,
+                        new StmtBlockRootNode(
+                                this,
+                                FrameDescriptor.newBuilder().build(),
+                                new BlockStmtNode(Collections.emptyList())).getCallTarget(),
+                        0));
     }
 
     @Override

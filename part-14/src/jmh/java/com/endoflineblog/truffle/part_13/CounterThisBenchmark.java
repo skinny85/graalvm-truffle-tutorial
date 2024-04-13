@@ -20,13 +20,20 @@ public class CounterThisBenchmark extends TruffleBenchmark {
             "        return this.count; " +
             "    } " +
             "} " +
-            "class CounterDirect extends DirectBase { " +
+            "class DirectLowerMiddle extends DirectBase { " +
+            "} " +
+            "class DirectUpperMiddle extends DirectLowerMiddle { " +
+            "    constructor() { " +
+            "        super(); " +
+            "    } " +
             "    increment() { " +
             "        return super.increment(); " +
             "    } " +
             "    getCount() { " +
             "        return super.getCount(); " +
             "    } " +
+            "} " +
+            "class CounterDirect extends DirectUpperMiddle { " +
             "} " +
             "class IndexedBase { " +
             "    constructor() { " +
@@ -39,13 +46,20 @@ public class CounterThisBenchmark extends TruffleBenchmark {
             "        return this['count']; " +
             "    } " +
             "} " +
-            "class CounterIndexed extends IndexedBase { " +
+            "class IndexedLowerMiddle extends IndexedBase { " +
+            "} " +
+            "class IndexedUpperMiddle extends IndexedLowerMiddle { " +
+            "    constructor() { " +
+            "        super(); " +
+            "    } " +
             "    increment() { " +
             "        return super['increment'](); " +
             "    } " +
             "    getCount() { " +
             "        return super['getCount'](); " +
             "    } " +
+            "} " +
+            "class CounterIndexed extends IndexedUpperMiddle { " +
             "}";
 
     @Override

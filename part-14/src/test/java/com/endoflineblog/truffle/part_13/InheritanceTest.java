@@ -144,13 +144,20 @@ public class InheritanceTest {
                 "        return this.count; " +
                 "    } " +
                 "} " +
-                "class Counter extends BaseCounter { " +
+                "class LowerMiddleCounter extends BaseCounter { " +
+                "} " +
+                "class UpperMiddleCounter extends LowerMiddleCounter { " +
+                "    constructor() { " +
+                "        super(); " +
+                "    } " +
                 "    increment() { " +
                 "        return super.increment(); " +
                 "    } " +
                 "    getCount() { " +
                 "        return super['getCount'](); " +
                 "    } " +
+                "} " +
+                "class Counter extends UpperMiddleCounter { " +
                 "} " +
                 "function countWithThisInFor(n) { " +
                 "    const counter = new Counter(); " +
