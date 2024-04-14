@@ -1,34 +1,34 @@
 package com.endoflineblog.truffle.part_13.runtime;
 
 import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.UnknownIdentifierException;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
-import com.oracle.truffle.api.object.DynamicObject;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
-/**
- * A {@link DynamicObject} that represents the prototype of class.
- * That can be a user-defined class, or a built-in class,
- * like for functions, or arrays.
- * Identical to the class with the same name from part 12.
- */
 @ExportLibrary(InteropLibrary.class)
-public class ClassPrototypeObject extends InteropDynamicObject {
-    public final String className;
+public final class ClassPrototypeObject extends AbstractClassPrototypeObject {
+    public final AbstractClassPrototypeObject superClassPrototype;
 
-    public ClassPrototypeObject(Shape shape, String className) {
-        super(shape);
+    public ClassPrototypeObject(Shape shape, String className,
+            AbstractClassPrototypeObject superClassPrototype) {
+        super(shape, className);
 
-        this.className = className;
-    }
-
-    @Override
-    public String toString() {
-        return "[class " + this.className + "]";
+        this.superClassPrototype = superClassPrototype;
     }
 
     @ExportMessage
-    Object toDisplayString(@SuppressWarnings("unused") boolean allowSideEffects) {
-        return this.toString();
+    Object readMember(String member,
+            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @CachedLibrary("this.superClassPrototype") InteropLibrary superClassInteropLibrary)
+            throws UnknownIdentifierException, UnsupportedMessageException {
+        Object value = thisObjectLibrary.getOrDefault(this, member, null);
+        if (value == null) {
+            return superClassInteropLibrary.readMember(this.superClassPrototype, member);
+        }
+        return value;
     }
 }

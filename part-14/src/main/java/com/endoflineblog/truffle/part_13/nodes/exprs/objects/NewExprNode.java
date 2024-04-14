@@ -4,7 +4,7 @@ import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchNodeGen;
-import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
+import com.endoflineblog.truffle.part_13.runtime.AbstractClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_13.runtime.JavaScriptObject;
 import com.oracle.truffle.api.dsl.Executed;
@@ -44,11 +44,11 @@ public abstract class NewExprNode extends EasyScriptExprNode {
     }
 
     /**
-     * The specialization for when the constructor expression evaluates to a
-     * {@link ClassPrototypeObject}.
+     * The specialization for when the constructor expression evaluates to an
+     * {@link AbstractClassPrototypeObject}.
      */
     @Specialization(limit = "2")
-    protected Object instantiateObject(VirtualFrame frame, ClassPrototypeObject classPrototypeObject,
+    protected Object instantiateObject(VirtualFrame frame, AbstractClassPrototypeObject classPrototypeObject,
             @CachedLibrary("classPrototypeObject") InteropLibrary interopPrototypeLibrary) {
         var object = new JavaScriptObject(this.currentLanguageContext().shapesAndPrototypes.rootShape, classPrototypeObject);
         Object constructor = null;
@@ -72,7 +72,7 @@ public abstract class NewExprNode extends EasyScriptExprNode {
 
     /**
      * The specialization for when the constructor expression evaluates to something other than
-     * {@link ClassPrototypeObject}.
+     * {@link AbstractClassPrototypeObject}.
      */
     @Fallback
     protected Object instantiateNonConstructor(VirtualFrame frame, Object object) {

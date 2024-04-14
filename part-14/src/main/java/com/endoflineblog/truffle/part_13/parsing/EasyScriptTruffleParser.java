@@ -54,8 +54,9 @@ import com.endoflineblog.truffle.part_13.nodes.stmts.variables.FuncDeclStmtNodeG
 import com.endoflineblog.truffle.part_13.nodes.stmts.variables.GlobalVarDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_13.parsing.antlr.EasyScriptLexer;
 import com.endoflineblog.truffle.part_13.parsing.antlr.EasyScriptParser;
-import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeChainObject;
+import com.endoflineblog.truffle.part_13.runtime.AbstractClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
+import com.endoflineblog.truffle.part_13.runtime.ObjectPrototype;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.object.Shape;
@@ -84,7 +85,7 @@ import java.util.stream.Collectors;
  * @see com.endoflineblog.truffle.part_13.EasyScriptTruffleLanguage
  */
 public final class EasyScriptTruffleParser {
-    public static ParsingResult parse(Reader program, Shape objectShape) throws IOException {
+    public static ParsingResult parse(Reader program, Shape objectShape, ObjectPrototype objectPrototype) throws IOException {
         var lexer = new EasyScriptLexer(CharStreams.fromReader(program));
         // remove the default console error listener
         lexer.removeErrorListeners();
@@ -93,7 +94,7 @@ public final class EasyScriptTruffleParser {
         parser.removeErrorListeners();
         // throw an exception when a parsing error is encountered
         parser.setErrorHandler(new BailErrorStrategy());
-        var easyScriptTruffleParser = new EasyScriptTruffleParser(objectShape);
+        var easyScriptTruffleParser = new EasyScriptTruffleParser(objectShape, objectPrototype);
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
         return new ParsingResult(
                 new BlockStmtNode(stmts),
@@ -131,9 +132,9 @@ public final class EasyScriptTruffleParser {
         }
     }
     private static final class ClassPrototype extends FrameMember {
-        public final ClassPrototypeObject classPrototypeObject;
+        public final AbstractClassPrototypeObject classPrototypeObject;
 
-        ClassPrototype(ClassPrototypeObject classPrototypeObject) {
+        ClassPrototype(AbstractClassPrototypeObject classPrototypeObject) {
             this.classPrototypeObject = classPrototypeObject;
         }
     }
@@ -157,13 +158,15 @@ public final class EasyScriptTruffleParser {
      */
     private ClassPrototypeObject currentClassPrototype;
 
-    private EasyScriptTruffleParser(Shape objectShape) {
+    private EasyScriptTruffleParser(Shape objectShape, ObjectPrototype objectPrototype) {
         this.objectShape = objectShape;
         this.state = ParserState.TOP_LEVEL;
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.localScopes = new Stack<>();
         // we add a global scope, in which we store the class prototypes
-        this.localScopes.push(new HashMap<>());
+        Map<String, FrameMember> classPrototypes = new HashMap<>();
+        classPrototypes.put("Object", new ClassPrototype(objectPrototype));
+        this.localScopes.push(classPrototypes);
         this.localVariablesCounter = 0;
         this.currentClassPrototype = null;
     }
@@ -346,19 +349,15 @@ public final class EasyScriptTruffleParser {
 
         String className = classDeclStmt.cls.getText();
         String superClass = classDeclStmt.spr_cls == null
-                ? null
+                ? "Object"
                 : classDeclStmt.spr_cls.getText();
         ClassPrototypeObject classPrototype;
-        if (superClass == null) {
-            classPrototype = new ClassPrototypeObject(this.objectShape, className);
+        FrameMember frameMember = this.localScopes.get(0).get(superClass);
+        if (frameMember instanceof ClassPrototype) {
+            AbstractClassPrototypeObject superClassPrototype = ((ClassPrototype) frameMember).classPrototypeObject;
+            classPrototype = new ClassPrototypeObject(this.objectShape, className, superClassPrototype);
         } else {
-            FrameMember frameMember = this.localScopes.get(0).get(superClass);
-            if (frameMember instanceof ClassPrototype) {
-                ClassPrototypeObject superClassPrototype = ((ClassPrototype) frameMember).classPrototypeObject;
-                classPrototype = new ClassPrototypeChainObject(this.objectShape, className, superClassPrototype);
-            } else {
-                throw new EasyScriptException("class '" + className + "' extends unknown class '" + superClass + "'");
-            }
+            throw new EasyScriptException("class '" + className + "' extends unknown class '" + superClass + "'");
         }
         this.localScopes.get(0).put(className, new ClassPrototype(classPrototype));
         this.currentClassPrototype = classPrototype;
@@ -585,11 +584,7 @@ public final class EasyScriptTruffleParser {
         if (this.currentClassPrototype == null) {
             throw new EasyScriptException("'super' is only available in class declarations");
         }
-        if (!(this.currentClassPrototype instanceof ClassPrototypeChainObject)) {
-            throw new EasyScriptException("Cannot use 'super' in class '" + this.currentClassPrototype.className +
-                    "' without a superclass");
-        }
-        return new SuperExprNode((ClassPrototypeChainObject) this.currentClassPrototype);
+        return new SuperExprNode(this.currentClassPrototype);
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
@@ -620,7 +615,7 @@ public final class EasyScriptTruffleParser {
 
     private ArrayLiteralExprNode parseArrayLiteralExpr(EasyScriptParser.ArrayLiteralExpr6Context arrayLiteralExpr) {
         return new ArrayLiteralExprNode(arrayLiteralExpr.expr1().stream()
-                .map(arrayElExpr -> this.parseExpr1(arrayElExpr))
+                .map(this::parseExpr1)
                 .collect(Collectors.toList()));
     }
 

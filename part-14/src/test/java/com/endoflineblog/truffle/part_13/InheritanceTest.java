@@ -117,6 +117,69 @@ public class InheritanceTest {
     }
 
     @Test
+    void object_class_can_be_instantiated() {
+        Value result = this.context.eval("ezs", "" +
+                "let obj = new Object(); " +
+                "obj;"
+        );
+
+        assertFalse(result.isNull());
+    }
+
+    @Test
+    void hasOwnProperty_can_be_called_on_class_instance() {
+        Value result = this.context.eval("ezs", "" +
+                "class Class extends Object { " +
+                "    constructor() { " +
+                "        super(); " +
+                "        this.x = 11; " +
+                "    } " +
+                "} " +
+                "let obj = new Class(); " +
+                "obj.hasOwnProperty('x') + '_' + obj.hasOwnProperty('constructor'); "
+        );
+        assertEquals("true_false", result.asString());
+    }
+
+    @Test
+    void hasOwnProperty_converts_its_argument_to_string() {
+        Value result = this.context.eval("ezs", "" +
+                "class Class { " +
+                "    constructor() { " +
+                "        this['true'] = false; " +
+                "    } " +
+                "} " +
+                "let obj = new Class(); " +
+                "obj.hasOwnProperty(true); "
+        );
+        assertTrue(result.asBoolean());
+    }
+
+    @Test
+    void hasOwnProperty_sees_only_length_of_strings() {
+        Value result = this.context.eval("ezs", "" +
+                "'a'.hasOwnProperty('length') + '_' + 'b'.hasOwnProperty('charAt'); "
+        );
+        assertEquals("true_false", result.asString());
+    }
+
+    @Test
+    void hasOwnProperty_sees_length_of_arrays() {
+        Value result = this.context.eval("ezs",
+                "[1, 2].hasOwnProperty('length')"
+        );
+        assertTrue(result.asBoolean());
+    }
+
+    @Test
+    void hasOwnProperty_returns_false_for_primitives() {
+        Value result = this.context.eval("ezs", "" +
+                "true.hasOwnProperty('toString'); "
+        );
+        assertFalse(result.asBoolean());
+    }
+
+    @Test
     void extending_non_existent_class_is_an_error() {
         try {
             this.context.eval("ezs",

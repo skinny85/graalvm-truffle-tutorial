@@ -2,7 +2,7 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.objects;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeChainObject;
+import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -13,7 +13,7 @@ import com.oracle.truffle.api.interop.UnsupportedMessageException;
  * The Node implementing the 'super' expression.
  */
 public final class SuperExprNode extends EasyScriptExprNode {
-    private final ClassPrototypeChainObject classPrototype;
+    private final ClassPrototypeObject classPrototype;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
@@ -22,7 +22,7 @@ public final class SuperExprNode extends EasyScriptExprNode {
     @Child
     private InteropLibrary interopLibrary;
 
-    public SuperExprNode(ClassPrototypeChainObject classPrototype) {
+    public SuperExprNode(ClassPrototypeObject classPrototype) {
         this.classPrototype = classPrototype;
         this.thisExprNode = new ThisExprNode();
     }

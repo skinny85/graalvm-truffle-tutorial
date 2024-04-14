@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.strings;
 
+import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_13.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
@@ -7,8 +8,10 @@ import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.UnknownIdentifierException;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -21,7 +24,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * @see #readNonLengthProperty
  */
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
-    protected static final String LENGTH_PROP = "length";
+    public static final String LENGTH_PROP = "length";
 
     /** The abstract {@code execute*()} method for this node. */
     public abstract Object executeReadTruffleStringProperty(TruffleString truffleString, Object property);
@@ -59,8 +62,13 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
             @SuppressWarnings("unused") TruffleString truffleString,
             Object property,
             @Cached("currentLanguageContext().shapesAndPrototypes.stringPrototype") ClassPrototypeObject stringPrototype,
-            @CachedLibrary(limit = "2") DynamicObjectLibrary stringPrototypeObjectLibrary) {
-        return stringPrototypeObjectLibrary.getOrDefault(stringPrototype, property,
-                Undefined.INSTANCE);
+            @CachedLibrary(limit = "2") InteropLibrary interopLibrary) {
+        try {
+            return interopLibrary.readMember(stringPrototype, property.toString());
+        } catch (UnknownIdentifierException e) {
+            return Undefined.INSTANCE;
+        } catch (UnsupportedMessageException e) {
+            throw new EasyScriptException(this, e.getMessage());
+        }
     }
 }

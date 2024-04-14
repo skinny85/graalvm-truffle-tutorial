@@ -1,7 +1,11 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
+import com.endoflineblog.truffle.part_13.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.strings.ReadTruffleStringPropertyNode;
+import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
+import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
+import com.endoflineblog.truffle.part_13.runtime.ObjectPrototype;
 import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
@@ -11,6 +15,7 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -18,7 +23,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  * Identical to the class with the same name from part 12.
  */
-public abstract class CommonReadPropertyNode extends Node {
+public abstract class CommonReadPropertyNode extends EasyScriptNode {
     public abstract Object executeReadProperty(Object target, Object property);
 
     /**
@@ -56,12 +61,14 @@ public abstract class CommonReadPropertyNode extends Node {
 
     /**
      * Accessing a property of anything that is not {@code undefined}
-     * but doesn't have any members returns simply {@code undefined}
-     * in JavaScript.
+     * but doesn't have any members reads from the Object prototype.
      */
     @Fallback
     protected Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
-            @SuppressWarnings("unused") Object property) {
-        return Undefined.INSTANCE;
+            @SuppressWarnings("unused") Object property,
+            @Cached("currentLanguageContext().shapesAndPrototypes.objectPrototype") ObjectPrototype objectPrototype,
+            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
+        return dynamicObjectLibrary.getOrDefault(objectPrototype,
+                EasyScriptTruffleStrings.toString(property), Undefined.INSTANCE);
     }
 }

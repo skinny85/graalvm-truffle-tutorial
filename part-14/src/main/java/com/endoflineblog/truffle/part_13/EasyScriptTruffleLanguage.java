@@ -6,6 +6,7 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.AbsFunct
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.methods.CharAtMethodBodyExprNodeFactory;
+import com.endoflineblog.truffle.part_13.nodes.exprs.functions.built_in.methods.HasOwnPropertyMethodBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_13.nodes.root.BuiltInFuncRootNode;
 import com.endoflineblog.truffle.part_13.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_13.nodes.stmts.blocks.BlockStmtNode;
@@ -16,6 +17,7 @@ import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_13.runtime.GlobalScopeObject;
 import com.endoflineblog.truffle.part_13.runtime.JavaScriptObject;
+import com.endoflineblog.truffle.part_13.runtime.ObjectPrototype;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
@@ -75,12 +77,15 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
      */
     private final Shape rootShape = Shape.newBuilder().build();
 
-    private final ClassPrototypeObject functionPrototype = new ClassPrototypeObject(this.rootShape, "Function");
+    private final ObjectPrototype objectPrototype = new ObjectPrototype(this.rootShape);
+
+    private final ClassPrototypeObject functionPrototype = new ClassPrototypeObject(this.rootShape,
+            "Function", this.objectPrototype);
 
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         ParsingResult parsingResult = EasyScriptTruffleParser.parse(
-                request.getSource().getReader(), this.rootShape);
+                request.getSource().getReader(), this.rootShape, this.objectPrototype);
         var programRootNode = new StmtBlockRootNode(this, parsingResult.topLevelFrameDescriptor,
                 parsingResult.programStmtBlock);
         return programRootNode.getCallTarget();
@@ -110,14 +115,22 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     private DynamicObject createGlobalScopeObject(DynamicObjectLibrary objectLibrary) {
         var globalScopeObject = new GlobalScopeObject(this.rootShape);
-        // the 0 flag indicates Math is a variable, and can be reassigned
+        // the 0 flag indicates that these are variables, and can be reassigned
         objectLibrary.putConstant(globalScopeObject, "Math",
                 this.createMathObject(objectLibrary), 0);
+
+        // initialize the Object prototype
+        objectLibrary.putConstant( this.objectPrototype, "hasOwnProperty",
+                this.defineBuiltInMethod(HasOwnPropertyMethodBodyExprNodeFactory.getInstance()),
+                0);
+        objectLibrary.putConstant(globalScopeObject, "Object",
+                this.objectPrototype, 0);
+
         return globalScopeObject;
     }
 
     private Object createMathObject(DynamicObjectLibrary objectLibrary) {
-        var mathPrototype = new ClassPrototypeObject(this.rootShape, "Math");
+        var mathPrototype = new ClassPrototypeObject(this.rootShape, "Math", this.objectPrototype);
         var mathObject = new JavaScriptObject(this.rootShape, mathPrototype);
         objectLibrary.putConstant(mathObject, "abs",
                 this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
@@ -129,14 +142,14 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     }
 
     private ShapesAndPrototypes createShapesAndPrototypes(DynamicObjectLibrary objectLibrary) {
-        var arrayPrototype = new ClassPrototypeObject(this.rootShape, "Array");
+        var arrayPrototype = new ClassPrototypeObject(this.rootShape, "Array", this.objectPrototype);
         return new ShapesAndPrototypes(this.rootShape, this.arrayShape,
-                this.functionPrototype, arrayPrototype,
-                this.createStringPrototype(objectLibrary));
+                this.objectPrototype, this.functionPrototype,
+                arrayPrototype, this.createStringPrototype(objectLibrary));
     }
 
     private ClassPrototypeObject createStringPrototype(DynamicObjectLibrary objectLibrary) {
-        var stringPrototype = new ClassPrototypeObject(this.rootShape, "String");
+        var stringPrototype = new ClassPrototypeObject(this.rootShape, "String", this.objectPrototype);
         objectLibrary.putConstant(stringPrototype, "charAt",
                 this.defineBuiltInMethod(CharAtMethodBodyExprNodeFactory.getInstance()),
                 0);
