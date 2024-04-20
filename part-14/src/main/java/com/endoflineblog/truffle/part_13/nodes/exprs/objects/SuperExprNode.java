@@ -29,16 +29,13 @@ public final class SuperExprNode extends EasyScriptExprNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        // executeGeneric() simply returns 'this'
-        // (that will be the method that property access Nodes use to establish the method call receiver,
-        // in their evaluateAsReceiver() methods)
-        return this.thisExprNode.executeGeneric(frame);
+        throw new EasyScriptException("'super' is not allowed here");
     }
 
     @Override
     public Object evaluateAsReceiver(VirtualFrame frame) {
         // receiver should be 'this' for a 'super()' call
-        return this.executeGeneric(frame);
+        return this.thisExprNode.executeGeneric(frame);
     }
 
     @Override

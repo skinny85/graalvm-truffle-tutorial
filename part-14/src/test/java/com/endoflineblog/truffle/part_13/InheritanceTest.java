@@ -95,28 +95,6 @@ public class InheritanceTest {
     }
 
     @Test
-    void writing_to_super_writes_to_this() {
-        Value result = this.context.eval("ezs", "" +
-                "class Base { " +
-                "    constructor() { " +
-                "        this.x = 11; " +
-                "    } " +
-                "} " +
-                "class Derived extends Base { " +
-                "    setSuperX(x) {" +
-                "        super.x = x; " +
-                "    } " +
-                "} " +
-                "const obj = new Derived(); " +
-                "let x = obj.x; " +
-                "obj.setSuperX(3); " +
-                "x + obj.x;"
-        );
-
-        assertEquals(14, result.asInt());
-    }
-
-    @Test
     void object_class_can_be_instantiated() {
         Value result = this.context.eval("ezs", "" +
                 "let obj = new Object(); " +
@@ -189,6 +167,63 @@ public class InheritanceTest {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
             assertEquals("class 'B' extends unknown class 'A'", e.getMessage());
+        }
+    }
+
+    @Test
+    void writing_to_super_is_an_error() {
+        try {
+            this.context.eval("ezs", "" +
+                    "class Class { " +
+                    "    setSuperX(x) {" +
+                    "        super.x = x; " +
+                    "    } " +
+                    "} " +
+                    "new Class().setSuperX(3); "
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'super' is not allowed here", e.getMessage());
+        }
+    }
+
+    @Test
+    void reading_from_super_is_an_error() {
+        try {
+            this.context.eval("ezs", "" +
+                    "class Class { " +
+                    "    getSuperX() {" +
+                    "        return super.x; " +
+                    "    } " +
+                    "} " +
+                    "new Class().getSuperX(); "
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'super' is not allowed here", e.getMessage());
+        }
+    }
+
+    @Test
+    void super_cannot_be_used_by_itself() {
+        try {
+            this.context.eval("ezs", "" +
+                    "class Class { " +
+                    "    getSuper() {" +
+                    "        return super; " +
+                    "    } " +
+                    "} " +
+                    "new Class().getSuper(); "
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'super' is not allowed here", e.getMessage());
         }
     }
 

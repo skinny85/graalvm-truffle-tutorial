@@ -38,7 +38,10 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
 
     @Override
     public Object evaluateAsReceiver(VirtualFrame frame) {
-        return this.getTargetExpr().executeGeneric(frame);
+        EasyScriptExprNode targetExpr = this.getTargetExpr();
+        return targetExpr instanceof SuperExprNode
+                ? targetExpr.evaluateAsReceiver(frame)
+                : targetExpr.executeGeneric(frame);
     }
 
     @Override

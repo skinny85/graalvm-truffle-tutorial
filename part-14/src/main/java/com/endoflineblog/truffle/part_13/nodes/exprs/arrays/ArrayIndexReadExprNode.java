@@ -128,7 +128,10 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
 
     @Override
     public Object evaluateAsReceiver(VirtualFrame frame) {
-        return this.getArrayExpr().executeGeneric(frame);
+        EasyScriptExprNode arrayExpr = this.getArrayExpr();
+        return arrayExpr instanceof SuperExprNode
+                ? arrayExpr.evaluateAsReceiver(frame)
+                : arrayExpr.executeGeneric(frame);
     }
 
     @Override
