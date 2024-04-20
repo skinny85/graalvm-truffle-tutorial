@@ -59,6 +59,7 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
             @Cached @SuppressWarnings("unused") TruffleString.ToJavaStringNode toJavaStringNode,
             @Cached("toJavaStringNode.execute(propertyName)") String javaStringPropertyName,
             @Cached CommonWritePropertyNode commonWritePropertyNode) {
+        // ToDo add call to arrayExpr.evaluateAsThis() here, like in PropertyWriteExprNode
         return commonWritePropertyNode.executeWriteProperty(target,
                 javaStringPropertyName, rvalue);
     }
@@ -72,6 +73,7 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
             Object target, TruffleString propertyName, Object rvalue,
             @Cached TruffleString.ToJavaStringNode toJavaStringNode,
             @Cached CommonWritePropertyNode commonWritePropertyNode) {
+        // ToDo add call to arrayExpr.evaluateAsThis() here, like in PropertyWriteExprNode
         return commonWritePropertyNode.executeWriteProperty(target,
                 toJavaStringNode.execute(propertyName), rvalue);
     }
@@ -85,6 +87,7 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
     protected Object writeNonStringProperty(
             Object target, Object property, Object rvalue,
             @Cached CommonWritePropertyNode commonWritePropertyNode) {
+        // ToDo add call to arrayExpr.evaluateAsThis() here, like in PropertyWriteExprNode
         return commonWritePropertyNode.executeWriteProperty(target,
                 EasyScriptTruffleStrings.toString(property), rvalue);
     }

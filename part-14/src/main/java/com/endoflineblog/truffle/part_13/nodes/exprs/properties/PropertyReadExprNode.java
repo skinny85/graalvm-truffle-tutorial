@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_13.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_13.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_13.nodes.exprs.objects.SuperExprNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -12,7 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * Used in code like {@code t.myProp}.
  * Very similar to the class with the same name from part 12,
  * the main differences being overriding the new
- * {@link EasyScriptExprNode#evaluateAsReceiver} and
+ * {@link EasyScriptExprNode#evaluateAsTarget} and
  * {@link EasyScriptExprNode#evaluateAsFunction} methods,
  * and thus changing the {@link #readProperty}
  * specialization to use {@link CommonReadPropertyNode}
@@ -37,19 +36,17 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     }
 
     @Override
-    public Object evaluateAsReceiver(VirtualFrame frame) {
+    public Object evaluateAsTarget(VirtualFrame frame) {
         return this.getTargetExpr().executeGeneric(frame);
     }
 
     @Override
-    public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
-        EasyScriptExprNode targetExpr = this.getTargetExpr();
-        // if we're reading a property of 'super',
-        // we know we need to look in its parent prototype,
-        // and not in 'this' (which will be used as the method receiver)
-        Object propertyTarget = targetExpr instanceof SuperExprNode
-                ? ((SuperExprNode) targetExpr).readParentPrototype()
-                : receiver;
-        return this.readProperty(propertyTarget);
+    public Object evaluateAsFunction(VirtualFrame frame, Object target) {
+        return this.readProperty(target);
+    }
+
+    @Override
+    public Object evaluateAsThis(VirtualFrame frame, Object target) {
+        return this.getTargetExpr().evaluateAsThis(frame, target);
     }
 }

@@ -29,28 +29,23 @@ public final class SuperExprNode extends EasyScriptExprNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        // executeGeneric() simply returns 'this'
-        // (that will be the method that property access Nodes use to establish the method call receiver,
-        // in their evaluateAsReceiver() methods)
-        return this.thisExprNode.executeGeneric(frame);
+        return this.classPrototype.superClassPrototype;
     }
 
     @Override
-    public Object evaluateAsReceiver(VirtualFrame frame) {
-        // receiver should be 'this' for a 'super()' call
+    public Object evaluateAsTarget(VirtualFrame frame) {
         return this.executeGeneric(frame);
     }
 
     @Override
-    public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
+    public Object evaluateAsFunction(VirtualFrame frame, Object target) {
         if (this.interopLibrary == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             this.interopLibrary = this.insert(
                     InteropLibrary.getFactory().createDispatched(1));
         }
         try {
-            return this.interopLibrary.readMember(
-                    this.classPrototype.superClassPrototype, "constructor");
+            return this.interopLibrary.readMember(target, "constructor");
         } catch (UnknownIdentifierException e) {
             return this.currentLanguageContext().emptyFunction;
         } catch (UnsupportedMessageException e) {
@@ -58,9 +53,8 @@ public final class SuperExprNode extends EasyScriptExprNode {
         }
     }
 
-    public Object readParentPrototype() {
-        // this method is called from the property access Nodes
-        // to find the parent prototype
-        return this.classPrototype.superClassPrototype;
+    @Override
+    public Object evaluateAsThis(VirtualFrame frame, Object target) {
+        return this.thisExprNode.executeGeneric(frame);
     }
 }

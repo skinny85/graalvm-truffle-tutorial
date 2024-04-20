@@ -11,7 +11,7 @@ import java.util.List;
  * for example {@code Math.pow(2, 3)}.
  * Very similar to the class with the same name from part 12,
  * the main difference is that it's now using the new
- * {@link EasyScriptExprNode#evaluateAsReceiver} and
+ * {@link EasyScriptExprNode#evaluateAsTarget} and
  * {@link EasyScriptExprNode#evaluateAsFunction} methods,
  * and passes the extra 'receiver' argument to
  * {@link FunctionDispatchNode#executeDispatch}.
@@ -37,14 +37,15 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
-        Object receiver = this.targetFunction.evaluateAsReceiver(frame);
-        Object function = this.targetFunction.evaluateAsFunction(frame, receiver);
+        Object target = this.targetFunction.evaluateAsTarget(frame);
+        Object function = this.targetFunction.evaluateAsFunction(frame, target);
 
         Object[] argumentValues = new Object[this.callArguments.length];
         for (int i = 0; i < this.callArguments.length; i++) {
             argumentValues[i] = this.callArguments[i].executeGeneric(frame);
         }
 
+        Object receiver = this.targetFunction.evaluateAsThis(frame, target);
         return this.dispatchNode.executeDispatch(function, argumentValues, receiver);
     }
 }

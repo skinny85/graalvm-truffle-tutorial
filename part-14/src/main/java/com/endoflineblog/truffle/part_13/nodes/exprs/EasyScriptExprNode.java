@@ -13,7 +13,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * The abstract common ancestor of all expression Nodes in EasyScript.
  * Very similar to the class with the same name from part 12,
  * the only differences are the two new methods,
- * {@link #evaluateAsReceiver} and {@link #evaluateAsFunction}.
+ * {@link #evaluateAsTarget} and {@link #evaluateAsFunction}.
  */
 @TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends EasyScriptNode {
@@ -62,7 +62,7 @@ public abstract class EasyScriptExprNode extends EasyScriptNode {
      * and is overridden only in {@link com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNode}
      * and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexReadExprNode}.
      */
-    public Object evaluateAsReceiver(VirtualFrame frame) {
+    public Object evaluateAsTarget(VirtualFrame frame) {
         // by default, almost no expressions have a method receiver -
         // the exception is property access
         return Undefined.INSTANCE;
@@ -72,13 +72,17 @@ public abstract class EasyScriptExprNode extends EasyScriptNode {
      * A more fine-grained alternative to {@link #executeGeneric}
      * that is used for function and method calls.
      * Used in {@link com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionCallExprNode},
-     * alongside {@link #evaluateAsReceiver}.
+     * alongside {@link #evaluateAsTarget}.
      * The default implementation is to delegate to {@link #executeGeneric},
      * and is overridden only in {@link com.endoflineblog.truffle.part_13.nodes.exprs.properties.PropertyReadExprNode}
      * and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexReadExprNode}.
      */
-    public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
+    public Object evaluateAsFunction(VirtualFrame frame, Object target) {
         // by default, the function is simply the result of executing the expression
         return this.executeGeneric(frame);
+    }
+
+    public Object evaluateAsThis(VirtualFrame frame, Object target) {
+        return target;
     }
 }

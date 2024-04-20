@@ -127,20 +127,18 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     }
 
     @Override
-    public Object evaluateAsReceiver(VirtualFrame frame) {
+    public Object evaluateAsTarget(VirtualFrame frame) {
         return this.getArrayExpr().executeGeneric(frame);
     }
 
     @Override
-    public Object evaluateAsFunction(VirtualFrame frame, Object receiver) {
+    public Object evaluateAsFunction(VirtualFrame frame, Object target) {
         Object property = this.getIndexExpr().executeGeneric(frame);
-        EasyScriptExprNode arrayExpr = this.getArrayExpr();
-        // if we're reading a property of 'super',
-        // we know we need to look in its parent prototype,
-        // and not in 'this' (which will be used as the method receiver)
-        Object propertyTarget = arrayExpr instanceof SuperExprNode
-                ? ((SuperExprNode) arrayExpr).readParentPrototype()
-                : receiver;
-        return this.readIndexOrProperty(propertyTarget, property);
+        return this.readIndexOrProperty(target, property);
+    }
+
+    @Override
+    public Object evaluateAsThis(VirtualFrame frame, Object target) {
+        return this.getArrayExpr().evaluateAsThis(frame, target);
     }
 }

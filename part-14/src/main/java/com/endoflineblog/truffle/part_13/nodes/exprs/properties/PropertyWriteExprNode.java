@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * The Node for reading properties of objects.
@@ -16,11 +17,14 @@ import com.oracle.truffle.api.dsl.Specialization;
 @NodeField(name = "propertyName", type = String.class)
 @NodeChild("rvalueExpr")
 public abstract class PropertyWriteExprNode extends EasyScriptExprNode {
+    protected abstract EasyScriptExprNode getTargetExpr();
     protected abstract String getPropertyName();
 
     @Specialization
-    protected Object writeProperty(Object target, Object rvalue,
+    protected Object writeProperty(VirtualFrame frame,
+            Object target, Object rvalue,
             @Cached CommonWritePropertyNode commonWritePropertyNode) {
-        return commonWritePropertyNode.executeWriteProperty(target, this.getPropertyName(), rvalue);
+        return commonWritePropertyNode.executeWriteProperty(
+                this.getTargetExpr().evaluateAsThis(frame, target), this.getPropertyName(), rvalue);
     }
 }
