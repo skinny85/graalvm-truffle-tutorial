@@ -14,9 +14,9 @@ we need to introduce two changes to the
 [ANTLR grammar](src/main/antlr/com/endoflineblog/truffle/part_13/parsing/antlr/EasyScript.g4)
 for EasyScript:
 
-1. We have to add a new `expr1` production (with the label `PropertyWriteExpr1`)
+1. We add a new `expr1` production (with the label `PropertyWriteExpr1`)
    that represents property writes.
-2. We have to add a new `expr6` production that represents the `this` keyword.
+2. We add a new `expr6` production that represents the `this` keyword.
 
 ## Property writes
 

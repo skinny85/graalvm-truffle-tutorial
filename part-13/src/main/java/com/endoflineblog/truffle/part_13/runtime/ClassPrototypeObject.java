@@ -7,7 +7,7 @@ import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.Shape;
 
 /**
- * A {@link DynamicObject} that represents the prototype of class.
+ * A {@link DynamicObject} that represents the prototype of a class.
  * That can be a user-defined class, or a built-in class,
  * like for functions, or arrays.
  * Identical to the class with the same name from part 12.

@@ -15,7 +15,7 @@ import com.oracle.truffle.api.object.Shape;
  * including user-defined class instances, and built-in objects like arrays and functions.
  * Very similar to {@code ClassInstanceObject} from part 12,
  * but with added support for writing properties,
- * using the {@link InteropLibrary} interface,
+ * through the {@link InteropLibrary} interface,
  * that is invoked in {@link com.endoflineblog.truffle.part_13.nodes.exprs.properties.CommonWritePropertyNode}.
  */
 @ExportLibrary(InteropLibrary.class)
@@ -54,11 +54,11 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
             @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary)
             throws UnknownIdentifierException {
         // since ClassInstanceObject is mutable, we need to check it first, before the prototype
-        Object value = thisObjectLibrary.getOrDefault(this, member, null);
+        Object value = instanceObjectLibrary.getOrDefault(this, member, null);
         if (value == null) {
             value = prototypeObjectLibrary.getOrDefault(this.classPrototypeObject, member, null);
         }
@@ -70,8 +70,8 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal,
-            @CachedLibrary("this") DynamicObjectLibrary dynamicObjectLibrary) {
-        return new MemberNamesObject(dynamicObjectLibrary.getKeyArray(this));
+            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary) {
+        return new MemberNamesObject(instanceObjectLibrary.getKeyArray(this));
     }
 
     @ExportMessage
@@ -84,13 +84,13 @@ public class JavaScriptObject extends DynamicObject {
     @ExportMessage
     boolean isMemberInsertable(String member,
             @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary) {
-        return !this.isMemberModifiable(member, instanceObjectLibrary, dynamicObjectLibrary);
+            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary) {
+        return !this.isMemberModifiable(member, instanceObjectLibrary, prototypeObjectLibrary);
     }
 
     @ExportMessage
     void writeMember(String member, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary dynamicObjectLibrary) {
-        dynamicObjectLibrary.put(this, member, value);
+            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary) {
+        instanceObjectLibrary.put(this, member, value);
     }
 }

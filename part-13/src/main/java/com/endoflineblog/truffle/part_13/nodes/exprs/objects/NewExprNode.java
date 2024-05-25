@@ -52,8 +52,8 @@ public abstract class NewExprNode extends EasyScriptExprNode {
         var constructor = dynamicObjectLibrary.getOrDefault(classPrototypeObject, "constructor", null);
         if (constructor instanceof FunctionObject) {
             // instanceof always returns 'false' for 'null'
-            var args = this.executeArguments(frame);
-            FunctionObject boundConstructor = (FunctionObject) constructor;
+            Object[] args = this.executeArguments(frame);
+            var boundConstructor = (FunctionObject) constructor;
             this.constructorDispatchNode.executeDispatch(boundConstructor, args, object);
         } else {
             this.consumeArguments(frame);

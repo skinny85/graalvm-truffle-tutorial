@@ -67,8 +67,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     private final Shape arrayShape = Shape.newBuilder().layout(ArrayObject.class).build();
 
     /**
-     * The root {@link Shape} for {@link com.endoflineblog.truffle.part_13.runtime.GlobalScopeObject}
-     * and {@link com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject}.
+     * The root {@link Shape} for {@link GlobalScopeObject}
+     * and {@link ClassPrototypeObject}.
      */
     private final Shape rootShape = Shape.newBuilder().build();
 

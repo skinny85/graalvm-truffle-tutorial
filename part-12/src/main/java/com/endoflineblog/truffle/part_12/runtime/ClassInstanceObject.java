@@ -48,7 +48,8 @@ public final class ClassInstanceObject implements TruffleObject {
     }
 
     @ExportMessage
-    Object readMember(String member, @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary)
+    Object readMember(String member,
+            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary)
             throws UnknownIdentifierException {
         Object value = dynamicObjectLibrary.getOrDefault(this.classPrototypeObject, member, null);
         if (value == null) {

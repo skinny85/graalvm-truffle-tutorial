@@ -67,3 +67,4 @@ $ ./gradlew build
 * [Part 11 - strings, static method calls](part-11)
 * [Part 12 - classes 1: methods, `new` operator](part-12)
 * [Part 13 - classes 2: fields, `this`, constructors](part-13)
+* [Part 14 - classes 3: inheritance, `super`](part-14)
