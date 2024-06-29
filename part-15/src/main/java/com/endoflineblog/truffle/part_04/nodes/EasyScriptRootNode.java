@@ -31,6 +31,8 @@ public final class EasyScriptRootNode extends RootNode {
 
     @Override
     protected ExecutionSignature prepareForAOT() {
-        return ExecutionSignature.GENERIC;
+        // this must be Integer.classs -
+        // int.class would cause the compiled code to invalidate
+        return ExecutionSignature.create(Integer.class, new Class[0]);
     }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PolyglotTest {
@@ -33,12 +34,18 @@ public class PolyglotTest {
 
     @Test
     public void addition_of_three_integers_with_aot() {
-        Value result = this.context.eval("ezs",
+        Value program = this.context.parse("ezs",
                 "10 + 24 + 56");
+
+        String afterParseLog = this.logHandler.toString();
+        this.logHandler.reset();
+        assertTrue(afterParseLog.contains("[engine] opt done"), "Expected engine log after parsing (" + afterParseLog + ") to contain '[engine] opt done'");
+        assertTrue(afterParseLog.contains("EasyScriptRootNode"), "Expected engine log after parsing (" + afterParseLog + ") to contain 'EasyScriptRootNode'");
+
+        Value result = program.execute();
         assertEquals(90, result.asInt());
 
-        String log = this.logHandler.toString();
-        assertTrue(log.contains("[engine] opt done"), "Expected engine log (" + log + ") to contain '[engine] opt done'");
-        assertTrue(log.contains("EasyScriptRootNode"), "Expected engine log (" + log + ") to contain 'EasyScriptRootNode'");
+        String afterExecuteLog = this.logHandler.toString();
+        assertFalse(afterExecuteLog.contains("inval"), "Expected engine log after execution (" + afterExecuteLog + ") not to contain 'inval'");
     }
 }
