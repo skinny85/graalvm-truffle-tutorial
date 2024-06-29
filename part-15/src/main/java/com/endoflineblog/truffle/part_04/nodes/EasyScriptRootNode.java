@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_04.nodes;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.nodes.ExecutionSignature;
 import com.oracle.truffle.api.nodes.RootNode;
 
 /**
@@ -26,5 +27,10 @@ public final class EasyScriptRootNode extends RootNode {
     @Override
     public Integer execute(VirtualFrame frame) {
         return this.exprNode.executeInt(frame);
+    }
+
+    @Override
+    protected ExecutionSignature prepareForAOT() {
+        return ExecutionSignature.GENERIC;
     }
 }
