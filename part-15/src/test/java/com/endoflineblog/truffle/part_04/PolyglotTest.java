@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,8 +29,9 @@ public class PolyglotTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    public void tearDown() throws IOException {
         this.context.close();
+        this.logHandler.close();
     }
 
     @Test
@@ -39,13 +41,16 @@ public class PolyglotTest {
 
         String afterParseLog = this.logHandler.toString();
         this.logHandler.reset();
-        assertTrue(afterParseLog.contains("[engine] opt done"), "Expected engine log after parsing (" + afterParseLog + ") to contain '[engine] opt done'");
-        assertTrue(afterParseLog.contains("EasyScriptRootNode"), "Expected engine log after parsing (" + afterParseLog + ") to contain 'EasyScriptRootNode'");
+        assertTrue(afterParseLog.contains("[engine] opt done"), "Expected engine log after parsing ('" +
+                afterParseLog + "') to contain '[engine] opt done'");
+        assertTrue(afterParseLog.contains("EasyScriptRootNode"), "Expected engine log after parsing ('" +
+                afterParseLog + "') to contain 'EasyScriptRootNode'");
 
         Value result = program.execute();
         assertEquals(90, result.asInt());
 
         String afterExecuteLog = this.logHandler.toString();
-        assertFalse(afterExecuteLog.contains("inval"), "Expected engine log after execution (" + afterExecuteLog + ") not to contain 'inval'");
+        assertFalse(afterExecuteLog.contains("inval"), "Expected engine log after execution ('" +
+                afterExecuteLog + "') not to contain 'inval'");
     }
 }
