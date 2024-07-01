@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_04.nodes;
 
+import com.oracle.truffle.api.dsl.AOTSupport;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExecutionSignature;
 import com.oracle.truffle.api.nodes.RootNode;
@@ -31,6 +32,9 @@ public final class EasyScriptRootNode extends RootNode {
 
     @Override
     protected ExecutionSignature prepareForAOT() {
+        // prepare all child Nodes
+        AOTSupport.prepareForAOT(this);
+
         // this must be Integer.class -
         // int.class would cause the compiled code to invalidate
         return ExecutionSignature.create(Integer.class, new Class[0]);
