@@ -1,6 +1,8 @@
 package com.endoflineblog.truffle.part_04;
 
 import com.endoflineblog.truffle.part_04.nodes.AdditionNode;
+import com.endoflineblog.truffle.part_04.nodes.AdditionNodeGen;
+import com.endoflineblog.truffle.part_04.nodes.DoubleLiteralNode;
 import com.endoflineblog.truffle.part_04.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_04.nodes.IntLiteralNode;
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -51,7 +53,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private static AdditionNode parseAdditionExpr(EasyScriptParser.AddExprContext addExpr) {
-        return new AdditionNode(
+        return AdditionNodeGen.create(
                 parseExpr(addExpr.left),
                 parseExpr(addExpr.right)
         );
@@ -59,24 +61,22 @@ public final class EasyScriptTruffleParser {
 
     private static EasyScriptNode parseLiteral(EasyScriptParser.LiteralExprContext literalExpr) {
         TerminalNode intTerminal = literalExpr.literal().INT();
-//        return intTerminal != null
-//                ? parseIntLiteral(intTerminal.getText())
-//                : parseDoubleLiteral(literalExpr.getText());
-        return parseIntLiteral(intTerminal.getText());
+        return intTerminal != null
+                ? parseIntLiteral(intTerminal.getText())
+                : parseDoubleLiteral(literalExpr.getText());
     }
 
     private static EasyScriptNode parseIntLiteral(String text) {
-        return new IntLiteralNode(Integer.parseInt(text));
-//        try {
-//            return new IntLiteralNode(Integer.parseInt(text));
-//        } catch (NumberFormatException e) {
-//            // it's possible that the integer literal is too big to fit in a 32-bit Java `int` -
-//            // in that case, fall back to a double literal
-//            return parseDoubleLiteral(text);
-//        }
+        try {
+            return new IntLiteralNode(Integer.parseInt(text));
+        } catch (NumberFormatException e) {
+            // it's possible that the integer literal is too big to fit in a 32-bit Java `int` -
+            // in that case, fall back to a double literal
+            return parseDoubleLiteral(text);
+        }
     }
 
-//    private static DoubleLiteralNode parseDoubleLiteral(String text) {
-//        return new DoubleLiteralNode(Double.parseDouble(text));
-//    }
+    private static DoubleLiteralNode parseDoubleLiteral(String text) {
+        return new DoubleLiteralNode(Double.parseDouble(text));
+    }
 }

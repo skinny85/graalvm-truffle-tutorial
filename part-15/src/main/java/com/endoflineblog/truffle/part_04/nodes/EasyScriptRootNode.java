@@ -28,8 +28,8 @@ public final class EasyScriptRootNode extends RootNode {
     }
 
     @Override
-    public Integer execute(VirtualFrame frame) {
-        return this.exprNode.executeInt(frame);
+    public Object execute(VirtualFrame frame) {
+        return this.exprNode.executeGeneric(frame);
     }
 
     @Override
@@ -37,8 +37,6 @@ public final class EasyScriptRootNode extends RootNode {
         // prepare all child Nodes
         AOTSupport.prepareForAOT(this);
 
-        // this must be Integer.class -
-        // int.class would cause the compiled code to invalidate
-        return ExecutionSignature.create(Integer.class, new Class[0]);
+        return ExecutionSignature.create(Object.class, new Class[0]);
     }
 }

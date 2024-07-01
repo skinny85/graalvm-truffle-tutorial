@@ -18,13 +18,13 @@ public final class IntLiteralNode extends EasyScriptNode {
         return this.value;
     }
 
-//    @Override
-//    public double executeDouble(VirtualFrame frame) {
-//        return this.value;
-//    }
-//
-//    @Override
-//    public Object executeGeneric(VirtualFrame frame) {
-//        return this.value;
-//    }
+    @Override
+    public double executeDouble(VirtualFrame frame) {
+        return this.value;
+    }
+
+    @Override
+    public Object executeGeneric(VirtualFrame frame) {
+        return this.value;
+    }
 }

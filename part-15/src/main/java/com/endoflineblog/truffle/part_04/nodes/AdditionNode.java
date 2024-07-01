@@ -2,7 +2,6 @@ package com.endoflineblog.truffle.part_04.nodes;
 
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * The AST node that represents the plus operator in EasyScript.
@@ -13,22 +12,29 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * {@link AdditionNodeGen},
  * that implements the `execute*()` methods.
  */
-public final class AdditionNode extends EasyScriptNode {
-    @SuppressWarnings("FieldMayBeFinal")
-    @Child
-    private EasyScriptNode leftNode;
-
-    @SuppressWarnings("FieldMayBeFinal")
-    @Child
-    private EasyScriptNode rightNode;
-
-    public AdditionNode(EasyScriptNode leftNode, EasyScriptNode rightNode) {
-        this.leftNode = leftNode;
-        this.rightNode = rightNode;
+// we want our generated node to have 2 children
+@NodeChild("leftNode")
+@NodeChild("rightNode")
+public abstract class AdditionNode extends EasyScriptNode {
+    /**
+     * The integer addition specialization.
+     * We invalidate it when it overflows,
+     * hence the `rewriteOn` attribute
+     * (Math.addExact() throws ArithmeticException when addition overflows).
+     */
+    @Specialization(rewriteOn = ArithmeticException.class)
+    protected int addInts(int leftValue, int rightValue) {
+        return Math.addExact(leftValue, rightValue);
     }
 
-    @Override
-    public int executeInt(VirtualFrame frame) {
-        return this.leftNode.executeInt(frame) + this.rightNode.executeInt(frame);
+    /**
+     * The `double` addition specialization.
+     * It is a superset of the `int` specialization
+     * (we don't want the two active at the same time),
+     * hence the `replaces` attribute.
+     */
+    @Specialization(replaces = "addInts")
+    protected double addDoubles(double leftValue, double rightValue) {
+        return leftValue + rightValue;
     }
 }
