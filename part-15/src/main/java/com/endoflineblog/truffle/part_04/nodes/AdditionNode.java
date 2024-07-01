@@ -14,9 +14,11 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * that implements the `execute*()` methods.
  */
 public final class AdditionNode extends EasyScriptNode {
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptNode leftNode;
 
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptNode rightNode;
 
