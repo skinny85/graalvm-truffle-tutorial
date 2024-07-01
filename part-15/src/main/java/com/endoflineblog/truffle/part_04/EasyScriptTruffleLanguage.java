@@ -26,7 +26,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<Void> {
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         EasyScriptNode exprNode = EasyScriptTruffleParser.parse(request.getSource().getReader());
-        var rootNode = new EasyScriptRootNode(exprNode);
+        var rootNode = new EasyScriptRootNode(this, exprNode);
         return rootNode.getCallTarget();
     }
 

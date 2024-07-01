@@ -1,5 +1,6 @@
 package com.endoflineblog.truffle.part_04.nodes;
 
+import com.endoflineblog.truffle.part_04.EasyScriptTruffleLanguage;
 import com.oracle.truffle.api.dsl.AOTSupport;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExecutionSignature;
@@ -19,8 +20,9 @@ public final class EasyScriptRootNode extends RootNode {
     @Child
     private EasyScriptNode exprNode;
 
-    public EasyScriptRootNode(EasyScriptNode exprNode) {
-        super(null);
+    public EasyScriptRootNode(EasyScriptTruffleLanguage easyScriptTruffleLanguage,
+            EasyScriptNode exprNode) {
+        super(easyScriptTruffleLanguage);
 
         this.exprNode = exprNode;
     }
