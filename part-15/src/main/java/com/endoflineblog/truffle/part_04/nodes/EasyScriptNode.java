@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_04.nodes;
 
 import com.endoflineblog.truffle.part_04.EasyScriptTypeSystem;
+import com.oracle.truffle.api.dsl.GenerateAOT;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
@@ -17,6 +18,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
  * and you should see 2 out of 3 tests in ExecuteNodesDslTest fail.
  */
 @TypeSystemReference(EasyScriptTypeSystem.class)
+@GenerateAOT
 public abstract class EasyScriptNode extends Node {
     public abstract int executeInt(VirtualFrame frame) throws UnexpectedResultException;
 
