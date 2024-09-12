@@ -43,23 +43,23 @@ public final class EasyScriptTruffleParser {
         // throw an exception when a parsing error is encountered
         parser.setErrorHandler(new BailErrorStrategy());
         EasyScriptParser.ExprContext context = parser.start().expr();
-        return expr2TruffleNode(context);
+        return parseExpr(context);
     }
 
-    private static EasyScriptNode expr2TruffleNode(EasyScriptParser.ExprContext expr) {
+    private static EasyScriptNode parseExpr(EasyScriptParser.ExprContext expr) {
         return expr instanceof EasyScriptParser.AddExprContext
-                ? addExpr2AdditionNode((EasyScriptParser.AddExprContext) expr)
-                : literalExpr2ExprNode((EasyScriptParser.LiteralExprContext) expr);
+                ? parseAdditionExpr((EasyScriptParser.AddExprContext) expr)
+                : parseLiteralExpr((EasyScriptParser.LiteralExprContext) expr);
     }
 
-    private static AdditionNode addExpr2AdditionNode(EasyScriptParser.AddExprContext addExpr) {
+    private static AdditionNode parseAdditionExpr(EasyScriptParser.AddExprContext addExpr) {
         return AdditionNodeGen.create(
-                expr2TruffleNode(addExpr.left),
-                expr2TruffleNode(addExpr.right)
+                parseExpr(addExpr.left),
+                parseExpr(addExpr.right)
         );
     }
 
-    private static EasyScriptNode literalExpr2ExprNode(EasyScriptParser.LiteralExprContext literalExpr) {
+    private static EasyScriptNode parseLiteralExpr(EasyScriptParser.LiteralExprContext literalExpr) {
         TerminalNode intTerminal = literalExpr.literal().INT();
         return intTerminal != null
                 ? parseIntLiteral(intTerminal.getText())
