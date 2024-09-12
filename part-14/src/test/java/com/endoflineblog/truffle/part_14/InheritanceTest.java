@@ -141,10 +141,15 @@ public class InheritanceTest {
     @Test
     void hasOwnProperty_can_be_called_on_class_instance() {
         Value result = this.context.eval("ezs", "" +
-                "class Class extends Object { " +
-                "    constructor() { " +
+                "class Base extends Object { " +
+                "    constructor(x) { " +
                 "        super(); " +
-                "        this.x = 11; " +
+                "        this.x = x; " +
+                "    } " +
+                "} " +
+                "class Class extends Base { " +
+                "    constructor() { " +
+                "        super(11); " +
                 "    } " +
                 "} " +
                 "let obj = new Class(); " +
