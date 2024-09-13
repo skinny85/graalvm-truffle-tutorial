@@ -14,7 +14,7 @@ import com.oracle.truffle.api.object.Shape;
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ClassPrototypeObject extends DynamicObject {
-    public final String className;
+    private final String className;
 
     public ClassPrototypeObject(Shape shape, String className) {
         super(shape);
