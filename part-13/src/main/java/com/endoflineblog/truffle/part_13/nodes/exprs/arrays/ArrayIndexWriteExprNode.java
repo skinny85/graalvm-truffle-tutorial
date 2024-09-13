@@ -67,7 +67,7 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
      * The uncached version of the specialization for writing a string property of an object,
      * in code like {@code [1, 2]['abc'] = 3}.
      */
-    @Specialization(replaces = "writeTruffleStringPropertyCached", limit = "2")
+    @Specialization(replaces = "writeTruffleStringPropertyCached")
     protected Object writeTruffleStringPropertyUncached(
             Object target, TruffleString propertyName, Object rvalue,
             @Cached TruffleString.ToJavaStringNode toJavaStringNode,
