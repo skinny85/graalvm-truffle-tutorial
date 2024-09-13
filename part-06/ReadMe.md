@@ -77,8 +77,8 @@ as functions can now be returned from EasyScript code
 (for example, in expressions like `Math.abs;`).
 So, we make `FunctionObject` implement the `TruffleObject` marker interface,
 and, to allow our functions to be called from other languages,
-override the [`isExecutable()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#isExecutable-java.lang.Object-)
-and [`execute()` messages](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#execute-java.lang.Object-java.lang.Object...-)
+override the [`isExecutable()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#isExecutable(java.lang.Object))
+and [`execute()` messages](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#execute(java.lang.Object,java.lang.Object...))
 from the [interop library](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html).
 When implementing `execute()`,
 we re-use the `FunctionDispatchNode` we saw in `FunctionCallExprNode` above,

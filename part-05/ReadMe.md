@@ -31,9 +31,9 @@ We also use a `LanguageContext` class in this version of our `TruffleLanguage`.
 Our [`EasyScriptLanguageContext` class](src/main/java/com/endoflineblog/truffle/part_05/EasyScriptLanguageContext.java)
 contains the `GlobalScopeObject` instance which stores the values of the global variables.
 We return that object from the
-[`TruffleLanguage.getScope()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/TruffleLanguage.html#getScope-C-),
+[`TruffleLanguage.getScope()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/TruffleLanguage.html#getScope(C)),
 which allows retrieving the global variables using the
-[`getBindings(String languageId)` method of the GraalVM polyglot `Context` class](https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Context.html#getBindings-java.lang.String-).
+[`getBindings(String languageId)` method of the GraalVM polyglot `Context` class](https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Context.html#getBindings(java.lang.String)).
 
 ## `GlobalScopeObject` class
 
@@ -45,7 +45,7 @@ It has methods that can be used to create, update and retrieve variables,
 which will be invoked from the new Truffle AST Nodes.
 
 Since this object is returned from the
-[`getBindings(String languageId)` method of the GraalVM polyglot `Context` class](https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Context.html#getBindings-java.lang.String-),
+[`getBindings(String languageId)` method of the GraalVM polyglot `Context` class](https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Context.html#getBindings(java.lang.String)),
 it needs to be a GraalVM interop object.
 This means implementing the
 [`TruffleObject` interface](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/TruffleObject.html),
@@ -82,9 +82,9 @@ when evaluating EasyScript code
 it also needs to be a GraalVM interop object,
 same as `GlobalScopeObject`.
 In this case, we only implement the
-[`isNull()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#isNull-java.lang.Object-)
+[`isNull()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#isNull(java.lang.Object))
 and
-[`toDisplayString(boolean)`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#toDisplayString-java.lang.Object-boolean-)
+[`toDisplayString(boolean)`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#toDisplayString(java.lang.Object,boolean))
 messages.
 
 ## Truffle AST Nodes

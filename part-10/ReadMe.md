@@ -34,9 +34,9 @@ The implementations of those Nodes use the
 This is a Truffle [Dynamic Object](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel),
 which means it implicitly implements the [`TruffleObject` interface](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/TruffleObject.html).
 It exports the appropriate messages for dealing with arrays, like
-[`getArraySize()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#getArraySize-java.lang.Object-),
-[`readArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readArrayElement-java.lang.Object-long-)
-and [`writeArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeArrayElement-java.lang.Object-long-java.lang.Object-).
+[`getArraySize()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#getArraySize(java.lang.Object)),
+[`readArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readArrayElement(java.lang.Object,long))
+and [`writeArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeArrayElement(java.lang.Object,long,java.lang.Object)).
 
 The [Shape for arrays](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel/#extended-object-layout),
 cached in a field of the
@@ -44,7 +44,7 @@ cached in a field of the
 for this chapter and then passed to the
 [parser class](src/main/java/com/endoflineblog/truffle/part_10/parsing/EasyScriptTruffleParser.java),
 is created by passing the `ArrayObject.class` to the
-[`layout()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/Shape.Builder.html#layout-java.lang.Class-)
+[`layout()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/Shape.Builder.html#layout(java.lang.Class))
 of `Shape.Builder`.
 There is a field in `ArrayObject` annotated with the
 [`@DynamicField` annotation](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObject.DynamicField.html)
@@ -61,7 +61,7 @@ We also extract a `TruffleObject` class
 [called `MemberNamesObject`](src/main/java/com/endoflineblog/truffle/part_10/runtime/MemberNamesObject.java),
 that simply encapsulates an array of property names,
 and we use it to implement the
-[`getMembers()` message](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#getMembers-java.lang.Object-boolean-)
+[`getMembers()` message](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#getMembers(java.lang.Object,boolean))
 of `ArrayObject`.
 We will use this class for the same purpose in other `TruffleObject`s below.
 
@@ -83,7 +83,7 @@ We implement that expression in the
 [`PropertyReadExprNode` Node](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/properties/PropertyReadExprNode.java).
 We again use the `InteropLibrary`,
 this time the
-[`readMember()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readMember-java.lang.Object-java.lang.String-)
+[`readMember()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readMember(java.lang.Object,java.lang.String))
 message.
 
 ## `Math` static object
@@ -108,7 +108,7 @@ Finally, we create a new object from a factory retrieved from the Shape,
 and save it, and the properties,
 as instance fields of the `Math` object.
 Then, the actual logic of reading the properties is implemented with messages from the `InteropLibrary`,
-like [`readMember()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readMember-java.lang.Object-java.lang.String-).
+like [`readMember()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readMember(java.lang.Object,java.lang.String)).
 
 ## Global scope as a Dynamic Object
 
@@ -138,7 +138,7 @@ This change to `GlobalScopeObject` means we need to adjust the Nodes that intera
 and [`GlobalVarAssignmentExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/variables/GlobalVarAssignmentExprNode.java).
 
 We use the
-[`flags` parameter](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObjectLibrary.html#putConstant-com.oracle.truffle.api.object.DynamicObject-java.lang.Object-java.lang.Object-int-)
+[`flags` parameter](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObjectLibrary.html#putConstant(com.oracle.truffle.api.object.DynamicObject,java.lang.Object,java.lang.Object,int))
 to save whether a given variable is a constant or not,
 and we check that when performing assignment.
 

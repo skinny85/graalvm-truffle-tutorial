@@ -43,7 +43,7 @@ to cache the first two Java `String`s resulting from converting `TruffleString`s
 
 `CommonWritePropertyNode` itself is quite simple,
 and uses the
-[`writeMember` message from the `InteropLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeMember-java.lang.Object-java.lang.String-java.lang.Object-)
+[`writeMember` message from the `InteropLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeMember(java.lang.Object,java.lang.String,java.lang.Object))
 to perform the actual property writes.
 
 The handling of the `writeMember()` interop library message is in the new
