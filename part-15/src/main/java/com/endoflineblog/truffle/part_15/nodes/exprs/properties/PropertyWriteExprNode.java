@@ -7,7 +7,7 @@ import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 
 /**
- * The Node for reading properties of objects.
+ * The Node for writing properties of objects.
  * Used in code like {@code t.myProp = 3}.
  * Very similar to {@link PropertyReadExprNode}.
  * Simply delegates to {@link CommonWritePropertyNode}.
