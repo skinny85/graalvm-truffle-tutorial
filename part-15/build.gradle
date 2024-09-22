@@ -15,9 +15,9 @@ test {
     jvmArgs '-Dgraalvm.locatorDisabled=true'
 }
 
-def jmhIncludes = findProperty("jmhIncludes")
+String jmhIncludes = findProperty("jmhIncludes")
 jmh {
     if (jmhIncludes != null) {
-        includes = jmhIncludes.tokenize(",")
+        includes = [jmhIncludes]
     }
 }

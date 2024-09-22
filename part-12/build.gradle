@@ -14,3 +14,10 @@ dependencies {
 test {
     jvmArgs '-Dgraalvm.locatorDisabled=true'
 }
+
+String jmhIncludes = findProperty("jmhIncludes")
+jmh {
+    if (jmhIncludes != null) {
+        includes = [jmhIncludes]
+    }
+}
