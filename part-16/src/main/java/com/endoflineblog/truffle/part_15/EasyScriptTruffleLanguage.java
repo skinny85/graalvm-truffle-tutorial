@@ -27,6 +27,8 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.frame.FrameDescriptor;
+import com.oracle.truffle.api.instrumentation.ProvidedTags;
+import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
@@ -44,6 +46,10 @@ import java.util.stream.IntStream;
  * {@code Error} and its subclasses by creating the appropriate AST Nodes "by hand".
  */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
+@ProvidedTags({
+        StandardTags.RootTag.class, StandardTags.RootBodyTag.class,
+        StandardTags.CallTag.class, StandardTags.StatementTag.class,
+})
 public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptLanguageContext> {
     private static final LanguageReference<EasyScriptTruffleLanguage> REF =
             LanguageReference.create(EasyScriptTruffleLanguage.class);

@@ -15,6 +15,10 @@ public class Main {
 
         try (Context context = Context
                 .newBuilder()
+                .option("inspect", "4242")
+                .option("inspect.Suspend", "true")
+                .allowExperimentalOptions(true)
+                .option("inspect.Initialization", "true")
                 .build()) {
             Value result = context.eval(source);
             System.out.println(result.toString());
