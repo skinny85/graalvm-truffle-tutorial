@@ -4,6 +4,8 @@ import com.endoflineblog.truffle.part_15.exceptions.ReturnException;
 import com.endoflineblog.truffle.part_15.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_15.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 import java.util.List;
@@ -38,5 +40,13 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
         // if there was no return statement,
         // then we return 'undefined'
         return Undefined.INSTANCE;
+    }
+
+    @Override
+    public boolean hasTag(Class<? extends Tag> tag) {
+        if (tag == StandardTags.RootTag.class || tag == StandardTags.RootBodyTag.class) {
+            return true;
+        }
+        return super.hasTag(tag);
     }
 }
