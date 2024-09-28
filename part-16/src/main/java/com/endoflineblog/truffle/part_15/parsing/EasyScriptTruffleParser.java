@@ -325,7 +325,8 @@ public final class EasyScriptTruffleParser {
         return new IfStmtNode(
                 this.parseExpr1(ifStmt.cond),
                 this.parseStmt(ifStmt.then_stmt),
-                this.parseStmt(ifStmt.else_stmt));
+                this.parseStmt(ifStmt.else_stmt),
+                this.createSourceSection(ifStmt));
     }
 
     private WhileStmtNode parseWhileStmt(EasyScriptParser.WhileStmtContext whileStmt) {

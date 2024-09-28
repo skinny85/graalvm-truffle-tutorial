@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_15.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_15.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.profiles.ConditionProfile;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * A Node that represents an {@code if} statement.
@@ -20,12 +21,18 @@ public final class IfStmtNode extends EasyScriptStmtNode {
     @Child
     private EasyScriptStmtNode elseStmt;
 
+    private final SourceSection sourceSection;
+
     private final ConditionProfile condition = ConditionProfile.createCountingProfile();
 
-    public IfStmtNode(EasyScriptExprNode conditionExpr, EasyScriptStmtNode thenStmt, EasyScriptStmtNode elseStmt) {
+    public IfStmtNode(
+        EasyScriptExprNode conditionExpr, EasyScriptStmtNode thenStmt,
+        EasyScriptStmtNode elseStmt, SourceSection sourceSection
+    ) {
         this.conditionExpr = conditionExpr;
         this.thenStmt = thenStmt;
         this.elseStmt = elseStmt;
+        this.sourceSection = sourceSection;
     }
 
     @Override
@@ -37,5 +44,10 @@ public final class IfStmtNode extends EasyScriptStmtNode {
                     ? Undefined.INSTANCE
                     : this.elseStmt.executeStatement(frame);
         }
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return this.sourceSection;
     }
 }
