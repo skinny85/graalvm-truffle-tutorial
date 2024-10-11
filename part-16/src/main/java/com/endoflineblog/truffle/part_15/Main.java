@@ -10,18 +10,27 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
         Source source = Source
-                .newBuilder("ezs", new File("src/main/resources/example.js"))
+                .newBuilder("ezs", new File("src/main/resources/fibonacci.js"))
+//                .newBuilder("js", new File("src/main/resources/fibonacci.js"))
                 .build();
 
         try (Context context = Context
                 .newBuilder()
                 .option("inspect", "4242")
-                .option("inspect.Suspend", "true")
-                .allowExperimentalOptions(true)
-                .option("inspect.Initialization", "true")
                 .build()) {
             Value result = context.eval(source);
-            System.out.println(result.toString());
+            if (result.hasArrayElements()) {
+                System.out.print("[");
+                for (long i = 0; i < result.getArraySize(); i++) {
+                    if (i != 0) {
+                        System.out.print(", ");
+                    }
+                    System.out.print(result.getArrayElement(i));
+                }
+                System.out.println("]");
+            } else {
+                System.out.println(result.toString());
+            }
         }
     }
 }
