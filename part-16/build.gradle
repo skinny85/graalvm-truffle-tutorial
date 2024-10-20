@@ -1,6 +1,7 @@
 plugins {
     id 'antlr'
     id 'me.champeau.jmh' version '0.6.6'
+    id 'application'
 }
 
 dependencies {
@@ -21,4 +22,11 @@ jmh {
     if (jmhIncludes != null) {
         includes = [jmhIncludes]
     }
+}
+
+application {
+    mainClass = 'com.endoflineblog.truffle.part_15.Main'
+    applicationDefaultJvmArgs = [
+        '-Dgraalvm.locatorDisabled=true',
+    ]
 }
