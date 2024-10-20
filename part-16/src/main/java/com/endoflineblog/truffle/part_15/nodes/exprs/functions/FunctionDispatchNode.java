@@ -6,6 +6,12 @@ import com.endoflineblog.truffle.part_15.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.instrumentation.GenerateWrapper;
+import com.oracle.truffle.api.instrumentation.InstrumentableNode;
+import com.oracle.truffle.api.instrumentation.ProbeNode;
+import com.oracle.truffle.api.instrumentation.StandardTags;
+import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
@@ -14,13 +20,12 @@ import com.oracle.truffle.api.nodes.Node;
  * A helper Node that contains specialization for functions calls.
  * Identical to the class with the same name from part 14.
  */
-public abstract class FunctionDispatchNode extends Node {
+@GenerateWrapper
+public abstract class FunctionDispatchNode extends Node implements InstrumentableNode {
     /**
-     * The execution method for this Node.
-     * The {@code receiver} parameter will be passed as {@code this}
-     * to the underlying function.
+     * The execute*() method for a Node with @GenerateWrapper _must_ have VirtualFrame as its first parameter.
      */
-    public abstract Object executeDispatch(Object function, Object[] arguments, Object receiver);
+    public abstract Object executeDispatch(VirtualFrame frame, Object function, Object[] arguments, Object receiver);
 
     /**
      * A specialization that calls the given target directly.
@@ -83,5 +88,20 @@ public abstract class FunctionDispatchNode extends Node {
             ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
         }
         return ret;
+    }
+
+    @Override
+    public boolean isInstrumentable() {
+        return true;
+    }
+
+    @Override
+    public WrapperNode createWrapper(ProbeNode probe) {
+        return new FunctionDispatchNodeWrapper(this, probe);
+    }
+
+    @Override
+    public boolean hasTag(Class<? extends Tag> tag) {
+        return tag == StandardTags.CallTag.class;
     }
 }

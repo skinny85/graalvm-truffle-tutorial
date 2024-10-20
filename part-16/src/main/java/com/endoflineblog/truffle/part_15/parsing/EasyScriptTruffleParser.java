@@ -471,9 +471,12 @@ public final class EasyScriptTruffleParser {
         this.state = previousParserState;
         this.localScopes = previousLocalScopes;
 
-        return FuncDeclStmtNodeGen.create(containerObjectExpr,
+        return FuncDeclStmtNodeGen.create(
+                containerObjectExpr,
                 subroutineDecl.name.getText(),
-                frameDescriptor, new UserFuncBodyStmtNode(funcStmts), argumentCount);
+                frameDescriptor,
+                new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
+                argumentCount);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {

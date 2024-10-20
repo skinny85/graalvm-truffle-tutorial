@@ -7,6 +7,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.instrumentation.Tag;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
+import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.List;
 
@@ -19,8 +20,12 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
     @Children
     private final EasyScriptStmtNode[] stmts;
 
-    public UserFuncBodyStmtNode(List<EasyScriptStmtNode> stmts) {
+    private final SourceSection sourceSection;
+
+    public UserFuncBodyStmtNode(
+            List<EasyScriptStmtNode> stmts, SourceSection sourceSection) {
         this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
+        this.sourceSection = sourceSection;
     }
 
     /**
@@ -48,5 +53,10 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
             return true;
         }
         return super.hasTag(tag);
+    }
+
+    @Override
+    public SourceSection getSourceSection() {
+        return sourceSection;
     }
 }

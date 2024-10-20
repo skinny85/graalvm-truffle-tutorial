@@ -61,7 +61,7 @@ public abstract class NewExprNode extends EasyScriptExprNode {
             // instanceof always returns 'false' for 'null'
             Object[] args = this.executeArguments(frame);
             var boundConstructor = (FunctionObject) constructor;
-            this.constructorDispatchNode.executeDispatch(boundConstructor, args, object);
+            this.constructorDispatchNode.executeDispatch(frame, boundConstructor, args, object);
         } else {
             this.consumeArguments(frame);
         }

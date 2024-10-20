@@ -55,7 +55,7 @@ public final class FunctionObject extends JavaScriptObject {
             }
         }
         // for GraalVM polyglot calls, we never fill the receiver
-        return this.functionDispatchNode.executeDispatch(this, arguments, Undefined.INSTANCE);
+        return this.functionDispatchNode.executeDispatch(null, this, arguments, Undefined.INSTANCE);
     }
 
     private boolean isEasyScriptValue(Object argument) {

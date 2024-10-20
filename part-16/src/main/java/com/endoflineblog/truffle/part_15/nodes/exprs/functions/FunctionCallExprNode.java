@@ -40,6 +40,6 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
             argumentValues[i] = this.callArguments[i].executeGeneric(frame);
         }
 
-        return this.dispatchNode.executeDispatch(function, argumentValues, receiver);
+        return this.dispatchNode.executeDispatch(frame, function, argumentValues, receiver);
     }
 }
