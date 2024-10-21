@@ -18,21 +18,14 @@ public final class ReturnStmtNode extends EasyScriptStmtNode {
     @Child
     private EasyScriptExprNode returnExpr;
 
-    private final SourceSection sourceSection;
-
     public ReturnStmtNode(EasyScriptExprNode returnExpr, SourceSection sourceSection) {
+        super(sourceSection);
         this.returnExpr = returnExpr;
-        this.sourceSection = sourceSection;
     }
 
     @Override
     public Object executeStatement(VirtualFrame frame) {
         Object returnValue = this.returnExpr.executeGeneric(frame);
         throw new ReturnException(returnValue);
-    }
-
-    @Override
-    public SourceSection getSourceSection() {
-        return this.sourceSection;
     }
 }

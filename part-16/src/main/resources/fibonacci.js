@@ -1,4 +1,6 @@
+var a = 3;
 main();
+let b = 4;
 
 function main() {
     var i = 1;

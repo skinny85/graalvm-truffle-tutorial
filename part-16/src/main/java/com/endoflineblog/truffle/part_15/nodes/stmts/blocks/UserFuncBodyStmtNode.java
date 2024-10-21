@@ -20,12 +20,10 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
     @Children
     private final EasyScriptStmtNode[] stmts;
 
-    private final SourceSection sourceSection;
-
     public UserFuncBodyStmtNode(
             List<EasyScriptStmtNode> stmts, SourceSection sourceSection) {
+        super(sourceSection);
         this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
-        this.sourceSection = sourceSection;
     }
 
     /**
@@ -53,10 +51,5 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
             return true;
         }
         return super.hasTag(tag);
-    }
-
-    @Override
-    public SourceSection getSourceSection() {
-        return sourceSection;
     }
 }

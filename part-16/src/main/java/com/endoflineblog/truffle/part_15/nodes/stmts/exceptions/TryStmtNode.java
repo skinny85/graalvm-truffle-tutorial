@@ -4,6 +4,7 @@ import com.endoflineblog.truffle.part_15.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_15.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_15.nodes.stmts.blocks.BlockStmtNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * This Node represents the implementation of the {@code try}-
@@ -24,12 +25,16 @@ public final class TryStmtNode extends EasyScriptStmtNode {
     @Child
     private BlockStmtNode finallyStatements;
 
-    public TryStmtNode(BlockStmtNode tryStatements, BlockStmtNode finallyStatements) {
-        this(tryStatements, null, null, finallyStatements);
+    public TryStmtNode(
+            BlockStmtNode tryStatements, BlockStmtNode finallyStatements,
+            SourceSection sourceSection) {
+        this(tryStatements, null, null, finallyStatements, sourceSection);
     }
 
     public TryStmtNode(BlockStmtNode tryStatements, Integer exceptionVarFrameSlot,
-            BlockStmtNode catchStatements, BlockStmtNode finallyStatements) {
+            BlockStmtNode catchStatements, BlockStmtNode finallyStatements,
+            SourceSection sourceSection) {
+        super(sourceSection);
         this.tryStatements = tryStatements;
         this.exceptionVarFrameSlot = exceptionVarFrameSlot;
         this.catchStatements = catchStatements;

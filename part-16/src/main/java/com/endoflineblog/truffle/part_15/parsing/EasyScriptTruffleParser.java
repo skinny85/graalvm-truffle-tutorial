@@ -223,9 +223,9 @@ public final class EasyScriptTruffleParser {
             } else if (stmt instanceof EasyScriptParser.BlockStmtContext) {
                 nonFuncDeclStmts.add(this.parseStmtBlock(((EasyScriptParser.BlockStmtContext) stmt).stmt_block()));
             } else if (stmt instanceof EasyScriptParser.BreakStmtContext) {
-                nonFuncDeclStmts.add(new BreakStmtNode());
+                nonFuncDeclStmts.add(new BreakStmtNode(this.createSourceSection(stmt)));
             } else if (stmt instanceof EasyScriptParser.ContinueStmtContext) {
-                nonFuncDeclStmts.add(new ContinueStmtNode());
+                nonFuncDeclStmts.add(new ContinueStmtNode(this.createSourceSection(stmt)));
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
                 DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
@@ -247,7 +247,12 @@ public final class EasyScriptTruffleParser {
 
                     if (this.state == ParserState.TOP_LEVEL) {
                         // this is a global variable
-                        nonFuncDeclStmts.add(GlobalVarDeclStmtNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId, declarationKind));
+                        nonFuncDeclStmts.add(GlobalVarDeclStmtNodeGen.create(
+                                this.createSourceSection(stmt),
+                                GlobalScopeObjectExprNodeGen.create(),
+                                initializerExpr,
+                                variableId,
+                                declarationKind));
                     } else {
                         // this is a local variable (either of a function, or on the top-level)
                         var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
@@ -308,7 +313,8 @@ public final class EasyScriptTruffleParser {
         // parse the 'catch' statement block
         BlockStmtNode catchBlockStmt = this.parseStmtBlock(tryCatchStmt.c);
 
-        return new TryStmtNode(tryBlockStmt, frameSlot, catchBlockStmt, finallyBlockStmt);
+        return new TryStmtNode(tryBlockStmt, frameSlot, catchBlockStmt, finallyBlockStmt,
+                this.createSourceSection(tryCatchStmt));
     }
 
     private TryStmtNode parseTryFinallyStmt(EasyScriptParser.TryFinallyStmtContext tryFinallyStmt) {
@@ -318,7 +324,7 @@ public final class EasyScriptTruffleParser {
         // parse the 'finally' statement block
         BlockStmtNode finallyBlockStmt = this.parseStmtBlock(tryFinallyStmt.f);
 
-        return new TryStmtNode(tryBlockStmt, finallyBlockStmt);
+        return new TryStmtNode(tryBlockStmt, finallyBlockStmt, this.createSourceSection(tryFinallyStmt));
     }
 
     private IfStmtNode parseIfStmt(EasyScriptParser.IfStmtContext ifStmt) {
@@ -332,13 +338,15 @@ public final class EasyScriptTruffleParser {
     private WhileStmtNode parseWhileStmt(EasyScriptParser.WhileStmtContext whileStmt) {
         return new WhileStmtNode(
                 this.parseExpr1(whileStmt.cond),
-                this.parseStmt(whileStmt.body));
+                this.parseStmt(whileStmt.body),
+                this.createSourceSection(whileStmt));
     }
 
     private DoWhileStmtNode parseDoWhileStmt(EasyScriptParser.DoWhileStmtContext doWhileStmt) {
         return new DoWhileStmtNode(
                 this.parseExpr1(doWhileStmt.cond),
-                this.parseStmtBlock(doWhileStmt.stmt_block()));
+                this.parseStmtBlock(doWhileStmt.stmt_block()),
+                this.createSourceSection(doWhileStmt));
     }
 
     private ForStmtNode parseForStmt(EasyScriptParser.ForStmtContext forStmt) {
@@ -354,7 +362,8 @@ public final class EasyScriptTruffleParser {
                 this.parseStmt(forStmt.init),
                 this.parseExpr1(forStmt.cond),
                 this.parseExpr1(forStmt.updt),
-                this.parseStmt(forStmt.body));
+                this.parseStmt(forStmt.body),
+                this.createSourceSection(forStmt));
 
         // bring back the old state
         this.state = previousParserState;
@@ -428,6 +437,7 @@ public final class EasyScriptTruffleParser {
 
         this.currentClassPrototype = null;
         return GlobalVarDeclStmtNodeGen.create(
+                null,
                 GlobalScopeObjectExprNodeGen.create(),
                 new ClassDeclExprNode(classMethods, classPrototype),
                 className, DeclarationKind.LET);

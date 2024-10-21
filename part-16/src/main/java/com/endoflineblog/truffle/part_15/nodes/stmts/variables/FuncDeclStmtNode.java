@@ -37,6 +37,12 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
     @CompilationFinal
     private FunctionObject cachedFunction;
 
+    protected FuncDeclStmtNode() {
+        // deliberately pass 'null' here,
+        // as we don't want the debugger to stop on function declarations
+        super(null);
+    }
+
     @Specialization(limit = "2")
     protected Object declareFunction(DynamicObject containerObject,
             @CachedLibrary("containerObject") DynamicObjectLibrary objectLibrary) {

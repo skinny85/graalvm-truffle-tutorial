@@ -14,6 +14,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * A Node that represents the declaration of a global
@@ -30,6 +31,10 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
 
     @CompilationFinal
     private boolean checkVariableExists = true;
+
+    protected GlobalVarDeclStmtNode(SourceSection sourceSection) {
+        super(sourceSection);
+    }
 
     @Specialization(limit = "2")
     protected Object createVariable(DynamicObject globalScopeObject, Object value,

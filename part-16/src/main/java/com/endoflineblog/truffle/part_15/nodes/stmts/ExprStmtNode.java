@@ -16,7 +16,7 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode expr;
-    private final SourceSection sourceSection;
+
     private final boolean discardExpressionValue;
 
     /**
@@ -38,8 +38,8 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
      */
     public ExprStmtNode(EasyScriptExprNode expr, SourceSection sourceSection,
             boolean discardExpressionValue) {
+        super(sourceSection);
         this.expr = expr;
-        this.sourceSection = sourceSection;
         this.discardExpressionValue = discardExpressionValue;
     }
 
@@ -50,10 +50,5 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
         // if this statement was created because of transforming a local variable declaration into an assignment,
         // return 'undefined', to be consistent with how other declarations work
         return this.discardExpressionValue ? Undefined.INSTANCE : exprResult;
-    }
-
-    @Override
-    public SourceSection getSourceSection() {
-        return this.sourceSection;
     }
 }

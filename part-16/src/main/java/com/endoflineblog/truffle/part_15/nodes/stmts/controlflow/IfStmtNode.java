@@ -21,18 +21,15 @@ public final class IfStmtNode extends EasyScriptStmtNode {
     @Child
     private EasyScriptStmtNode elseStmt;
 
-    private final SourceSection sourceSection;
-
     private final ConditionProfile condition = ConditionProfile.createCountingProfile();
 
     public IfStmtNode(
-        EasyScriptExprNode conditionExpr, EasyScriptStmtNode thenStmt,
-        EasyScriptStmtNode elseStmt, SourceSection sourceSection
-    ) {
+            EasyScriptExprNode conditionExpr, EasyScriptStmtNode thenStmt,
+            EasyScriptStmtNode elseStmt, SourceSection sourceSection) {
+        super(sourceSection);
         this.conditionExpr = conditionExpr;
         this.thenStmt = thenStmt;
         this.elseStmt = elseStmt;
-        this.sourceSection = sourceSection;
     }
 
     @Override
@@ -44,10 +41,5 @@ public final class IfStmtNode extends EasyScriptStmtNode {
                     ? Undefined.INSTANCE
                     : this.elseStmt.executeStatement(frame);
         }
-    }
-
-    @Override
-    public SourceSection getSourceSection() {
-        return this.sourceSection;
     }
 }

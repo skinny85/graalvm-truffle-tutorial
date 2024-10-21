@@ -22,6 +22,10 @@ public final class BlockStmtNode extends EasyScriptStmtNode {
     private final EasyScriptStmtNode[] stmts;
 
     public BlockStmtNode(List<EasyScriptStmtNode> stmts) {
+        // deliberately pass 'null' here,
+        // as we don't want the debugger to stop on blocks themselves,
+        // but on statements inside the block instead
+        super(null);
         this.stmts = stmts.toArray(new EasyScriptStmtNode[]{});
     }
 

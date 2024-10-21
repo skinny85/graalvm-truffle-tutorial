@@ -30,11 +30,9 @@ public abstract class ThrowStmtNode extends EasyScriptStmtNode {
     @Executed
     protected EasyScriptExprNode exceptionExpr;
 
-    private final SourceSection sourceSection;
-
     protected ThrowStmtNode(EasyScriptExprNode exceptionExpr, SourceSection sourceSection) {
+        super(sourceSection);
         this.exceptionExpr = exceptionExpr;
-        this.sourceSection = sourceSection;
     }
 
     @Specialization(limit = "2")
@@ -89,10 +87,5 @@ public abstract class ThrowStmtNode extends EasyScriptStmtNode {
             }
         }
         return sb.toStringUncached();
-    }
-
-    @Override
-    public SourceSection getSourceSection() {
-        return this.sourceSection;
     }
 }

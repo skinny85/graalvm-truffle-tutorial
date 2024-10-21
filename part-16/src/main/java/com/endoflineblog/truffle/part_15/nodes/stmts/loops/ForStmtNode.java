@@ -10,6 +10,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.LoopNode;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.RepeatingNode;
+import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * A Node that represents a {@code for} statement.
@@ -25,7 +26,9 @@ public final class ForStmtNode extends EasyScriptStmtNode {
     private LoopNode loopNode;
 
     public ForStmtNode(EasyScriptStmtNode initStmt, EasyScriptExprNode conditionExpr,
-            EasyScriptExprNode updateExpr, EasyScriptStmtNode bodyStmt) {
+            EasyScriptExprNode updateExpr, EasyScriptStmtNode bodyStmt,
+            SourceSection sourceSection) {
+        super(sourceSection);
         this.initStmt = initStmt;
         this.loopNode = Truffle.getRuntime().createLoopNode(
                 new ForRepeatingNode(conditionExpr, updateExpr, bodyStmt));
