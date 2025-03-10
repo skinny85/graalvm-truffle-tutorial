@@ -196,7 +196,7 @@ public class FunctionDefinitionsTest {
                 "} " +
                 "g(f);"
         );
-        assertEquals(result.asInt(), 6);
+        assertEquals(6, result.asInt());
     }
 
     @Test
