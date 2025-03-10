@@ -11,12 +11,15 @@ import com.oracle.truffle.api.profiles.ConditionProfile;
  * Identical to the class with the same name from part 12.
  */
 public final class IfStmtNode extends EasyScriptStmtNode {
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode conditionExpr;
 
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptStmtNode thenStmt;
 
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptStmtNode elseStmt;
 

@@ -10,12 +10,15 @@ import com.oracle.truffle.api.profiles.ConditionProfile;
  * A Node that represents an {@code if} statement.
  */
 public final class IfStmtNode extends EasyScriptStmtNode {
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode conditionExpr;
 
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptStmtNode thenStmt;
 
+    @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptStmtNode elseStmt;
 
