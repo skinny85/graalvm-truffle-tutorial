@@ -141,13 +141,13 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                                                     new ThisExprNode(),
                                                     new ReadFunctionArgExprNode(1),
                                                     "message"
-                                            ), null),
+                                            )),
                                             // this.name = <name>;
                                             new ExprStmtNode(PropertyWriteExprNodeGen.create(
                                                     new ThisExprNode(),
                                                     new StringLiteralExprNode(entry.getKey()),
                                                     "name"
-                                            ), null)
+                                            ))
                                     )),
                                     "constructor"
                             ).getCallTarget(),

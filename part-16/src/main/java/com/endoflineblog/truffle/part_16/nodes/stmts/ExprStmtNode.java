@@ -22,6 +22,10 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
      */
     public final boolean discardExpressionValue;
 
+    public ExprStmtNode(EasyScriptExprNode expr) {
+        this(expr, null);
+    }
+
     /**
      * Creates a new instance of the expression statement.
      *
