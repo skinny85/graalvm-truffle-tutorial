@@ -40,11 +40,9 @@ public final class BlockDebuggerScopeObject extends AbstractDebuggerScopeObject 
             @SuppressWarnings("unused") boolean allowSideEffects,
             @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock
     ) {
-        if (nodeGrandParentBlock instanceof RootNode) {
-            return ((RootNode) nodeGrandParentBlock).getName();
-        } else {
-            return "block";
-        }
+        return nodeGrandParentBlock instanceof RootNode
+                ? ((RootNode) nodeGrandParentBlock).getName()
+                : "block";
     }
 
     @ExportMessage
