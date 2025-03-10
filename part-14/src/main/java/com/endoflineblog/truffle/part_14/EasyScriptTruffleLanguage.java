@@ -89,7 +89,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                         new StmtBlockRootNode(
                                 this,
                                 FrameDescriptor.newBuilder().build(),
-                                new BlockStmtNode(Collections.emptyList())).getCallTarget(),
+                                new BlockStmtNode(Collections.emptyList())
+                        ).getCallTarget(),
                         0));
     }
 

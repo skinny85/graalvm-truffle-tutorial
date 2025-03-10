@@ -92,7 +92,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                                 this,
                                 FrameDescriptor.newBuilder().build(),
                                 new BlockStmtNode(Collections.emptyList()),
-                                null).getCallTarget(),
+                                null
+                        ).getCallTarget(),
                         0));
     }
 
@@ -148,7 +149,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                                                     "name"
                                             ), null)
                                     )),
-                                    "constructor").getCallTarget(),
+                                    "constructor"
+                            ).getCallTarget(),
                             1),
                     0);
         }
