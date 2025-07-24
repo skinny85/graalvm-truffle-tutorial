@@ -10,9 +10,9 @@ import com.oracle.truffle.api.source.SourceSection;
  * This Node represents the implementation of the {@code try}-
  * {@code catch}-{@code finally} statement.
  * Almost identical to the class with the same name from part 15,
- * the only difference is that we get rid of the {@link #getSourceSection()}
- * method, since it has now been moved into {@link EasyScriptStmtNode},
- * to which we pass the {@link SourceSection} through its constructor.
+ * the only difference is that we need to add a {@link SourceSection}
+ * parameter to its constructors,
+ * since the {@link EasyScriptStmtNode} constructor now requires it.
  */
 public final class TryStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
