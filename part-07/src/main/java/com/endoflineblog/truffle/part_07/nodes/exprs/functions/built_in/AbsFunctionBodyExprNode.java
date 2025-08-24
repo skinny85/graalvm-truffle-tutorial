@@ -8,7 +8,8 @@ import com.oracle.truffle.api.dsl.Specialization;
  * {@code Math.abs()} JavaScript function.
  * Almost identical to the class with the same name from part 6,
  * the only difference is that this class extends
- * {@link BuiltInFunctionBodyExprNode}.
+ * {@link BuiltInFunctionBodyExprNode},
+ * and thus doesn't need its own {@link com.oracle.truffle.api.dsl.NodeChild} annotation.
  */
 public abstract class AbsFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
