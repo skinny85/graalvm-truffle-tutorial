@@ -20,7 +20,7 @@ public class StringsTest {
     @BeforeEach
     public void setUp() {
         this.context = Context.newBuilder()
-                .option("cpusampler", "true")
+//                .option("cpusampler", "true")
                 .build();
     }
 
