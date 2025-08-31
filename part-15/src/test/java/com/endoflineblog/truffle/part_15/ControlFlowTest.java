@@ -13,7 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-/** This is a set of unit tests for control flow. */
+/**
+ * This is a set of unit tests for control flow.
+ */
 public class ControlFlowTest {
     private Context context;
 
@@ -29,10 +31,10 @@ public class ControlFlowTest {
 
     @Test
     public void var_declarations_are_local_in_nested_blocks() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "var v = 3; " +
                 "{ " +
-                    "var v = 5; " +
+                "    var v = 5; " +
                 "} " +
                 "v"
         );
@@ -41,13 +43,13 @@ public class ControlFlowTest {
 
     @Test
     public void var_declarations_are_local_in_nested_blocks_of_functions() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "function f() { " +
-                    "var v = 3; " +
-                    "{ " +
-                        "var v = 5; " +
-                    "} " +
-                    "return v; " +
+                "    var v = 3; " +
+                "    { " +
+                "        var v = 5; " +
+                "    } " +
+                "    return v; " +
                 "} " +
                 "f() "
         );
@@ -56,7 +58,7 @@ public class ControlFlowTest {
 
     @Test
     public void a_function_is_equal_to_itself_but_not_lte() {
-        this.context.eval("ezs",
+        this.context.eval("ezs", "" +
                 "function f() { return false; } " +
                 "var t1 = f === f; " +
                 "let f1 = f  <  f; " +
@@ -70,7 +72,7 @@ public class ControlFlowTest {
 
     @Test
     public void if_in_a_function_works() {
-        this.context.eval("ezs",
+        this.context.eval("ezs", "" +
                 "function sig(n) {" +
                 "    if (n < 0) return -1; " +
                 "    else if (n > 0) return 1; " +
@@ -88,7 +90,7 @@ public class ControlFlowTest {
 
     @Test
     public void iterative_fibonacci_works() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "function fib(n) { " +
                 "    if (n < 2) { " +
                 "        return n; " +
@@ -109,7 +111,7 @@ public class ControlFlowTest {
 
     @Test
     public void do_while_always_executes_at_least_once() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "function f(n) { " +
                 "    let ret = n + 2; " +
                 "    do { " +
@@ -124,7 +126,7 @@ public class ControlFlowTest {
 
     @Test
     public void for_parts_are_all_optional() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "function fib(n) { " +
                 "    if (n < 2) { " +
                 "        return n; " +
@@ -149,7 +151,7 @@ public class ControlFlowTest {
 
     @Test
     public void for_loop_executes_as_expected() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "function fib(n) { " +
                 "    if (n < 2) { " +
                 "        return n; " +
@@ -169,7 +171,7 @@ public class ControlFlowTest {
 
     @Test
     public void recursive_fibonacci_works() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "function fib(n) { " +
                 "    if (n > -2) { " +
                 "        return Math.abs(n); " +
@@ -197,7 +199,7 @@ public class ControlFlowTest {
 
     @Test
     public void if_statement_returns_value() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "if (true) { " +
                 "    42; " +
                 "}"

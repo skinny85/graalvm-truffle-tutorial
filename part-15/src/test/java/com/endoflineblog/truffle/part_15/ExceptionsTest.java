@@ -288,7 +288,7 @@ public class ExceptionsTest {
                 "    } " +
                 "    return ret; " +
                 "} " +
-                "countdown(" + input +"); ");
+                "countdown(" + input + "); ");
 
         assertEquals(input, result.asInt());
     }

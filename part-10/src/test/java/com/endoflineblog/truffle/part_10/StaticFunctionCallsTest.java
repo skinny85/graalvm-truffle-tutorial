@@ -57,7 +57,7 @@ public class StaticFunctionCallsTest {
 
     @Test
     public void extra_function_arguments_expressions_are_still_evaluated() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "var a = -1; " +
                 "Math.abs(4, a = 5);" +
                 "a"
@@ -86,7 +86,7 @@ public class StaticFunctionCallsTest {
 
     @Test
     public void negating_a_function_or_undefined_returns_NaN() {
-        this.context.eval("ezs",
+        this.context.eval("ezs", "" +
                 "var uNeg = -undefined;" +
                 "var fNeg = -Math.abs;"
         );

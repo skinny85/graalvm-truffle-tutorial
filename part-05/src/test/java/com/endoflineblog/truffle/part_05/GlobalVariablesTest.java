@@ -29,7 +29,7 @@ public class GlobalVariablesTest {
 
     @Test
     public void executing_list_of_statements_returns_the_last_ones_value() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "var a = 1; " +
                 "let b = 2 + 3; " +
                 "const c = 4 + 5.0; " +
@@ -59,7 +59,7 @@ public class GlobalVariablesTest {
 
     @Test
     public void global_variables_are_saved_between_executions() {
-        this.context.eval("ezs",
+        this.context.eval("ezs", "" +
                 "var a = 1; " +
                 "let b = 2; " +
                 "const c = 3.0; "
@@ -71,7 +71,7 @@ public class GlobalVariablesTest {
 
     @Test
     public void variables_without_initializers_have_undefined_value() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "let a; " +
                 "a"
         );
@@ -82,7 +82,7 @@ public class GlobalVariablesTest {
 
     @Test
     public void addition_with_undefined_returns_nan() {
-        Value result = this.context.eval("ezs",
+        Value result = this.context.eval("ezs", "" +
                 "var a, b = 3; " +
                 "a + b"
         );
@@ -94,10 +94,10 @@ public class GlobalVariablesTest {
     @Test
     public void using_a_variable_before_it_is_defined_causes_an_error() {
         try {
-            this.context.eval("ezs",
-                "let b = a; " +
-                "var a = 3; " +
-                "b"
+            this.context.eval("ezs", "" +
+                    "let b = a; " +
+                    "var a = 3; " +
+                    "b"
             );
             fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
@@ -110,7 +110,7 @@ public class GlobalVariablesTest {
     @Test
     public void reassigning_a_const_causes_an_error() {
         try {
-            this.context.eval("ezs",
+            this.context.eval("ezs", "" +
                     "const a = undefined, b = a; " +
                     "a = b"
             );
@@ -139,8 +139,8 @@ public class GlobalVariablesTest {
     @Test
     public void duplicate_variable_causes_an_error() {
         try {
-            this.context.eval("ezs",
-                    "var a = 1; "+
+            this.context.eval("ezs", "" +
+                    "var a = 1; " +
                     "let a = 2"
             );
             fail("expected PolyglotException to be thrown");
