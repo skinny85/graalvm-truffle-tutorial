@@ -1,6 +1,5 @@
 package com.endoflineblog.truffle.part_10.nodes.stmts.variables;
 
-import com.endoflineblog.truffle.part_10.nodes.exprs.GlobalScopeObjectExprNode;
 import com.endoflineblog.truffle.part_10.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.blocks.UserFuncBodyStmtNode;
@@ -8,7 +7,7 @@ import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
-import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameDescriptor;
@@ -24,7 +23,6 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
  * (for getting a reference to which we use the {@link GlobalScopeObjectExprNode}),
  * since {@link FunctionObject} went back to being immutable in this part of the series.
  */
-@NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeField(name = "funcName", type = String.class)
 @NodeField(name = "frameDescriptor", type = FrameDescriptor.class)
 @NodeField(name = "funcBody", type = UserFuncBodyStmtNode.class)
@@ -39,7 +37,8 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
     private FunctionObject cachedFunction;
 
     @Specialization(limit = "2")
-    protected Object declareFunction(DynamicObject globalScopeObject,
+    protected Object declareFunction(
+            @Cached("currentLanguageContext().globalScopeObject") DynamicObject globalScopeObject,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         if (this.cachedFunction == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();

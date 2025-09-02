@@ -3,11 +3,11 @@ package com.endoflineblog.truffle.part_10.nodes.stmts.variables;
 import com.endoflineblog.truffle.part_10.common.DeclarationKind;
 import com.endoflineblog.truffle.part_10.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_10.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_10.nodes.exprs.GlobalScopeObjectExprNode;
 import com.endoflineblog.truffle.part_10.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -24,7 +24,6 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
  * (for getting a reference to which we use the {@link GlobalScopeObjectExprNode}),
  * using {@link DynamicObjectLibrary}.
  */
-@NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeChild(value = "initializerExpr", type = EasyScriptExprNode.class)
 @NodeField(name = "name", type = String.class)
 @NodeField(name = "declarationKind", type = DeclarationKind.class)
@@ -36,7 +35,9 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
     private boolean checkVariableExists = true;
 
     @Specialization(limit = "2")
-    protected Object createVariable(DynamicObject globalScopeObject, Object value,
+    protected Object createVariable(
+            Object value,
+            @Cached("currentLanguageContext().globalScopeObject") DynamicObject globalScopeObject,
             @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
         var variableId = this.getName();
 
