@@ -9,7 +9,7 @@ dependencies {
     implementation "org.graalvm.js:js:$graal_version"
     implementation "org.graalvm.tools:profiler:$graal_version"
     implementation "org.graalvm.tools:chromeinspector:$graal_version"
-    implementation "org.apache.commons:commons-text:1.10.0"
+    implementation "org.apache.commons:commons-text:1.14.0"
 
     testImplementation "org.graalvm.truffle:truffle-tck:$graal_version"
 }

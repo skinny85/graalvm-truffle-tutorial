@@ -17,7 +17,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Source source = Source
                 .newBuilder("ezs", new File("src/main/resources/fibonacci.js"))
-//                .newBuilder("js", new File("src/main/resources/fibonacci.js"))
                 .build();
 
         try (Context context = Context
