@@ -103,7 +103,7 @@ whose value will be the port the debugger will listen on
 (note that you need the
 [`org.graalvm.tools:chromeinspector` dependency](https://search.maven.org/search?q=g:org.graalvm.tools%20AND%20a:chromeinspector)
 for this to work).
-When you run that program with the `./gradlew :part16:run` command,
+When you run that program with the `./gradlew :part-16:run` command,
 it will print out a URL, similar to
 `devtools://devtools/bundled/js_app.html?ws=127.0.0.1:4242/sQ1fqUidEwEIeQOOh5WsI5Yke6KuTeGPvtOYb03WhVg`.
 If you open that URL in Chrome, you should see the debugger suspended at the first line of the sample program:
