@@ -1,20 +1,24 @@
 package com.endoflineblog.truffle.part_16.nodes.exprs.functions;
 
+import com.endoflineblog.truffle.part_16.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_16.exceptions.EasyScriptException;
+import com.endoflineblog.truffle.part_16.nodes.EasyScriptNode;
+import com.endoflineblog.truffle.part_16.runtime.Environment;
 import com.endoflineblog.truffle.part_16.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_16.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
-import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A helper Node that contains specialization for functions calls.
  * Identical to the class with the same name from part 15.
  */
-public abstract class FunctionDispatchNode extends Node {
+public abstract class FunctionDispatchNode extends EasyScriptNode {
     /**
      * The execution method for this Node.
      * The {@code receiver} parameter will be passed as {@code this}
@@ -33,8 +37,11 @@ public abstract class FunctionDispatchNode extends Node {
             FunctionObject function,
             Object[] arguments,
             Object receiver,
-            @Cached("create(function.callTarget)") DirectCallNode directCallNode) {
-        return directCallNode.call(extendArguments(arguments, receiver, function));
+            @Cached("create(function.callTarget)") DirectCallNode directCallNode,
+            @Cached("currentLanguageContext().shapesAndPrototypes") ShapesAndPrototypes shapesAndPrototypes,
+            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
+        return directCallNode.call(closureArguments(arguments, receiver, function,
+                shapesAndPrototypes, dynamicObjectLibrary));
     }
 
     /**
@@ -51,8 +58,11 @@ public abstract class FunctionDispatchNode extends Node {
             FunctionObject function,
             Object[] arguments,
             Object receiver,
-            @Cached IndirectCallNode indirectCallNode) {
-        return indirectCallNode.call(function.callTarget, extendArguments(arguments, receiver, function));
+            @Cached IndirectCallNode indirectCallNode,
+            @Cached("currentLanguageContext().shapesAndPrototypes") ShapesAndPrototypes shapesAndPrototypes,
+            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
+        return indirectCallNode.call(function.callTarget, closureArguments(arguments, receiver, function,
+                shapesAndPrototypes, dynamicObjectLibrary));
     }
 
     /**
@@ -82,6 +92,24 @@ public abstract class FunctionDispatchNode extends Node {
             // we fill the remaining ones with `undefined`
             ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
         }
+        return ret;
+    }
+
+    private static Object[] closureArguments(
+            Object[] arguments, Object receiver, FunctionObject function,
+            ShapesAndPrototypes shapesAndPrototypes, DynamicObjectLibrary dynamicObjectLibrary) {
+        Environment environment = new Environment(shapesAndPrototypes.rootShape);
+        // move all arguments to the closure's environment
+        for (int i = 0; i < function.argumentCount; i++) {
+            // the argument read Nodes are offset by 1 because of 'this'
+            // (that happens in the parser),
+            // so we need to offset the arguments in the closure environment as well
+            dynamicObjectLibrary.put(environment, i + 1,
+                    i < arguments.length ? arguments[i] : Undefined.INSTANCE);
+        }
+        Object[] ret = new Object[2];
+        ret[0] = receiver;
+        ret[1] = environment;
         return ret;
     }
 }

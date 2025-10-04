@@ -2,7 +2,8 @@ package com.endoflineblog.truffle.part_16;
 
 import com.endoflineblog.truffle.part_16.common.ErrorPrototypes;
 import com.endoflineblog.truffle.part_16.common.ShapesAndPrototypes;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadFunctionArgExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.AbstractFuncMemberReadNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadClosureArgExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
@@ -143,7 +144,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                                             // this.message = args[1];
                                             new ExprStmtNode(PropertyWriteExprNodeGen.create(
                                                     new ThisExprNode(),
-                                                    new ReadFunctionArgExprNode(1, "message"),
+                                                    ReadClosureArgExprNodeGen.create(1, "message"),
                                                     "message"
                                             )),
                                             // this.name = <name>;
@@ -208,9 +209,11 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     private CallTarget createCallTarget(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory,
             boolean offsetArguments) {
         int argumentCount = nodeFactory.getExecutionSignature().size();
-        ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
-                .mapToObj(i -> new ReadFunctionArgExprNode(offsetArguments ? i + 1 : i, "arg" + i))
-                .toArray(ReadFunctionArgExprNode[]::new);
+        AbstractFuncMemberReadNode[] functionArguments = IntStream.range(0, argumentCount)
+                .mapToObj(i -> offsetArguments
+                        ? ReadClosureArgExprNodeGen.create(i + 1, "arg" + i)
+                        : (i == 0 ? new ThisExprNode() : ReadClosureArgExprNodeGen.create(i, "arg" + i)))
+                .toArray(AbstractFuncMemberReadNode[]::new);
         var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));
         return rootNode.getCallTarget();

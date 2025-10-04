@@ -1,7 +1,7 @@
 package com.endoflineblog.truffle.part_16.nodes.stmts.blocks;
 
 import com.endoflineblog.truffle.part_16.exceptions.ReturnException;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadFunctionArgExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadClosureArgExprNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_16.runtime.Undefined;
 import com.endoflineblog.truffle.part_16.runtime.debugger.FuncArgRefObject;
@@ -90,18 +90,18 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
     private RefObject[] findFuncArgAndLocalVarRefs() {
         Set<FuncArgRefObject> funcArgs = new HashSet<>();
         // The first argument is always special - it represents 'this'.
-        // We'll never encounter 'this' below, because we check for ReadFunctionArgExprNode,
+        // We'll never encounter 'this' below, because we check for ReadClosureArgExprNode,
         // while 'this' has its own Node (ThisExprNode)
         funcArgs.add(new FuncArgRefObject("this", null, 0));
         NodeUtil.forEachChild(this, new NodeVisitor() {
             @Override
             public boolean visit(Node visitedNode) {
-                if (visitedNode instanceof ReadFunctionArgExprNode) {
-                    var readFunctionArgExprNode = (ReadFunctionArgExprNode) visitedNode;
+                if (visitedNode instanceof ReadClosureArgExprNode) {
+                    var readClosureArgExprNode = (ReadClosureArgExprNode) visitedNode;
                     funcArgs.add(new FuncArgRefObject(
-                            readFunctionArgExprNode.argName,
-                            readFunctionArgExprNode.getSourceSection(),
-                            readFunctionArgExprNode.index));
+                            readClosureArgExprNode.argName,
+                            readClosureArgExprNode.getSourceSection(),
+                            readClosureArgExprNode.index));
                     return true;
                 }
                 return NodeUtil.forEachChild(visitedNode, this);

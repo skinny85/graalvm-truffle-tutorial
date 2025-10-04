@@ -5,6 +5,7 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -21,8 +22,8 @@ public abstract class RefObject implements TruffleObject {
         this.refSourceSection = refSourceSection;
     }
 
-    public abstract Object readReference(Frame frame);
-    public abstract void writeReference(Frame frame, Object value);
+    public abstract Object readReference(Frame frame, DynamicObjectLibrary dynamicObjectLibrary);
+    public abstract void writeReference(Frame frame, Object value, DynamicObjectLibrary dynamicObjectLibrary);
 
     @ExportMessage
     boolean isString() {

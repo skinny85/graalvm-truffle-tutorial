@@ -9,8 +9,10 @@ import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
+import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 import java.util.Objects;
 
@@ -88,25 +90,30 @@ abstract class AbstractDebuggerScopeObject implements TruffleObject {
                 @SuppressWarnings("unused") String member,
                 @Cached("member") String cachedMember,
                 // We cache the member's reference for fast-path access
-                @Cached("receiver.findReference(member)") RefObject refObject)
+                @Cached("receiver.findReference(member)") RefObject refObject,
+                @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary)
                 throws UnknownIdentifierException {
-            return readMember(receiver, cachedMember, refObject);
+            return readMember(receiver, cachedMember, refObject, dynamicObjectLibrary);
         }
 
         @Specialization(replaces = "readMemberCached")
         @TruffleBoundary
-        static Object readMemberUncached(AbstractDebuggerScopeObject receiver, String member)
+        static Object readMemberUncached(
+                AbstractDebuggerScopeObject receiver,
+                String member,
+                @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary)
                 throws UnknownIdentifierException {
             RefObject refObject = receiver.findReference(member);
-            return readMember(receiver, member, refObject);
+            return readMember(receiver, member, refObject, dynamicObjectLibrary);
         }
 
-        private static Object readMember(AbstractDebuggerScopeObject receiver, String member, RefObject refObject)
-                throws UnknownIdentifierException {
+        private static Object readMember(
+                AbstractDebuggerScopeObject receiver, String member, RefObject refObject,
+                DynamicObjectLibrary dynamicObjectLibrary) throws UnknownIdentifierException {
             if (refObject == null) {
                 throw UnknownIdentifierException.create(member);
             }
-            return refObject.readReference(receiver.frame);
+            return refObject.readReference(receiver.frame, dynamicObjectLibrary);
         }
     }
 
@@ -137,25 +144,32 @@ abstract class AbstractDebuggerScopeObject implements TruffleObject {
                 Object value,
                 @Cached("member") @SuppressWarnings("unused") String cachedMember,
                 // We cache the member's reference for fast-path access
-                @Cached("receiver.findReference(member)") RefObject refObject)
+                @Cached("receiver.findReference(member)") RefObject refObject,
+                @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary)
                 throws UnknownIdentifierException {
-            writeMember(receiver, member, refObject, value);
+            writeMember(receiver, member, refObject, value, dynamicObjectLibrary);
         }
 
         @Specialization(replaces = "writeMemberCached")
         @TruffleBoundary
-        static void writeMemberUncached(AbstractDebuggerScopeObject receiver, String member, Object value)
+        static void writeMemberUncached(
+                AbstractDebuggerScopeObject receiver,
+                String member,
+                Object value,
+                @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary)
                 throws UnknownIdentifierException {
             RefObject refObject = receiver.findReference(member);
-            writeMember(receiver, member, refObject, value);
+            writeMember(receiver, member, refObject, value, dynamicObjectLibrary);
         }
 
-        private static void writeMember(AbstractDebuggerScopeObject receiver, String member, RefObject refObject, Object value)
+        private static void writeMember(
+                AbstractDebuggerScopeObject receiver, String member, RefObject refObject, Object value,
+                DynamicObjectLibrary dynamicObjectLibrary)
                 throws UnknownIdentifierException {
             if (refObject == null) {
                 throw UnknownIdentifierException.create(member);
             }
-            refObject.writeReference(receiver.frame, value);
+            refObject.writeReference(receiver.frame, value, dynamicObjectLibrary);
         }
     }
 

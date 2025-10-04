@@ -1,6 +1,8 @@
 package com.endoflineblog.truffle.part_16.runtime.debugger;
 
+import com.endoflineblog.truffle.part_16.runtime.Environment;
 import com.oracle.truffle.api.frame.Frame;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.source.SourceSection;
 
 import java.util.Objects;
@@ -18,13 +20,19 @@ public final class FuncArgRefObject extends RefObject {
     }
 
     @Override
-    public Object readReference(Frame frame) {
-        return frame.getArguments()[this.funcArgIndex];
+    public Object readReference(Frame frame, DynamicObjectLibrary dynamicObjectLibrary) {
+        if (this.funcArgIndex == 0) {
+            return frame.getArguments()[0];
+        }
+        Environment environment = (Environment) frame.getArguments()[1];
+        return dynamicObjectLibrary.getOrDefault(environment, this.funcArgIndex, null);
     }
 
     @Override
-    public void writeReference(Frame frame, Object value) {
-        frame.getArguments()[this.funcArgIndex] = value;
+    public void writeReference(Frame frame, Object value, DynamicObjectLibrary dynamicObjectLibrary) {
+        // ToDO: should we allow writing to the 'this' (index 0)?
+        Environment environment = (Environment) frame.getArguments()[1];
+        dynamicObjectLibrary.put(environment, this.funcArgIndex, value);
     }
 
     /**

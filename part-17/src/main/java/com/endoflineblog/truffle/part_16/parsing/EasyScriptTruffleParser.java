@@ -21,8 +21,8 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.InequalityExprN
 import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.LesserExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.LesserOrEqualExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionCallExprNode;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadFunctionArgExprNode;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteFunctionArgExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadClosureArgExprNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteClosureArgExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.BoolLiteralExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.IntLiteralExprNode;
@@ -523,7 +523,7 @@ public final class EasyScriptTruffleParser {
             return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
         } else {
             if (frameMember instanceof FunctionArgument) {
-                return new WriteFunctionArgExprNode(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
+                return WriteClosureArgExprNodeGen.create(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
             } else {
                 var localVariable = (LocalVariable) frameMember;
                 if (localVariable.declarationKind == DeclarationKind.CONST) {
@@ -676,7 +676,7 @@ public final class EasyScriptTruffleParser {
             return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
         } else {
             return frameMember instanceof FunctionArgument
-                    ? new ReadFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex, variableId)
+                    ? ReadClosureArgExprNodeGen.create(((FunctionArgument) frameMember).argumentIndex, variableId)
                     : LocalVarReferenceExprNodeGen.create(((LocalVariable) frameMember).variableIndex);
         }
     }
