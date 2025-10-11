@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_16.nodes.exprs.objects;
 
 import com.endoflineblog.truffle.part_16.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_16.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_16.runtime.ClassPrototypeObject;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -16,13 +17,13 @@ import java.util.List;
  */
 public final class ClassDeclExprNode extends EasyScriptExprNode {
     @Children
-    private final FuncDeclStmtNode[] classMethodDecls;
+    private final EasyScriptStmtNode[] classMethodDecls;
 
     private final ClassPrototypeObject classPrototypeObject;
 
-    public ClassDeclExprNode(List<FuncDeclStmtNode> classMethodDecls,
+    public ClassDeclExprNode(List<EasyScriptStmtNode> classMethodDecls,
             ClassPrototypeObject classPrototypeObject) {
-        this.classMethodDecls = classMethodDecls.toArray(FuncDeclStmtNode[]::new);
+        this.classMethodDecls = classMethodDecls.toArray(EasyScriptStmtNode[]::new);
         this.classPrototypeObject = classPrototypeObject;
     }
 

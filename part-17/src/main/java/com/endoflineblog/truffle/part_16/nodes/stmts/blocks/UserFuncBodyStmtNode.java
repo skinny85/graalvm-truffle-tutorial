@@ -101,7 +101,7 @@ public final class UserFuncBodyStmtNode extends EasyScriptStmtNode {
                     funcArgs.add(new FuncArgRefObject(
                             readClosureArgExprNode.argName,
                             readClosureArgExprNode.getSourceSection(),
-                            readClosureArgExprNode.index));
+                            readClosureArgExprNode.argIndex));
                     return true;
                 }
                 return NodeUtil.forEachChild(visitedNode, this);

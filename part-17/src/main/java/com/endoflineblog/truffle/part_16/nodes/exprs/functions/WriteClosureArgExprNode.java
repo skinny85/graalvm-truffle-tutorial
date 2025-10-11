@@ -8,14 +8,16 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 public abstract class WriteClosureArgExprNode extends EasyScriptExprNode {
-    public final int index;
+    private final int funcNestingLevel;
+    private final int argIndex;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode initializerExpr;
 
-    protected WriteClosureArgExprNode(EasyScriptExprNode initializerExpr, int index) {
-        this.index = index;
+    protected WriteClosureArgExprNode(EasyScriptExprNode initializerExpr, int funcNestingLevel, int argIndex) {
+        this.funcNestingLevel = funcNestingLevel;
+        this.argIndex = argIndex;
         this.initializerExpr = initializerExpr;
     }
 
@@ -26,8 +28,8 @@ public abstract class WriteClosureArgExprNode extends EasyScriptExprNode {
         Object value = this.initializerExpr.executeGeneric(frame);
         // because of the logic in FunctionDispatchNode,
         // we know the environment is always the second argument
-        Environment environment = (Environment) frame.getArguments()[1];
-        dynamicObjectLibrary.put(environment, this.index,  value);
+        var environment = (Environment) frame.getArguments()[this.funcNestingLevel];
+        dynamicObjectLibrary.put(environment, this.argIndex,  value);
         return value;
     }
 }

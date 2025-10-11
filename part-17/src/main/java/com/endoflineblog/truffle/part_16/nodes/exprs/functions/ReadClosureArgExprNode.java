@@ -7,11 +7,13 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 public abstract class ReadClosureArgExprNode extends AbstractFuncMemberReadNode {
-    public final int index;
+    public final int funcNestingLevel;
+    public final int argIndex;
     public final String argName;
 
-    protected ReadClosureArgExprNode(int index, String argName) {
-        this.index = index;
+    protected ReadClosureArgExprNode(int funcNestingLevel, int argIndex, String argName) {
+        this.funcNestingLevel = funcNestingLevel;
+        this.argIndex = argIndex;
         this.argName = argName;
     }
 
@@ -21,8 +23,8 @@ public abstract class ReadClosureArgExprNode extends AbstractFuncMemberReadNode 
             @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
         // because of the logic in FunctionDispatchNode,
         // we know the environment is always the second argument
-        Environment environment = (Environment) frame.getArguments()[1];
-        return dynamicObjectLibrary.getOrDefault(environment, this.index, null);
+        var environment = (Environment) frame.getArguments()[this.funcNestingLevel];
+        return dynamicObjectLibrary.getOrDefault(environment, this.argIndex, null);
         // ToDo: should the last argument be Undefined.INSTANCE instead of null?
         // check with a benchmark (I think it shouldn't matter, but make sure to confirm)
     }

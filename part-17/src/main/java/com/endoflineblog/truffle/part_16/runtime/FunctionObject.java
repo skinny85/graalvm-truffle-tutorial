@@ -19,14 +19,20 @@ import com.oracle.truffle.api.strings.TruffleString;
 public final class FunctionObject extends JavaScriptObject {
     public final CallTarget callTarget;
     public final int argumentCount;
+    public final Environment parentEnvironment;
 
     private final FunctionDispatchNode functionDispatchNode;
 
     public FunctionObject(Shape shape, ClassPrototypeObject functionPrototype, CallTarget callTarget, int argumentCount) {
+        this(shape, functionPrototype, callTarget, argumentCount, null);
+    }
+
+    public FunctionObject(Shape shape, ClassPrototypeObject functionPrototype, CallTarget callTarget, int argumentCount, Environment parentEnvironment) {
         super(shape, functionPrototype);
 
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
+        this.parentEnvironment = parentEnvironment;
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
     }
 

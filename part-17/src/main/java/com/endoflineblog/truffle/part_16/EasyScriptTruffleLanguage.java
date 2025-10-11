@@ -144,7 +144,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                                             // this.message = args[1];
                                             new ExprStmtNode(PropertyWriteExprNodeGen.create(
                                                     new ThisExprNode(),
-                                                    ReadClosureArgExprNodeGen.create(1, "message"),
+                                                    ReadClosureArgExprNodeGen.create(1, 1, "message"),
                                                     "message"
                                             )),
                                             // this.name = <name>;
@@ -211,8 +211,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         int argumentCount = nodeFactory.getExecutionSignature().size();
         AbstractFuncMemberReadNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> offsetArguments
-                        ? ReadClosureArgExprNodeGen.create(i + 1, "arg" + i)
-                        : (i == 0 ? new ThisExprNode() : ReadClosureArgExprNodeGen.create(i, "arg" + i)))
+                        ? ReadClosureArgExprNodeGen.create(1, i + 1, "arg" + i)
+                        : (i == 0 ? new ThisExprNode() : ReadClosureArgExprNodeGen.create(1, i, "arg" + i)))
                 .toArray(AbstractFuncMemberReadNode[]::new);
         var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));

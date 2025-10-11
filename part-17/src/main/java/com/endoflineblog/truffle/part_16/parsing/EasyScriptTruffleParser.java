@@ -56,6 +56,7 @@ import com.endoflineblog.truffle.part_16.nodes.stmts.loops.WhileStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.GlobalVarDeclStmtNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.stmts.variables.NestedFuncDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_16.parsing.antlr.EasyScriptLexer;
 import com.endoflineblog.truffle.part_16.parsing.antlr.EasyScriptParser;
 import com.endoflineblog.truffle.part_16.runtime.ClassPrototypeObject;
@@ -103,6 +104,10 @@ public final class EasyScriptTruffleParser {
     /** Whether we're parsing a function definition. */
     private ParserState state;
 
+    private int functionNestingLevel = 0;
+    // ToDo temporary solution until we properly support local variables in closures
+    private int nestedFuncDeclCounter;
+
     /**
      * The {@link FrameDescriptor} for either a given function definition,
      * or for any local variables in the statements of the top-level program.
@@ -111,9 +116,11 @@ public final class EasyScriptTruffleParser {
 
     private static abstract class FrameMember {}
     private static final class FunctionArgument extends FrameMember {
+        public final int funcNestingLevel;
         public final int argumentIndex;
 
-        FunctionArgument(int argumentIndex) {
+        FunctionArgument(int funcNestingLevel, int argumentIndex) {
+            this.funcNestingLevel = funcNestingLevel;
             this.argumentIndex = argumentIndex;
         }
     }
@@ -138,7 +145,7 @@ public final class EasyScriptTruffleParser {
      * Map containing bindings for the function arguments and local variables when parsing function definitions
      * and nested scopes of the top-level scope.
      */
-    private Stack<Map<String, FrameMember>> localScopes;
+    private final Stack<Map<String, FrameMember>> localScopes;
 
     /**
      * The counter that makes it easy to generate unique variable names for local variables
@@ -202,7 +209,7 @@ public final class EasyScriptTruffleParser {
     private List<EasyScriptStmtNode> parseStmtsList(List<EasyScriptParser.StmtContext> stmts) {
         // in the first pass, only handle function declarations,
         // as it's legal to invoke functions before they are declared
-        var funcDecls = new ArrayList<FuncDeclStmtNode>();
+        var funcDecls = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.FuncDeclStmtContext) {
                 funcDecls.add(this.parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
@@ -413,7 +420,7 @@ public final class EasyScriptTruffleParser {
         return new BlockStmtNode(ret, this.createSourceSection(stmtBlock));
     }
 
-    private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
+    private EasyScriptStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
         return this.parseSubroutineDecl(funcDeclStmt.subroutine_decl(),
                 GlobalScopeObjectExprNodeGen.create());
     }
@@ -441,7 +448,7 @@ public final class EasyScriptTruffleParser {
         this.localScopes.get(0).put(className, new ClassPrototypeMember(classPrototype));
         this.currentClassPrototype = classPrototype;
 
-        List<FuncDeclStmtNode> classMethods = new ArrayList<>();
+        List<EasyScriptStmtNode> classMethods = new ArrayList<>();
         for (var classMember : classDeclStmt.class_member()) {
             classMethods.add(this.parseSubroutineDecl(classMember.subroutine_decl(),
                     new DynamicObjectReferenceExprNode(classPrototype)));
@@ -455,22 +462,29 @@ public final class EasyScriptTruffleParser {
                 className, DeclarationKind.LET);
     }
 
-    private FuncDeclStmtNode parseSubroutineDecl(EasyScriptParser.Subroutine_declContext subroutineDecl,
+    private EasyScriptStmtNode parseSubroutineDecl(EasyScriptParser.Subroutine_declContext subroutineDecl,
             EasyScriptExprNode containerObjectExpr) {
-        if (this.state == ParserState.FUNC_DEF) {
-            // we do not allow nested functions (yet 😉)
-            throw new EasyScriptException("nested functions are not supported in EasyScript yet");
-        }
+        boolean isNestedFunction = this.state == ParserState.FUNC_DEF;
 
         // save the current state of the parser (before entering the function)
         FrameDescriptor.Builder previousFrameDescriptor = this.frameDescriptor;
         ParserState previousParserState = this.state;
-        var previousLocalScopes = this.localScopes;
+        var previousNestedFuncDeclCounter = isNestedFunction
+                ? ++this.nestedFuncDeclCounter
+                : this.nestedFuncDeclCounter;
+
+        if (isNestedFunction) {
+            // ToDo add the function name to the local scope of the _previous_ function
+            //  (as a "function argument" for now, until we properly support local variables in closures)
+            this.localScopes.peek().put(
+                    subroutineDecl.name.getText(),
+                    new FunctionArgument(this.functionNestingLevel, previousNestedFuncDeclCounter));
+        }
 
         // initialize the new state
+        this.functionNestingLevel++;
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.state = ParserState.FUNC_DEF;
-        this.localScopes = new Stack<>();
 
         var localVariables = new HashMap<String, FrameMember>();
         // add each parameter to the map, with the correct index
@@ -480,24 +494,36 @@ public final class EasyScriptTruffleParser {
         for (int i = 0; i < argumentCount; i++) {
             // offset the arguments by one,
             // because the first argument is always `this`
-            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1));
+            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(this.functionNestingLevel, i + 1));
         }
         this.localScopes.push(localVariables);
+        this.nestedFuncDeclCounter = argumentCount;
 
         // parse the statements in the function definition
         List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(subroutineDecl.stmt_block().stmt());
 
         FrameDescriptor frameDescriptor = this.frameDescriptor.build();
         // bring back the old state
+        this.functionNestingLevel--;
         this.frameDescriptor = previousFrameDescriptor;
         this.state = previousParserState;
-        this.localScopes = previousLocalScopes;
+        this.localScopes.pop();
+        this.nestedFuncDeclCounter = previousNestedFuncDeclCounter;
 
-        return FuncDeclStmtNodeGen.create(containerObjectExpr,
-                subroutineDecl.name.getText(),
-                frameDescriptor,
-                new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
-                argumentCount);
+        return isNestedFunction
+                ? NestedFuncDeclStmtNodeGen.create(
+                        previousNestedFuncDeclCounter,
+                        subroutineDecl.name.getText(),
+                        this.functionNestingLevel,
+                        frameDescriptor,
+                        new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
+                        argumentCount)
+                : FuncDeclStmtNodeGen.create(
+                        containerObjectExpr,
+                        subroutineDecl.name.getText(),
+                        frameDescriptor,
+                        new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
+                        argumentCount);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
@@ -523,7 +549,8 @@ public final class EasyScriptTruffleParser {
             return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
         } else {
             if (frameMember instanceof FunctionArgument) {
-                return WriteClosureArgExprNodeGen.create(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
+                FunctionArgument functionArgument = (FunctionArgument) frameMember;
+                return WriteClosureArgExprNodeGen.create(initializerExpr, functionArgument.funcNestingLevel, functionArgument.argumentIndex);
             } else {
                 var localVariable = (LocalVariable) frameMember;
                 if (localVariable.declarationKind == DeclarationKind.CONST) {
@@ -674,10 +701,11 @@ public final class EasyScriptTruffleParser {
         if (frameMember == null || frameMember instanceof ClassPrototypeMember) {
             // we know for sure this is a reference to a global variable
             return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
+        } else if (frameMember instanceof FunctionArgument) {
+            var functionArgument = (FunctionArgument) frameMember;
+            return ReadClosureArgExprNodeGen.create(functionArgument.funcNestingLevel, functionArgument.argumentIndex, variableId);
         } else {
-            return frameMember instanceof FunctionArgument
-                    ? ReadClosureArgExprNodeGen.create(((FunctionArgument) frameMember).argumentIndex, variableId)
-                    : LocalVarReferenceExprNodeGen.create(((LocalVariable) frameMember).variableIndex);
+            return LocalVarReferenceExprNodeGen.create(((LocalVariable) frameMember).variableIndex);
         }
     }
 

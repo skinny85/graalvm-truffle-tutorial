@@ -107,9 +107,13 @@ public abstract class FunctionDispatchNode extends EasyScriptNode {
             dynamicObjectLibrary.put(environment, i + 1,
                     i < arguments.length ? arguments[i] : Undefined.INSTANCE);
         }
-        Object[] ret = new Object[2];
+        Object[] ret = new Object[function.parentEnvironment == null ? 2 : 3];
         ret[0] = receiver;
-        ret[1] = environment;
+        int i = 1;
+        if (function.parentEnvironment != null) {
+            ret[i++] = function.parentEnvironment;
+        }
+        ret[i] = environment;
         return ret;
     }
 }
