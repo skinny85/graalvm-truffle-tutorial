@@ -16,21 +16,21 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * This is a set of unit tests for testing support for arrays in EasyScript.
  */
-public class ArraysTest {
+class ArraysTest {
     private Context context;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.context = Context.create();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         this.context.close();
     }
 
     @Test
-    public void array_literal_is_polyglot_value() {
+    void array_literal_is_polyglot_value() {
         Value result = this.context.eval("ezs",
                 "[11]"
         );
@@ -40,7 +40,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void array_can_be_indexed() {
+    void array_can_be_indexed() {
         Value result = this.context.eval("ezs", "" +
                 "const arr = [3, 6]; " +
                 "arr[0] + arr[1]"
@@ -49,7 +49,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void reading_an_out_of_bound_array_index_returns_undefined() {
+    void reading_an_out_of_bound_array_index_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "[1, 9][2]"
         );
@@ -58,7 +58,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void reading_a_double_array_index_returns_undefined() {
+    void reading_a_double_array_index_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "[1, 9][0.5]"
         );
@@ -67,7 +67,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void reading_a_negative_array_index_returns_undefined() {
+    void reading_a_negative_array_index_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "[1, 9][-3]"
         );
@@ -76,7 +76,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void reading_a_non_number_array_index_returns_undefined() {
+    void reading_a_non_number_array_index_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "[1, 9][Math.pow]"
         );
@@ -85,7 +85,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void indexing_a_non_array_returns_undefined() {
+    void indexing_a_non_array_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "3[1]"
         );
@@ -94,7 +94,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void index_in_array_can_be_written_to() {
+    void index_in_array_can_be_written_to() {
         Value result = this.context.eval("ezs", "" +
                 "let a = [9]; " +
                 "a[0] = 45; " +
@@ -104,7 +104,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void index_beyond_array_size_can_be_assigned_and_fills_array_with_undefined() {
+    void index_beyond_array_size_can_be_assigned_and_fills_array_with_undefined() {
         Value array = this.context.eval("ezs", "" +
                 "let a = [9]; " +
                 "a[2] = 45; " +
@@ -123,16 +123,16 @@ public class ArraysTest {
     }
 
     @Test
-    public void non_int_indexes_are_ignored_on_write() {
+    void non_int_indexes_are_ignored_on_write() {
         Value result = this.context.eval("ezs",
-                "[1][Math.abs] = 45; "
+                "[1][Math.abs] = 45;"
         );
 
         assertEquals(45, result.asInt());
     }
 
     @Test
-    public void negative_indexes_are_ignored_on_write() {
+    void negative_indexes_are_ignored_on_write() {
         Value array = this.context.eval("ezs", "" +
                 "let a = [9]; " +
                 "a[-1] = 45; " +
@@ -145,7 +145,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void non_stable_array_reads_work_correctly() {
+    void non_stable_array_reads_work_correctly() {
         Value result = this.context.eval("ezs", "" +
                 "function readFirstArrayEl(array) { " +
                 "    return array[0]; " +
@@ -171,7 +171,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void unknown_array_member_read_through_GraalVM_interop_returns_null() {
+    void unknown_array_member_read_through_GraalVM_interop_returns_null() {
         Value arr = this.context.eval("ezs", "[0, 1, 2];");
         assertTrue(arr.hasMembers());
         Value doesNotExist = arr.getMember("doesNotExist");
@@ -179,7 +179,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void an_array_can_be_passed_to_a_function_exec() {
+    void an_array_can_be_passed_to_a_function_exec() {
         this.context.eval("ezs", "" +
                 "let array = [1, 2, 3]; " +
                 "function secondIndex(arr) { " +
@@ -194,7 +194,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void reading_an_index_of_undefined_is_an_error() {
+    void reading_an_index_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",
                     "undefined[0];"
@@ -208,7 +208,7 @@ public class ArraysTest {
     }
 
     @Test
-    public void writing_an_index_of_undefined_is_an_error() {
+    void writing_an_index_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",
                     "undefined[0] = 3;"

@@ -8,16 +8,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PolyglotTest {
+class PolyglotTest {
     private Context context;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.context = Context.create();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         this.context.close();
     }
 
@@ -26,9 +26,9 @@ public class PolyglotTest {
      * through GraalVM's polyglot API.
      */
     @Test
-    public void runs_EasyScript_code() {
+    void runs_EasyScript_code() {
         Value result = this.context.eval("ezs",
                 "10 + 24 + 56.0");
-        assertEquals(90.0, result.asDouble(), 0.0);
+        assertEquals(90.0, result.asDouble());
     }
 }

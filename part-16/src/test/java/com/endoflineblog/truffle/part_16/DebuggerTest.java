@@ -20,7 +20,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DebuggerTest {
+class DebuggerTest {
     private static final String FIB_ITER = "" +
             "class Fib {\n" +
             "    fib(unused, num) {\n" +

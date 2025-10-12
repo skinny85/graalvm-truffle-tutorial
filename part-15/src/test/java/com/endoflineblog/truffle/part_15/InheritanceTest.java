@@ -1,4 +1,4 @@
-package com.endoflineblog.truffle.part_16;
+package com.endoflineblog.truffle.part_15;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;

@@ -19,22 +19,22 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * A set of unit tests that verify exception handling in EasyScript.
  */
-public class ExceptionsTest {
+class ExceptionsTest {
     private Context context;
     private String ezsFile;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.context = Context.create();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         this.context.close();
     }
 
     @Test
-    public void uncaught_thrown_strings_produce_message_and_stack_trace() throws Exception {
+    void uncaught_thrown_strings_produce_message_and_stack_trace() throws Exception {
         this.ezsFile = "exceptions-throw-f3.js";
 
         Source source = Source.newBuilder("ezs", new File("src/test/resources/" + this.ezsFile))
@@ -64,7 +64,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void integers_can_be_thrown_and_caught() {
+    void integers_can_be_thrown_and_caught() {
         Value result = this.context.eval("ezs", "" +
                 "try { " +
                 "    throw 5; " +
@@ -78,7 +78,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void finally_executes_after_throw_and_catch() {
+    void finally_executes_after_throw_and_catch() {
         Value global = this.context.eval("ezs", "" +
                 "let global = 0; " +
                 "try { " +
@@ -96,7 +96,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void finally_preserves_thrown_exception() {
+    void finally_preserves_thrown_exception() {
         try {
             this.context.eval("ezs", "" +
                     "function f() { " +
@@ -117,7 +117,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void finally_without_catch_returns_try_value() {
+    void finally_without_catch_returns_try_value() {
         Value result = this.context.eval("ezs", "" +
                 "try { " +
                 "    5; " +
@@ -130,7 +130,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void return_in_finally_replaces_thrown_exception() {
+    void return_in_finally_replaces_thrown_exception() {
         Value result = this.context.eval("ezs", "" +
                 "function f() { " +
                 "    try { " +
@@ -146,7 +146,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void error_class_has_name_and_message_properties() {
+    void error_class_has_name_and_message_properties() {
         this.context.eval("ezs", "" +
                 "const e = new Error('exception-message'); " +
                 "let name = e.name; " +
@@ -158,7 +158,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void custom_errors_get_name_from_error_superclass() {
+    void custom_errors_get_name_from_error_superclass() {
         Value result = this.context.eval("ezs", "" +
                 "class SecondTypeError extends TypeError { }" +
                 "class MyError extends SecondTypeError { }" +
@@ -170,7 +170,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void uncaught_thrown_error_fills_exception_message() {
+    void uncaught_thrown_error_fills_exception_message() {
         try {
             this.context.eval("ezs", "" +
                     "class MyError extends TypeError { } " +
@@ -184,7 +184,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void uncaught_thrown_non_error_object_fills_exception_message() {
+    void uncaught_thrown_non_error_object_fills_exception_message() {
         try {
             this.context.eval("ezs", "" +
                     "class NotError {" +
@@ -204,7 +204,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void reading_property_of_undefined_can_be_caught() {
+    void reading_property_of_undefined_can_be_caught() {
         this.context.eval("ezs", "" +
                 "let name = 'name-before';" +
                 "var message = 'message-before';" +
@@ -221,7 +221,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void uncaught_read_of_undefined_property_fills_message() {
+    void uncaught_read_of_undefined_property_fills_message() {
         try {
             this.context.eval("ezs",
                     "undefined.property;");
@@ -234,7 +234,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void catch_fills_stack_trace() throws IOException {
+    void catch_fills_stack_trace() throws IOException {
         this.ezsFile = "exceptions-stack-top-level.js";
         Source source = Source.newBuilder("ezs", new File("src/test/resources/" + this.ezsFile))
                 .build();
@@ -247,7 +247,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void catch_fills_stack_trace_from_func() throws IOException {
+    void catch_fills_stack_trace_from_func() throws IOException {
         this.ezsFile = "exceptions-stack-from-func.js";
         Source source = Source.newBuilder("ezs", new File("src/test/resources/" + this.ezsFile))
                 .build();
@@ -261,7 +261,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void benchmark_returns_its_input() {
+    void benchmark_returns_its_input() {
         int input = 100;
         Value result = this.context.eval("ezs", "" +
                 "class Countdown { " +
@@ -288,7 +288,7 @@ public class ExceptionsTest {
                 "    } " +
                 "    return ret; " +
                 "} " +
-                "countdown(" + input + "); ");
+                "countdown(" + input + ");");
 
         assertEquals(input, result.asInt());
     }

@@ -17,21 +17,21 @@ import static org.junit.jupiter.api.Assertions.fail;
  * This is a set of unit tests for testing support for (read-only)
  * properties in EasyScript.
  */
-public class PropertiesTest {
+class PropertiesTest {
     private Context context;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.context = Context.create();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         this.context.close();
     }
 
     @Test
-    public void array_has_length_property() {
+    void array_has_length_property() {
         Value result = this.context.eval("ezs",
                 "[1, 2, 3].length"
         );
@@ -39,7 +39,7 @@ public class PropertiesTest {
     }
 
     @Test
-    public void bubble_sort_changes_array_to_sorted() {
+    void bubble_sort_changes_array_to_sorted() {
         Value result = this.context.eval("ezs", "" +
                 "const array = [4, 3, 2, 1]; " +
                 "function bubbleSort(array) { " +
@@ -64,7 +64,7 @@ public class PropertiesTest {
     }
 
     @Test
-    public void reading_a_property_of_undefined_is_an_error() {
+    void reading_a_property_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",
                     "undefined.abc;"
@@ -78,7 +78,7 @@ public class PropertiesTest {
     }
 
     @Test
-    public void non_existent_array_property_returns_undefined() {
+    void non_existent_array_property_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "[1, 2, 3].abc"
         );
@@ -87,7 +87,7 @@ public class PropertiesTest {
     }
 
     @Test
-    public void any_property_of_integer_returns_undefined() {
+    void any_property_of_integer_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "1.toString"
         );
@@ -96,7 +96,7 @@ public class PropertiesTest {
     }
 
     @Test
-    public void unknown_Math_member_read_through_GraalVM_interop_returns_null() {
+    void unknown_Math_member_read_through_GraalVM_interop_returns_null() {
         Value Math = this.context.eval("ezs", "Math;");
         assertTrue(Math.hasMembers());
         Value doesNotExist = Math.getMember("doesNotExist");

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class InheritanceTest {
+class InheritanceTest {
     private Context context;
 
     @BeforeEach
@@ -35,8 +35,8 @@ public class InheritanceTest {
                 "} " +
                 "class B extends A { } " +
                 "const bb = new B(); " +
-                "bb.m();");
-
+                "bb.m();"
+        );
         assertEquals("A", result.toString());
     }
 
@@ -47,7 +47,7 @@ public class InheritanceTest {
                 "    a() { } " +
                 "} " +
                 "class B extends A { } " +
-                "new B; "
+                "new B;"
         );
         assertTrue(obj.hasMember("a"));
     }
@@ -74,7 +74,6 @@ public class InheritanceTest {
                 "const obj = new Derived(); " +
                 "obj.callSuperM() + '_' + obj.callThisM();"
         );
-
         assertEquals("Base_Derived", result.asString());
     }
 
@@ -102,7 +101,6 @@ public class InheritanceTest {
                 "const obj = new Derived(); " +
                 "obj.callSuperM();"
         );
-
         assertEquals("Base", result.asString());
     }
 
@@ -124,7 +122,6 @@ public class InheritanceTest {
                 "obj.setSuperX(3); " +
                 "x + obj.x;"
         );
-
         assertEquals(14, result.asInt());
     }
 
@@ -134,7 +131,6 @@ public class InheritanceTest {
                 "let obj = new Object(); " +
                 "obj;"
         );
-
         assertFalse(result.isNull());
     }
 
@@ -153,7 +149,7 @@ public class InheritanceTest {
                 "    } " +
                 "} " +
                 "let obj = new Class(); " +
-                "obj.hasOwnProperty('x') + '_' + obj.hasOwnProperty('constructor'); "
+                "obj.hasOwnProperty('x') + '_' + obj.hasOwnProperty('constructor');"
         );
         assertEquals("true_false", result.asString());
     }
@@ -167,15 +163,15 @@ public class InheritanceTest {
                 "    } " +
                 "} " +
                 "let obj = new Class(); " +
-                "obj.hasOwnProperty(true); "
+                "obj.hasOwnProperty(true);"
         );
         assertTrue(result.asBoolean());
     }
 
     @Test
     void hasOwnProperty_sees_only_length_of_strings() {
-        Value result = this.context.eval("ezs", "" +
-                "'a'.hasOwnProperty('length') + '_' + 'b'.hasOwnProperty('charAt'); "
+        Value result = this.context.eval("ezs",
+                "'a'.hasOwnProperty('length') + '_' + 'b'.hasOwnProperty('charAt');"
         );
         assertEquals("true_false", result.asString());
     }
@@ -190,8 +186,8 @@ public class InheritanceTest {
 
     @Test
     void hasOwnProperty_returns_false_for_primitives() {
-        Value result = this.context.eval("ezs", "" +
-                "true.hasOwnProperty('toString'); "
+        Value result = this.context.eval("ezs",
+                "true.hasOwnProperty('toString');"
         );
         assertFalse(result.asBoolean());
     }
@@ -209,7 +205,7 @@ public class InheritanceTest {
                 "} " +
                 "const obj = new Class(); " +
                 "Class.m = m; " +
-                "obj.m(); "
+                "obj.m();"
         );
         assertEquals(46, result.asInt());
     }
@@ -218,7 +214,7 @@ public class InheritanceTest {
     void Object_prototype_can_be_written_to() {
         Value result = this.context.eval("ezs", "" +
                 "Object['true'] = 42; " +
-                "'string'[true]; "
+                "'string'[true];"
         );
         assertEquals(42, result.asInt());
     }
@@ -227,7 +223,7 @@ public class InheritanceTest {
     void extending_non_existent_class_is_an_error() {
         try {
             this.context.eval("ezs",
-                    "class B extends A { } ");
+                    "class B extends A { }");
             fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
@@ -237,7 +233,7 @@ public class InheritanceTest {
     }
 
     @Test
-    public void benchmark_returns_its_input() {
+    void benchmark_returns_its_input() {
         var input = 100;
         Value result = this.context.eval("ezs", "" +
                 "class BaseCounter extends Object { " +

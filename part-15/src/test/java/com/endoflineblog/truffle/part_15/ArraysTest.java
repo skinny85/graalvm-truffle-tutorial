@@ -1,4 +1,4 @@
-package com.endoflineblog.truffle.part_12;
+package com.endoflineblog.truffle.part_15;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
@@ -132,19 +132,6 @@ class ArraysTest {
     }
 
     @Test
-    void negative_indexes_are_ignored_on_write() {
-        Value array = this.context.eval("ezs", "" +
-                "let a = [9]; " +
-                "a[-1] = 45; " +
-                "a"
-        );
-
-        assertEquals(1, array.getArraySize());
-        assertEquals(9, array.getArrayElement(0).asInt());
-        assertFalse(array.hasMember("-1"));
-    }
-
-    @Test
     void non_stable_array_reads_work_correctly() {
         Value result = this.context.eval("ezs", "" +
                 "function readFirstArrayEl(array) { " +
@@ -203,6 +190,50 @@ class ArraysTest {
     }
 
     @Test
+    void length_property_assignment_resets_the_elements() {
+        Value result = this.context.eval("ezs", "" +
+                "const array = [1, 2, 3]; " +
+                "array.length = 1; " +
+                "array['length'] = 3; " +
+                "array[2];"
+        );
+
+        assertTrue(result.isNull());
+        assertEquals("undefined", result.toString());
+    }
+
+    @Test
+    void writing_negative_array_length_is_an_error() {
+        try {
+            this.context.eval("ezs", "" +
+                    "const array = [1, 2, 3]; " +
+                    "array.length = -1;"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Invalid array length: -1", e.getMessage());
+        }
+    }
+
+    @Test
+    void writing_a_non_int_array_length_is_an_error() {
+        try {
+            this.context.eval("ezs", "" +
+                    "const array = [1, 2, 3];" +
+                    "array.propName = undefined; " +
+                    "array['length'] = undefined;"
+            );
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("Invalid array length: undefined", e.getMessage());
+        }
+    }
+
+    @Test
     void reading_an_index_of_undefined_is_an_error() {
         try {
             this.context.eval("ezs",
@@ -212,7 +243,7 @@ class ArraysTest {
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());
             assertFalse(e.isInternalError());
-            assertEquals("Cannot read properties of undefined (reading '0')", e.getMessage());
+            assertEquals("TypeError: Cannot read properties of undefined (reading '0')", e.getMessage());
         }
     }
 

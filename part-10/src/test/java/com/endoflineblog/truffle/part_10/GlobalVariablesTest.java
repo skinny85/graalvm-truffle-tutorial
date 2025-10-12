@@ -12,21 +12,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class GlobalVariablesTest {
+class GlobalVariablesTest {
     private Context context;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.context = Context.create();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         this.context.close();
     }
 
     @Test
-    public void executing_list_of_statements_returns_the_last_ones_value() {
+    void executing_list_of_statements_returns_the_last_ones_value() {
         Value result = this.context.eval("ezs", "" +
                 "var a = 1; " +
                 "let b = 2 + 3; " +
@@ -47,7 +47,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void variable_declaration_statement_returns_undefined() {
+    void variable_declaration_statement_returns_undefined() {
         Value result = this.context.eval("ezs",
                 "const $_ = 1;"
         );
@@ -57,19 +57,19 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void global_variables_are_saved_between_executions() {
+    void global_variables_are_saved_between_executions() {
         this.context.eval("ezs", "" +
                 "var a = 1; " +
                 "let b = 2; " +
-                "const c = 3.0; "
+                "const c = 3.0;"
         );
         Value result = this.context.eval("ezs", "a + b + c;");
 
-        assertEquals(6.0, result.asDouble(), 0.0);
+        assertEquals(6.0, result.asDouble());
     }
 
     @Test
-    public void variables_without_initializers_have_undefined_value() {
+    void variables_without_initializers_have_undefined_value() {
         Value result = this.context.eval("ezs", "" +
                 "let a; " +
                 "a"
@@ -80,7 +80,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void addition_with_undefined_returns_nan() {
+    void addition_with_undefined_returns_nan() {
         Value result = this.context.eval("ezs", "" +
                 "var a, b = 3; " +
                 "a + b"
@@ -91,7 +91,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void using_a_variable_before_it_is_defined_causes_an_error() {
+    void using_a_variable_before_it_is_defined_causes_an_error() {
         try {
             this.context.eval("ezs", "" +
                     "let b = a; " +
@@ -107,7 +107,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void reassigning_a_const_causes_an_error() {
+    void reassigning_a_const_causes_an_error() {
         try {
             this.context.eval("ezs", "" +
                     "const a = undefined, b = a; " +
@@ -122,7 +122,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void const_variables_must_have_an_initializer() {
+    void const_variables_must_have_an_initializer() {
         try {
             this.context.eval("ezs",
                     "const a;"
@@ -136,7 +136,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void duplicate_variable_causes_an_error() {
+    void duplicate_variable_causes_an_error() {
         try {
             this.context.eval("ezs", "" +
                     "var a = 1; " +
@@ -151,7 +151,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void referencing_an_undeclared_variable_causes_an_error() {
+    void referencing_an_undeclared_variable_causes_an_error() {
         try {
             this.context.eval("ezs", "a");
             fail("expected PolyglotException to be thrown");
@@ -163,7 +163,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void assigning_to_an_undeclared_variable_causes_an_error() {
+    void assigning_to_an_undeclared_variable_causes_an_error() {
         try {
             this.context.eval("ezs", "a = 1");
             fail("expected PolyglotException to be thrown");
@@ -175,7 +175,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void using_a_variable_in_its_own_definition_causes_an_error() {
+    void using_a_variable_in_its_own_definition_causes_an_error() {
         try {
             this.context.eval("ezs", "let x = x");
             fail("expected PolyglotException to be thrown");
@@ -187,7 +187,7 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void const_variables_can_be_re_evaluated() {
+    void const_variables_can_be_re_evaluated() {
         String program = "const a = 3; a";
         this.context.eval("ezs", program);
         Value result = this.context.eval("ezs", program);
@@ -196,10 +196,10 @@ public class GlobalVariablesTest {
     }
 
     @Test
-    public void parsing_a_large_integer_falls_back_to_double() {
+    void parsing_a_large_integer_falls_back_to_double() {
         // this is 9,876,543,210
         Value result = this.context.eval("ezs", "9876543210");
 
-        assertEquals(9_876_543_210D, result.asDouble(), 0.0);
+        assertEquals(9_876_543_210D, result.asDouble());
     }
 }

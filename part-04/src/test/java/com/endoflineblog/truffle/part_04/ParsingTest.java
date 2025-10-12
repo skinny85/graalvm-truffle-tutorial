@@ -8,34 +8,34 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ParsingTest {
+class ParsingTest {
     @Test
-    public void parses_and_executes_easyscript_code_correctly() {
+    void parses_and_executes_EasyScript_code_correctly() {
         EasyScriptNode exprNode = EasyScriptTruffleParser.parse("1 + 2 + 3.0 + 4");
         var rootNode = new EasyScriptRootNode(exprNode);
         CallTarget callTarget = rootNode.getCallTarget();
 
-        var result = callTarget.call();
+        Object result = callTarget.call();
 
         assertEquals(10.0, result);
     }
 
     @Test
-    public void throws_an_exception_when_the_code_cannot_be_parsed() {
+    void throws_an_exception_when_the_code_cannot_be_parsed() {
         assertThrows(ParseCancellationException.class, () -> {
             EasyScriptTruffleParser.parse("xyz");
         });
     }
 
     @Test
-    public void parsing_a_large_integer_falls_back_to_double() {
+    void parsing_a_large_integer_falls_back_to_double() {
         // this is 9,876,543,210
         String largeInt = "9876543210";
         EasyScriptNode exprNode = EasyScriptTruffleParser.parse(largeInt);
 
-        assertTrue(exprNode instanceof DoubleLiteralNode);
+        assertInstanceOf(DoubleLiteralNode.class, exprNode);
     }
 }

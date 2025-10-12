@@ -14,23 +14,23 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * This is a set of unit tests for testing strings in EasyScript.
  */
-public class StringsTest {
+class StringsTest {
     private Context context;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.context = Context.newBuilder()
                 .option("cpusampler", "true")
                 .build();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         this.context.close();
     }
 
     @Test
-    public void strings_can_be_created_with_single_quotes() {
+    void strings_can_be_created_with_single_quotes() {
         Value result = this.context.eval("ezs",
                 " '' "
         );
@@ -39,7 +39,7 @@ public class StringsTest {
     }
 
     @Test
-    public void single_quote_strings_can_contain_a_single_quote_by_escaping_it() {
+    void single_quote_strings_can_contain_a_single_quote_by_escaping_it() {
         Value result = this.context.eval("ezs",
                 " '\\'' "
         );
@@ -48,7 +48,7 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_can_be_created_with_double_quotes() {
+    void strings_can_be_created_with_double_quotes() {
         Value result = this.context.eval("ezs",
                 " \"\" "
         );
@@ -57,7 +57,7 @@ public class StringsTest {
     }
 
     @Test
-    public void double_quote_strings_can_contain_a_double_quote_by_escaping_it() {
+    void double_quote_strings_can_contain_a_double_quote_by_escaping_it() {
         Value result = this.context.eval("ezs",
                 " \"\\\"\" "
         );
@@ -66,7 +66,7 @@ public class StringsTest {
     }
 
     @Test
-    public void empty_string_is_falsy() {
+    void empty_string_is_falsy() {
         Value result = this.context.eval("ezs", "" +
                 "let ret; " +
                 "if ('') { " +
@@ -80,7 +80,7 @@ public class StringsTest {
     }
 
     @Test
-    public void blank_string_is_truthy() {
+    void blank_string_is_truthy() {
         Value result = this.context.eval("ezs", "" +
                 "let ret; " +
                 "if (' ') { " +
@@ -94,7 +94,7 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_can_be_concatenated() {
+    void strings_can_be_concatenated() {
         Value result = this.context.eval("ezs",
                 " 'abc' + '_' + 'def' "
         );
@@ -102,7 +102,7 @@ public class StringsTest {
     }
 
     @Test
-    public void properties_can_be_accessed_through_indexing() {
+    void properties_can_be_accessed_through_indexing() {
         Value result = this.context.eval("ezs", "" +
                 "const arr = [0, 1, 2]; " +
                 "arr['length']"
@@ -111,7 +111,7 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_have_a_length_property() {
+    void strings_have_a_length_property() {
         Value result = this.context.eval("ezs",
                 " 'length'.length"
         );
@@ -119,7 +119,7 @@ public class StringsTest {
     }
 
     @Test
-    public void string_properties_can_be_accessed_through_indexing() {
+    void string_properties_can_be_accessed_through_indexing() {
         Value result = this.context.eval("ezs", "" +
                 "var l = 'length'; " +
                 "l[l]"
@@ -128,7 +128,7 @@ public class StringsTest {
     }
 
     @Test
-    public void indexed_property_writes_to_strings_have_no_effect() {
+    void indexed_property_writes_to_strings_have_no_effect() {
         Value result = this.context.eval("ezs", "" +
                 "const str = 'abc'; " +
                 "const result = str['length'] = 5; " +
@@ -139,7 +139,7 @@ public class StringsTest {
     }
 
     @Test
-    public void ezs_strings_in_polyglot_context_have_no_members() {
+    void ezs_strings_in_polyglot_context_have_no_members() {
         Value result = this.context.eval("ezs", " 'a' ");
 
         assertTrue(result.isString());
@@ -147,12 +147,12 @@ public class StringsTest {
     }
 
     @Test
-    public void java_strings_can_be_used_for_indexing() {
+    void java_strings_can_be_used_for_indexing() {
         this.context.eval("ezs", "" +
                 "function access(o, propertyName) { " +
                 "    return o[propertyName]; " +
                 "} " +
-                "let str = 'ab'; "
+                "let str = 'ab';"
         );
         Value ezsBindings = this.context.getBindings("ezs");
         Value str = ezsBindings.getMember("str");
@@ -162,24 +162,24 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_can_be_indexed() {
+    void strings_can_be_indexed() {
         Value result = this.context.eval("ezs",
-                " 'abc'[1][0] "
+                " 'abc'[1][0]"
         );
         assertEquals("b", result.asString());
     }
 
     @Test
-    public void strings_indexed_out_of_range_return_undefined() {
+    void strings_indexed_out_of_range_return_undefined() {
         Value result = this.context.eval("ezs",
-                " 'abc'[-1] "
+                " 'abc'[-1]"
         );
         assertTrue(result.isNull());
         assertEquals("undefined", result.toString());
     }
 
     @Test
-    public void strings_can_be_compared_for_equality() {
+    void strings_can_be_compared_for_equality() {
         Value result = this.context.eval("ezs", "" +
                 "let ret = 'string equality is broken'; " +
                 "if ('abc' === 'a' + 'b' + 'c') " +
@@ -190,7 +190,7 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_can_be_compared_with_less() {
+    void strings_can_be_compared_with_less() {
         Value result = this.context.eval("ezs",
                 " 'a' < 'b' "
         );
@@ -198,7 +198,7 @@ public class StringsTest {
     }
 
     @Test
-    public void concatenated_strings_have_a_length_property() {
+    void concatenated_strings_have_a_length_property() {
         Value result = this.context.eval("ezs",
                 "('abc' + 'def').length"
         );
@@ -206,7 +206,7 @@ public class StringsTest {
     }
 
     @Test
-    public void strings_have_a_charAt_method() {
+    void strings_have_a_charAt_method() {
         Value result = this.context.eval("ezs",
                 " 'abc'.charAt(2)"
         );
@@ -214,7 +214,7 @@ public class StringsTest {
     }
 
     @Test
-    public void charAt_without_argument_defaults_to_0() {
+    void charAt_without_argument_defaults_to_0() {
         Value result = this.context.eval("ezs",
                 " 'abc'.charAt()"
         );
@@ -222,7 +222,7 @@ public class StringsTest {
     }
 
     @Test
-    public void charAt_outside_range_returns_empty_string() {
+    void charAt_outside_range_returns_empty_string() {
         Value result = this.context.eval("ezs",
                 " 'abc'.charAt(3) + 'abc'.charAt(-1)"
         );
@@ -230,7 +230,7 @@ public class StringsTest {
     }
 
     @Test
-    public void charAt_called_on_an_empty_string_without_arguments_returns_empty_string() {
+    void charAt_called_on_an_empty_string_without_arguments_returns_empty_string() {
         Value result = this.context.eval("ezs",
                 " ''.charAt()"
         );
@@ -238,7 +238,7 @@ public class StringsTest {
     }
 
     @Test
-    public void methods_ignore_extra_arguments() {
+    void methods_ignore_extra_arguments() {
         Value result = this.context.eval("ezs",
                 " 'abc'.charAt(1, 2, 99)"
         );
@@ -246,7 +246,7 @@ public class StringsTest {
     }
 
     @Test
-    public void unknown_string_property_returns_undefined() {
+    void unknown_string_property_returns_undefined() {
         Value result = this.context.eval("ezs", " 'a'.someProp");
 
         assertTrue(result.isNull());
@@ -254,7 +254,7 @@ public class StringsTest {
     }
 
     @Test
-    public void unknown_string_member_read_through_GraalVM_interop_throws() {
+    void unknown_string_member_read_through_GraalVM_interop_throws() {
         Value str = this.context.eval("ezs", "'my-string'");
         assertFalse(str.hasMembers());
         try {
@@ -266,7 +266,7 @@ public class StringsTest {
     }
 
     @Test
-    public void methods_correctly_resolve_their_targets() {
+    void methods_correctly_resolve_their_targets() {
         Value result = this.context.eval("ezs", "" +
                 "function firstChar(str) { " +
                 "    return str.charAt(0); " +
@@ -274,7 +274,7 @@ public class StringsTest {
                 "firstChar('A'); " +
                 "firstChar('B'); " +
                 "firstChar('C'); " +
-                "firstChar('D'); "
+                "firstChar('D');"
         );
         assertEquals("D", result.asString());
     }
@@ -301,7 +301,7 @@ public class StringsTest {
                 "function charAtStr(index) { " +
                 "    return 'str'.charAt(index); " +
                 "} " +
-                "charAtStr; ");
+                "charAtStr;");
 
         assertEquals("s", charAtStr.execute().asString());
         assertEquals("t", charAtStr.execute(1).asString());
@@ -309,7 +309,7 @@ public class StringsTest {
     }
 
     @Test
-    public void Math_props_can_be_accessed_through_indexing() {
+    void Math_props_can_be_accessed_through_indexing() {
         Value result = this.context.eval("ezs",
                 "Math['abs'](-4)"
         );
@@ -317,7 +317,7 @@ public class StringsTest {
     }
 
     @Test
-    public void string_index_writes_are_ignored() {
+    void string_index_writes_are_ignored() {
         Value result = this.context.eval("ezs", "" +
                 "let s = 'a'; " +
                 "const tmp = s[0] = 'b'; " +
@@ -327,7 +327,7 @@ public class StringsTest {
     }
 
     @Test
-    public void count_algorithm_returns_its_input() {
+    void count_algorithm_returns_its_input() {
         int input = 10_000;
         Value result = this.context.eval("ezs", "" +
                 "function countWhileCharAtIndexProp(n) { " +

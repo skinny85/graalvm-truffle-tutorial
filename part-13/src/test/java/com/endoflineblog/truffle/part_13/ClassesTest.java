@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * This is a set of unit tests for validating support for user-defined classes in EasyScript.
  */
-public class ClassesTest {
+class ClassesTest {
     private Context context;
 
     @BeforeEach
@@ -117,7 +116,7 @@ public class ClassesTest {
     }
 
     @Test
-    public void class_instances_can_be_used_as_function_arguments() {
+    void class_instances_can_be_used_as_function_arguments() {
         this.context.eval("ezs", "" +
                 "class M { " +
                 "    m(a) { " +
@@ -127,7 +126,7 @@ public class ClassesTest {
                 "function invokeM(target, argument) { " +
                 "    return target.m(argument); " +
                 "} " +
-                "let m = new M; "
+                "let m = new M;"
         );
         Value ezsBindings = this.context.getBindings("ezs");
         Value m = ezsBindings.getMember("m");
@@ -137,7 +136,7 @@ public class ClassesTest {
     }
 
     @Test
-    public void unknown_class_instance_member_read_through_GraalVM_interop_returns_null() {
+    void unknown_class_instance_member_read_through_GraalVM_interop_returns_null() {
         Value obj = this.context.eval("ezs", "" +
                 "class A { }; " +
                 "new A;");
@@ -195,7 +194,7 @@ public class ClassesTest {
             this.context.eval("ezs", "" +
                     "function f() { " +
                     "    class Class { } " +
-                    "} ");
+                    "}");
             fail("expected PolyglotException to be thrown");
         } catch (PolyglotException e) {
             assertTrue(e.isGuestException());

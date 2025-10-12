@@ -9,24 +9,25 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class StaticFunctionCallsTest {
+class StaticFunctionCallsTest {
     private Context context;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.context = Context.create();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         this.context.close();
     }
 
     @Test
-    public void calling_Math_abs_works() {
+    void calling_Math_abs_works() {
         Value result = this.context.eval("ezs",
                 "Math.abs(-2)"
         );
@@ -35,7 +36,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void Math_abs_correctly_handles_min_int() {
+    void Math_abs_correctly_handles_min_int() {
         Value result = this.context.eval("ezs",
                 // if we just use Integer.MIN_VALUE, that will overflow int,
                 // as EasyScript parses it as two expressions,
@@ -43,11 +44,11 @@ public class StaticFunctionCallsTest {
                 "Math.abs(" + (Integer.MIN_VALUE + 1) + " + (-1))"
         );
 
-        assertEquals(Integer.MAX_VALUE + 1D, result.asDouble(), 0.0);
+        assertEquals(Integer.MAX_VALUE + 1D, result.asDouble());
     }
 
     @Test
-    public void calling_a_function_with_extra_arguments_ignores_the_extra_ones() {
+    void calling_a_function_with_extra_arguments_ignores_the_extra_ones() {
         Value result = this.context.eval("ezs",
                 "Math.abs(3, 4);"
         );
@@ -56,7 +57,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void extra_function_arguments_expressions_are_still_evaluated() {
+    void extra_function_arguments_expressions_are_still_evaluated() {
         Value result = this.context.eval("ezs", "" +
                 "var a = -1; " +
                 "Math.abs(4, a = 5);" +
@@ -67,7 +68,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void calling_a_function_with_less_arguments_assigns_them_undefined() {
+    void calling_a_function_with_less_arguments_assigns_them_undefined() {
         Value result = this.context.eval("ezs",
                 "Math.abs()"
         );
@@ -76,7 +77,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void abs_of_a_function_is_nan() {
+    void abs_of_a_function_is_nan() {
         Value result = this.context.eval("ezs",
                 "Math.abs(Math.abs)"
         );
@@ -85,7 +86,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void negating_a_function_or_undefined_returns_NaN() {
+    void negating_a_function_or_undefined_returns_NaN() {
         this.context.eval("ezs", "" +
                 "var uNeg = -undefined;" +
                 "var fNeg = -Math.abs;"
@@ -97,7 +98,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void adding_a_function_turns_into_string_concatenation() {
+    void adding_a_function_turns_into_string_concatenation() {
         Value result = this.context.eval("ezs",
                 "Math.abs + 3"
         );
@@ -106,7 +107,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void calling_a_non_function_throws_a_guest_polyglot_exception() {
+    void calling_a_non_function_throws_a_guest_polyglot_exception() {
         try {
             this.context.eval("ezs",
                     "1(2)"
@@ -120,7 +121,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void an_EasyScript_function_can_be_called_from_Java() {
+    void an_EasyScript_function_can_be_called_from_Java() {
         Value mathAbs = this.context.eval("ezs",
                 "Math.abs;"
         );
@@ -132,7 +133,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void calling_an_EasyScript_function_with_a_byte_throws_an_exception() {
+    void calling_an_EasyScript_function_with_a_byte_throws_an_exception() {
         Value mathAbs = this.context.eval("ezs",
                 "Math.abs;"
         );
@@ -149,7 +150,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void calling_Math_pow_works() {
+    void calling_Math_pow_works() {
         Value result = this.context.eval("ezs",
                 "Math.pow(2, 3)"
         );
@@ -158,25 +159,25 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void Math_pow_with_negative_exponent_works_correctly() {
+    void Math_pow_with_negative_exponent_works_correctly() {
         Value result = this.context.eval("ezs",
                 "Math.pow(2, -1)"
         );
 
-        assertEquals(0.5, result.asDouble(), 0.0);
+        assertEquals(0.5, result.asDouble());
     }
 
     @Test
-    public void Math_pow_correctly_switches_to_double_on_overflow() {
+    void Math_pow_correctly_switches_to_double_on_overflow() {
         Value result = this.context.eval("ezs",
                 "Math.pow(2, 35)"
         );
 
-        assertEquals(34_359_738_368D, result.asDouble(), 0.0);
+        assertEquals(34_359_738_368D, result.asDouble());
     }
 
     @Test
-    public void Math_can_be_referenced_by_itself() {
+    void Math_can_be_referenced_by_itself() {
         Value result = this.context.eval("ezs",
                 "Math"
         );
@@ -186,7 +187,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void Math_is_not_a_legal_variable_name() {
+    void Math_is_not_a_legal_variable_name() {
         try {
             this.context.eval("ezs",
                     "let Math = -5;"
@@ -200,7 +201,7 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void Math_cannot_be_reassigned() {
+    void Math_cannot_be_reassigned() {
         try {
             this.context.eval("ezs",
                     "Math = -5;"
@@ -214,14 +215,11 @@ public class StaticFunctionCallsTest {
     }
 
     @Test
-    public void unknown_function_member_read_through_GraalVM_interop_throws() {
+    void unknown_function_member_read_through_GraalVM_interop_throws() {
         Value abs = this.context.eval("ezs", "Math.abs;");
         assertFalse(abs.hasMembers());
-        try {
+        assertThrows(UnsupportedOperationException.class, () -> {
             abs.getMember("doesNotExist");
-            fail("Expected Function.getMember() to throw");
-        } catch (UnsupportedOperationException e) {
-            // nothing to do here
-        }
+        });
     }
 }

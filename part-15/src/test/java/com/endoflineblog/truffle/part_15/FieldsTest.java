@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FieldsTest {
+class FieldsTest {
     private Context context;
 
     @BeforeEach
@@ -46,7 +46,7 @@ public class FieldsTest {
                 "    } " +
                 "} " +
                 "let a = new A; " +
-                "a === a.returnThis(); "
+                "a === a.returnThis();"
         );
         assertTrue(result.asBoolean());
     }
@@ -109,7 +109,7 @@ public class FieldsTest {
     }
 
     @Test
-    public void reading_property_after_write_to_object_works() {
+    void reading_property_after_write_to_object_works() {
         Value result = this.context.eval("ezs", "" +
                 "class Counter { " +
                 "    reset() { " +
@@ -121,13 +121,13 @@ public class FieldsTest {
                 "} " +
                 "const counter = new Counter(); " +
                 "callReset(counter); " +
-                "callReset(counter); "
+                "callReset(counter);"
         );
         assertTrue(result.isNull());
     }
 
     @Test
-    public void reading_same_property_after_writing_it_works() {
+    void reading_same_property_after_writing_it_works() {
         Value result = this.context.eval("ezs", "" +
                 "class Obj { } " +
                 "function readX(input) { " +
@@ -144,29 +144,29 @@ public class FieldsTest {
     }
 
     @Test
-    public void invoking_functions_inside_arrays_works() {
+    void invoking_functions_inside_arrays_works() {
         Value result = this.context.eval("ezs", "" +
                 "function double(n) { return n + n; } " +
                 "let arr = [double, double, double]; " +
-                "arr[1](2); "
+                "arr[1](2);"
         );
         assertEquals(4, result.asInt());
     }
 
     @Test
-    public void this_gets_populated_in_array_index_reads() {
+    void this_gets_populated_in_array_index_reads() {
         Value result = this.context.eval("ezs", "" +
                 "function index0OfThis() { " +
                 "    return this[0]; " +
                 "} " +
                 "let arr = [index0OfThis]; " +
-                "arr[0]() === index0OfThis; "
+                "arr[0]() === index0OfThis;"
         );
         assertTrue(result.asBoolean());
     }
 
     @Test
-    public void benchmark_returns_its_input() {
+    void benchmark_returns_its_input() {
         var input = 100;
         Value result = this.context.eval("ezs", "" +
                 "class Counter { " +
@@ -239,7 +239,7 @@ public class FieldsTest {
     }
 
     @Test
-    public void arrays_have_indexed_writeable_properties() {
+    void arrays_have_indexed_writeable_properties() {
         Value result = this.context.eval("ezs", "" +
                 "const arr = [0, 1, 2]; " +
                 "const result = arr['prop'] = 5; " +
@@ -250,7 +250,7 @@ public class FieldsTest {
     }
 
     @Test
-    public void non_string_properties_are_converted_to_strings() {
+    void non_string_properties_are_converted_to_strings() {
         Value result = this.context.eval("ezs", "" +
                 "class A { } " +
                 "const a = new A(); " +
@@ -261,17 +261,17 @@ public class FieldsTest {
     }
 
     @Test
-    public void negative_array_indexes_are_converted_to_strings() {
+    void negative_array_indexes_are_converted_to_strings() {
         Value result = this.context.eval("ezs", "" +
                 "let a = [9]; " +
                 "a[-1] = 45; " +
-                "a[-1]; "
+                "a[-1];"
         );
         assertEquals(45, result.asInt());
     }
 
     @Test
-    public void constructors_are_invoked_through_new() {
+    void constructors_are_invoked_through_new() {
         Value result = this.context.eval("ezs", "" +
                 "class A { " +
                 "    constructor(x) { " +
