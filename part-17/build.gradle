@@ -1,0 +1,34 @@
+plugins {
+    id 'antlr'
+    id 'me.champeau.jmh' version '0.6.6'
+    id 'application'
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:$antlr_version"
+    implementation "org.graalvm.js:js:$graal_version"
+    implementation "org.graalvm.tools:profiler:$graal_version"
+    implementation "org.graalvm.tools:chromeinspector:$graal_version"
+    implementation "org.apache.commons:commons-text:1.14.0"
+
+    testImplementation "org.graalvm.truffle:truffle-tck:$graal_version"
+}
+
+// required to allow GraalVM to discover our EasyScript language class
+test {
+    jvmArgs '-Dgraalvm.locatorDisabled=true'
+}
+
+String jmhIncludes = findProperty("jmhIncludes")
+jmh {
+    if (jmhIncludes != null) {
+        includes = [jmhIncludes]
+    }
+}
+
+application {
+    mainClass = 'com.endoflineblog.truffle.part_16.Main'
+    applicationDefaultJvmArgs = [
+        '-Dgraalvm.locatorDisabled=true',
+    ]
+}
