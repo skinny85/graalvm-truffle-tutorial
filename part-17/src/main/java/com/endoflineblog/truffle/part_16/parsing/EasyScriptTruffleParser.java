@@ -207,16 +207,11 @@ public final class EasyScriptTruffleParser {
     }
 
     private List<EasyScriptStmtNode> parseStmtsList(List<EasyScriptParser.StmtContext> stmts) {
-        // in the first pass, only handle function declarations,
-        // as it's legal to invoke functions before they are declared
+        // function declarations must be executed first,
+        // so that a function can be used before it is declared
+        // (executing it first will make sure it gets added to the appropriate scope
+        // before the statement using it tries to find a reference to it)
         var funcDecls = new ArrayList<EasyScriptStmtNode>();
-        for (EasyScriptParser.StmtContext stmt : stmts) {
-            if (stmt instanceof EasyScriptParser.FuncDeclStmtContext) {
-                funcDecls.add(this.parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
-            }
-        }
-
-        // in the second pass, handle the remaining statements that are not function declarations
         var nonFuncDeclStmts = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.ExprStmtContext) {
@@ -245,6 +240,8 @@ public final class EasyScriptTruffleParser {
                 nonFuncDeclStmts.add(new BreakStmtNode(this.createSourceSection(stmt)));
             } else if (stmt instanceof EasyScriptParser.ContinueStmtContext) {
                 nonFuncDeclStmts.add(new ContinueStmtNode(this.createSourceSection(stmt)));
+            } else if (stmt instanceof EasyScriptParser.FuncDeclStmtContext) {
+                funcDecls.add(this.parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
                 EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
                 DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
