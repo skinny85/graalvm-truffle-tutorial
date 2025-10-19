@@ -189,6 +189,20 @@ class ClassesTest {
     }
 
     @Test
+    void classes_cannot_be_used_before_being_defined() {
+        try {
+            this.context.eval("ezs", "" +
+                    "let c = new C(); " +
+                    "class C { }");
+            fail("expected PolyglotException to be thrown");
+        } catch (PolyglotException e) {
+            assertTrue(e.isGuestException());
+            assertFalse(e.isInternalError());
+            assertEquals("'C' is not defined", e.getMessage());
+        }
+    }
+
+    @Test
     void classes_cannot_be_defined_inside_functions() {
         try {
             this.context.eval("ezs", "" +
