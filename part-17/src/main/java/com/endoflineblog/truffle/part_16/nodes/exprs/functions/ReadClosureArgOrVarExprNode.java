@@ -6,12 +6,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
-public abstract class ReadClosureArgExprNode extends AbstractFuncMemberReadNode {
+public abstract class ReadClosureArgOrVarExprNode extends AbstractFuncMemberReadNode {
     public final int funcNestingLevel;
     public final int argIndex;
     public final String argName;
 
-    protected ReadClosureArgExprNode(int funcNestingLevel, int argIndex, String argName) {
+    protected ReadClosureArgOrVarExprNode(int funcNestingLevel, int argIndex, String argName) {
         this.funcNestingLevel = funcNestingLevel;
         this.argIndex = argIndex;
         this.argName = argName;

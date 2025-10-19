@@ -3,7 +3,7 @@ package com.endoflineblog.truffle.part_16;
 import com.endoflineblog.truffle.part_16.common.ErrorPrototypes;
 import com.endoflineblog.truffle.part_16.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.AbstractFuncMemberReadNode;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadClosureArgExprNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadClosureArgOrVarExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.PowFunctionBodyExprNodeFactory;
@@ -13,6 +13,7 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.literals.StringLiteralExprN
 import com.endoflineblog.truffle.part_16.nodes.exprs.objects.ThisExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.properties.PropertyWriteExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.root.BuiltInFuncRootNode;
+import com.endoflineblog.truffle.part_16.nodes.root.ProgramRootNode;
 import com.endoflineblog.truffle.part_16.nodes.root.StmtBlockRootNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.blocks.BlockStmtNode;
@@ -79,8 +80,10 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     protected CallTarget parse(ParsingRequest request) throws Exception {
         ParsingResult parsingResult = EasyScriptTruffleParser.parse(
                 request.getSource(), this.shapesAndPrototypes);
-        var programRootNode = new StmtBlockRootNode(this, parsingResult.topLevelFrameDescriptor,
+        var programStmtBlockRootNode = new StmtBlockRootNode(this, null,
                 parsingResult.programStmtBlock, ":program", parsingResult.programSourceSection);
+        var programRootNode = new ProgramRootNode(this, this.rootShape,
+                programStmtBlockRootNode.getCallTarget());
         return programRootNode.getCallTarget();
     }
 
@@ -144,7 +147,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                                             // this.message = args[1];
                                             new ExprStmtNode(PropertyWriteExprNodeGen.create(
                                                     new ThisExprNode(),
-                                                    ReadClosureArgExprNodeGen.create(1, 1, "message"),
+                                                    ReadClosureArgOrVarExprNodeGen.create(1, 1, "message"),
                                                     "message"
                                             )),
                                             // this.name = <name>;
@@ -211,8 +214,8 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         int argumentCount = nodeFactory.getExecutionSignature().size();
         AbstractFuncMemberReadNode[] functionArguments = IntStream.range(0, argumentCount)
                 .mapToObj(i -> offsetArguments
-                        ? ReadClosureArgExprNodeGen.create(1, i + 1, "arg" + i)
-                        : (i == 0 ? new ThisExprNode() : ReadClosureArgExprNodeGen.create(1, i, "arg" + i)))
+                        ? ReadClosureArgOrVarExprNodeGen.create(1, i + 1, "arg" + i)
+                        : (i == 0 ? new ThisExprNode() : ReadClosureArgOrVarExprNodeGen.create(1, i, "arg" + i)))
                 .toArray(AbstractFuncMemberReadNode[]::new);
         var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));

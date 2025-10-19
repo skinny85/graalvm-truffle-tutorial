@@ -3,7 +3,11 @@ package com.endoflineblog.truffle.part_16.nodes.stmts.exceptions;
 import com.endoflineblog.truffle.part_16.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_16.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.blocks.BlockStmtNode;
+import com.endoflineblog.truffle.part_16.runtime.Environment;
+import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
@@ -14,7 +18,7 @@ import com.oracle.truffle.api.source.SourceSection;
  * parameter to its constructors,
  * since the {@link EasyScriptStmtNode} constructor now requires it.
  */
-public final class TryStmtNode extends EasyScriptStmtNode {
+public abstract class TryStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private BlockStmtNode tryStatements;
@@ -29,12 +33,6 @@ public final class TryStmtNode extends EasyScriptStmtNode {
     @Child
     private BlockStmtNode finallyStatements;
 
-    public TryStmtNode(
-            BlockStmtNode tryStatements, BlockStmtNode finallyStatements,
-            SourceSection sourceSection) {
-        this(tryStatements, null, null, finallyStatements, sourceSection);
-    }
-
     public TryStmtNode(BlockStmtNode tryStatements, Integer exceptionVarFrameSlot,
             BlockStmtNode catchStatements, BlockStmtNode finallyStatements,
             SourceSection sourceSection) {
@@ -45,8 +43,10 @@ public final class TryStmtNode extends EasyScriptStmtNode {
         this.finallyStatements = finallyStatements;
     }
 
-    @Override
-    public Object executeStatement(VirtualFrame frame) {
+    @Specialization
+    protected Object tryCatchFinallyException(
+            VirtualFrame frame,
+            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
         if (this.exceptionVarFrameSlot == null) {
             try {
                 return this.tryStatements.executeStatement(frame);
@@ -57,7 +57,9 @@ public final class TryStmtNode extends EasyScriptStmtNode {
             try {
                 return this.tryStatements.executeStatement(frame);
             } catch (EasyScriptException e) {
-                frame.setObject(this.exceptionVarFrameSlot, e.value);
+//                frame.setObject(this.exceptionVarFrameSlot, e.value);
+                Environment env = (Environment) frame.getArguments()[1];
+                dynamicObjectLibrary.put(env, this.exceptionVarFrameSlot, e.value);
                 return this.catchStatements.executeStatement(frame);
             } finally {
                 if (this.finallyStatements != null) {

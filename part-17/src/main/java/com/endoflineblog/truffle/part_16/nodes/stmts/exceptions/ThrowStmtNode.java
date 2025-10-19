@@ -67,10 +67,15 @@ public abstract class ThrowStmtNode extends EasyScriptStmtNode {
         }
         List<TruffleStackTraceElement> truffleStackTraceEls = TruffleStackTrace.getStackTrace(easyScriptException);
         for (TruffleStackTraceElement truffleStackTracEl : truffleStackTraceEls) {
-            sb.appendJavaStringUTF16Uncached("\n\tat ");
-
             Node location = truffleStackTracEl.getLocation();
             RootNode rootNode = location.getRootNode();
+            if (rootNode.isInternal()) {
+                // we want to skip any internal RootNodes
+                // (most noticeably, ProgramRootNode)
+                continue;
+            }
+
+            sb.appendJavaStringUTF16Uncached("\n\tat ");
             String funcName = rootNode.getName();
             // we want to ignore the top-level program RootNode name in this stack trace
             boolean isFunc = !":program".equals(funcName);

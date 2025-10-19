@@ -20,14 +20,14 @@ public final class ParsingResult {
      * The {@link FrameDescriptor} used for the Truffle program itself
      * (which can contain local variables in this part).
      */
-    public final FrameDescriptor topLevelFrameDescriptor;
+//    public final FrameDescriptor topLevelFrameDescriptor;
 
     public final SourceSection programSourceSection;
 
     public ParsingResult(BlockStmtNode programStmtBlock, FrameDescriptor topLevelFrameDescriptor,
             SourceSection programSourceSection) {
         this.programStmtBlock = programStmtBlock;
-        this.topLevelFrameDescriptor = topLevelFrameDescriptor;
+//        this.topLevelFrameDescriptor = topLevelFrameDescriptor;
         this.programSourceSection = programSourceSection;
     }
 }

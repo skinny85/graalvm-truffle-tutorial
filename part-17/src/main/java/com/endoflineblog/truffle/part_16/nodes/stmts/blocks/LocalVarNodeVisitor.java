@@ -1,8 +1,11 @@
 package com.endoflineblog.truffle.part_16.nodes.stmts.blocks;
 
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteClosureArgOrVarExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.LocalVarAssignmentExprNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_16.runtime.debugger.LocalVarRefObject;
+import com.endoflineblog.truffle.part_16.runtime.debugger.LocalFuncVarRefObject;
+import com.endoflineblog.truffle.part_16.runtime.debugger.RefObject;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeUtil;
 import com.oracle.truffle.api.nodes.NodeVisitor;
@@ -15,7 +18,7 @@ import java.util.List;
  * Used in {@link BlockStmtNode} and {@link UserFuncBodyStmtNode}.
  */
 public final class LocalVarNodeVisitor implements NodeVisitor {
-    public final List<LocalVarRefObject> localVarRefs = new ArrayList<>(4);
+    public final List<RefObject> localVarRefs = new ArrayList<>(4);
     private boolean inDeclaration = false;
 
     @Override
@@ -35,6 +38,14 @@ public final class LocalVarNodeVisitor implements NodeVisitor {
                     lvaen.getSlotName(),
                     lvaen.getSourceSection(),
                     lvaen.getFrameSlot()));
+            return true;
+        }
+        if (this.inDeclaration && visistedNode instanceof WriteClosureArgOrVarExprNode) {
+            var wcaoven = (WriteClosureArgOrVarExprNode) visistedNode;
+            localVarRefs.add(new LocalFuncVarRefObject(
+                    wcaoven.varName,
+                    wcaoven.getSourceSection(),
+                    wcaoven.argIndex));
             return true;
         }
         // Recur into any Node except a block of statements.

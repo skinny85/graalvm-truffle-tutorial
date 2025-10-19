@@ -1,7 +1,6 @@
 package com.endoflineblog.truffle.part_16.parsing;
 
 import com.endoflineblog.truffle.part_16.common.DeclarationKind;
-import com.endoflineblog.truffle.part_16.common.LocalVariableFrameSlotId;
 import com.endoflineblog.truffle.part_16.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_16.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_16.nodes.exprs.DynamicObjectReferenceExprNode;
@@ -21,8 +20,8 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.InequalityExprN
 import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.LesserExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.LesserOrEqualExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionCallExprNode;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadClosureArgExprNodeGen;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteClosureArgExprNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadClosureArgOrVarExprNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteClosureArgOrVarExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.BoolLiteralExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.DoubleLiteralExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.IntLiteralExprNode;
@@ -36,9 +35,6 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.properties.PropertyReadExpr
 import com.endoflineblog.truffle.part_16.nodes.exprs.properties.PropertyWriteExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
-import com.endoflineblog.truffle.part_16.nodes.exprs.variables.LocalVarAssignmentExprNode;
-import com.endoflineblog.truffle.part_16.nodes.exprs.variables.LocalVarAssignmentExprNodeGen;
-import com.endoflineblog.truffle.part_16.nodes.exprs.variables.LocalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.ExprStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.blocks.BlockStmtNode;
@@ -50,10 +46,10 @@ import com.endoflineblog.truffle.part_16.nodes.stmts.controlflow.ReturnStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.exceptions.ThrowStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.exceptions.ThrowStmtNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.stmts.exceptions.TryStmtNode;
+import com.endoflineblog.truffle.part_16.nodes.stmts.exceptions.TryStmtNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.stmts.loops.DoWhileStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.loops.ForStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.loops.WhileStmtNode;
-import com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.GlobalVarDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.NestedFuncDeclStmtNodeGen;
@@ -61,7 +57,6 @@ import com.endoflineblog.truffle.part_16.parsing.antlr.EasyScriptLexer;
 import com.endoflineblog.truffle.part_16.parsing.antlr.EasyScriptParser;
 import com.endoflineblog.truffle.part_16.runtime.ClassPrototypeObject;
 import com.oracle.truffle.api.frame.FrameDescriptor;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
@@ -112,7 +107,7 @@ public final class EasyScriptTruffleParser {
      * The {@link FrameDescriptor} for either a given function definition,
      * or for any local variables in the statements of the top-level program.
      */
-    private FrameDescriptor.Builder frameDescriptor;
+//    private FrameDescriptor.Builder frameDescriptor;
 
     private static abstract class FrameMember {}
     private static final class FunctionArgument extends FrameMember {
@@ -125,10 +120,12 @@ public final class EasyScriptTruffleParser {
         }
     }
     private static final class LocalVariable extends FrameMember {
+        public final int funcNestingLevel;
         public final int variableIndex;
         public final DeclarationKind declarationKind;
 
-        LocalVariable(int variableIndex, DeclarationKind declarationKind) {
+        LocalVariable(int funcNestingLevel, int variableIndex, DeclarationKind declarationKind) {
+            this.funcNestingLevel = funcNestingLevel;
             this.variableIndex = variableIndex;
             this.declarationKind = declarationKind;
         }
@@ -172,7 +169,7 @@ public final class EasyScriptTruffleParser {
         this.parser.setErrorHandler(new BailErrorStrategy());
 
         this.state = ParserState.TOP_LEVEL;
-        this.frameDescriptor = FrameDescriptor.newBuilder();
+//        this.frameDescriptor = FrameDescriptor.newBuilder();
         this.localScopes = new Stack<>();
         // we add a global scope, in which we store the class prototypes
         Map<String, FrameMember> classPrototypes = new HashMap<>();
@@ -193,7 +190,9 @@ public final class EasyScriptTruffleParser {
         boolean programBlock = true;
         return new ParsingResult(
                 new BlockStmtNode(stmts, programBlock, programSourceSection),
-                this.frameDescriptor.build(),
+
+//                this.frameDescriptor.build(),
+                null,
 
                 // unit tests pass with this,
                 // but the actual debugger has "double breakpoints" -
@@ -270,13 +269,12 @@ public final class EasyScriptTruffleParser {
                                 variableId,
                                 declarationKind));
                     } else {
-                        // this is a local variable (either of a function, or on the top-level)
-                        var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
-                        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, frameSlotId, declarationKind);
-                        if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
+                        int frameSlot = -(++this.localVariablesCounter);
+                        int functionNestingLevel = this.state == ParserState.NESTED_SCOPE_IN_TOP_LEVEL ? 1 : this.functionNestingLevel;
+                        if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(functionNestingLevel, frameSlot, declarationKind)) != null) {
                             throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                         }
-                        LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(initializerExpr, variableId, frameSlot);
+                        EasyScriptExprNode assignmentExpr = WriteClosureArgOrVarExprNodeGen.create(initializerExpr, functionNestingLevel, variableId, frameSlot);
                         nonFuncDeclStmts.add(new ExprStmtNode(assignmentExpr,
                                 this.createSourceSection(varDeclStmt), /* discardExpressionValue */ true));
                     }
@@ -320,16 +318,18 @@ public final class EasyScriptTruffleParser {
 
         // add the 'catch' identifier as a local variable
         String exceptionVar = tryCatchStmt.ID().getText();
-        var frameSlotId = new LocalVariableFrameSlotId(exceptionVar, ++this.localVariablesCounter);
-        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Object, frameSlotId, DeclarationKind.LET);
-        if (this.localScopes.peek().putIfAbsent(exceptionVar, new LocalVariable(frameSlot, DeclarationKind.LET)) != null) {
+//        var frameSlotId = new LocalVariableFrameSlotId(exceptionVar, ++this.localVariablesCounter);
+//        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Object, frameSlotId, DeclarationKind.LET);
+        int frameSlot = -(++this.localVariablesCounter);
+        int functionNestingLevel = this.state != ParserState.FUNC_DEF ? 1 : this.functionNestingLevel;
+        if (this.localScopes.peek().putIfAbsent(exceptionVar, new LocalVariable(functionNestingLevel, frameSlot, DeclarationKind.LET)) != null) {
             throw new EasyScriptException("Identifier '" + exceptionVar + "' has already been declared");
         }
 
         // parse the 'catch' statement block
         BlockStmtNode catchBlockStmt = this.parseStmtBlock(tryCatchStmt.c);
 
-        return new TryStmtNode(tryBlockStmt, frameSlot, catchBlockStmt, finallyBlockStmt,
+        return TryStmtNodeGen.create(tryBlockStmt, frameSlot, catchBlockStmt, finallyBlockStmt,
                 this.createSourceSection(tryCatchStmt));
     }
 
@@ -340,7 +340,8 @@ public final class EasyScriptTruffleParser {
         // parse the 'finally' statement block
         BlockStmtNode finallyBlockStmt = this.parseStmtBlock(tryFinallyStmt.f);
 
-        return new TryStmtNode(tryBlockStmt, finallyBlockStmt, this.createSourceSection(tryFinallyStmt));
+        return TryStmtNodeGen.create(tryBlockStmt, null, null, finallyBlockStmt,
+                this.createSourceSection(tryFinallyStmt));
     }
 
     private IfStmtNode parseIfStmt(EasyScriptParser.IfStmtContext ifStmt) {
@@ -464,7 +465,7 @@ public final class EasyScriptTruffleParser {
         boolean isNestedFunction = this.state == ParserState.FUNC_DEF;
 
         // save the current state of the parser (before entering the function)
-        FrameDescriptor.Builder previousFrameDescriptor = this.frameDescriptor;
+//        FrameDescriptor.Builder previousFrameDescriptor = this.frameDescriptor;
         ParserState previousParserState = this.state;
         var previousNestedFuncDeclCounter = isNestedFunction
                 ? ++this.nestedFuncDeclCounter
@@ -480,7 +481,7 @@ public final class EasyScriptTruffleParser {
 
         // initialize the new state
         this.functionNestingLevel++;
-        this.frameDescriptor = FrameDescriptor.newBuilder();
+//        this.frameDescriptor = FrameDescriptor.newBuilder();
         this.state = ParserState.FUNC_DEF;
 
         var localVariables = new HashMap<String, FrameMember>();
@@ -499,10 +500,10 @@ public final class EasyScriptTruffleParser {
         // parse the statements in the function definition
         List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(subroutineDecl.stmt_block().stmt());
 
-        FrameDescriptor frameDescriptor = this.frameDescriptor.build();
+//        FrameDescriptor frameDescriptor = this.frameDescriptor.build();
         // bring back the old state
         this.functionNestingLevel--;
-        this.frameDescriptor = previousFrameDescriptor;
+//        this.frameDescriptor = previousFrameDescriptor;
         this.state = previousParserState;
         this.localScopes.pop();
         this.nestedFuncDeclCounter = previousNestedFuncDeclCounter;
@@ -512,13 +513,15 @@ public final class EasyScriptTruffleParser {
                         previousNestedFuncDeclCounter,
                         subroutineDecl.name.getText(),
                         this.functionNestingLevel,
-                        frameDescriptor,
+//                        frameDescriptor,
+                        null,
                         new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
                         argumentCount)
                 : FuncDeclStmtNodeGen.create(
                         containerObjectExpr,
                         subroutineDecl.name.getText(),
-                        frameDescriptor,
+//                        frameDescriptor,
+                        null,
                         new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
                         argumentCount);
     }
@@ -547,13 +550,13 @@ public final class EasyScriptTruffleParser {
         } else {
             if (frameMember instanceof FunctionArgument) {
                 FunctionArgument functionArgument = (FunctionArgument) frameMember;
-                return WriteClosureArgExprNodeGen.create(initializerExpr, functionArgument.funcNestingLevel, functionArgument.argumentIndex);
+                return WriteClosureArgOrVarExprNodeGen.create(initializerExpr, functionArgument.funcNestingLevel, variableId, functionArgument.argumentIndex);
             } else {
                 var localVariable = (LocalVariable) frameMember;
                 if (localVariable.declarationKind == DeclarationKind.CONST) {
                     throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
                 }
-                return LocalVarAssignmentExprNodeGen.create(initializerExpr, variableId, localVariable.variableIndex);
+                return WriteClosureArgOrVarExprNodeGen.create(initializerExpr, localVariable.funcNestingLevel, variableId, localVariable.variableIndex);
             }
         }
     }
@@ -700,9 +703,10 @@ public final class EasyScriptTruffleParser {
             return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
         } else if (frameMember instanceof FunctionArgument) {
             var functionArgument = (FunctionArgument) frameMember;
-            return ReadClosureArgExprNodeGen.create(functionArgument.funcNestingLevel, functionArgument.argumentIndex, variableId);
+            return ReadClosureArgOrVarExprNodeGen.create(functionArgument.funcNestingLevel, functionArgument.argumentIndex, variableId);
         } else {
-            return LocalVarReferenceExprNodeGen.create(((LocalVariable) frameMember).variableIndex);
+            LocalVariable localVariable = (LocalVariable) frameMember;
+            return ReadClosureArgOrVarExprNodeGen.create(localVariable.funcNestingLevel, localVariable.variableIndex, variableId);
         }
     }
 

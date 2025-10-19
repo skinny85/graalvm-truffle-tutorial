@@ -7,16 +7,19 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
-public abstract class WriteClosureArgExprNode extends EasyScriptExprNode {
+public abstract class WriteClosureArgOrVarExprNode extends EasyScriptExprNode {
     private final int funcNestingLevel;
-    private final int argIndex;
+    public final String varName;
+    public final int argIndex;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode initializerExpr;
 
-    protected WriteClosureArgExprNode(EasyScriptExprNode initializerExpr, int funcNestingLevel, int argIndex) {
+    protected WriteClosureArgOrVarExprNode(EasyScriptExprNode initializerExpr, int funcNestingLevel,
+            String varName, int argIndex) {
         this.funcNestingLevel = funcNestingLevel;
+        this.varName = varName;
         this.argIndex = argIndex;
         this.initializerExpr = initializerExpr;
     }

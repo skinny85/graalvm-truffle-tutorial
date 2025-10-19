@@ -51,4 +51,20 @@ class ClosuresTest {
         );
         assertEquals("1234", result.asString());
     }
+
+    @Test
+    void nested_functions_support_local_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "function makeDecreaser(n) { " +
+                "    const c = -n; " +
+                "    function decrease(arg) { " +
+                "        return c + arg; " +
+                "    } " +
+                "    return decrease; " +
+                "} " +
+                "var sub3 = makeDecreaser(3); " +
+                "sub3(4);"
+        );
+        assertEquals(1, result.asInt());
+    }
 }
