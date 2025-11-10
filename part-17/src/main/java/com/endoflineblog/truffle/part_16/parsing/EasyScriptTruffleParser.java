@@ -53,9 +53,9 @@ import com.endoflineblog.truffle.part_16.nodes.stmts.exceptions.TryStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.loops.DoWhileStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.loops.ForStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.loops.WhileStmtNode;
-import com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.stmts.variables.GlobalVarDeclStmtNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.stmts.variables.NestedFuncDeclStmtNodeGen;
 import com.endoflineblog.truffle.part_16.parsing.antlr.EasyScriptLexer;
 import com.endoflineblog.truffle.part_16.parsing.antlr.EasyScriptParser;
 import com.endoflineblog.truffle.part_16.runtime.ClassPrototypeObject;
@@ -138,7 +138,7 @@ public final class EasyScriptTruffleParser {
      * Map containing bindings for the function arguments and local variables when parsing function definitions
      * and nested scopes of the top-level scope.
      */
-    private Stack<Map<String, FrameMember>> localScopes;
+    private final Stack<Map<String, FrameMember>> localScopes;
 
     /**
      * The counter that makes it easy to generate unique variable names for local variables
@@ -202,7 +202,7 @@ public final class EasyScriptTruffleParser {
     private List<EasyScriptStmtNode> parseStmtsList(List<EasyScriptParser.StmtContext> stmts) {
         // in the first pass, only handle function declarations,
         // as it's legal to invoke functions before they are declared
-        var funcDecls = new ArrayList<FuncDeclStmtNode>();
+        var funcDecls = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.FuncDeclStmtContext) {
                 funcDecls.add(this.parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
@@ -413,7 +413,7 @@ public final class EasyScriptTruffleParser {
         return new BlockStmtNode(ret, this.createSourceSection(stmtBlock));
     }
 
-    private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
+    private EasyScriptStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
         return this.parseSubroutineDecl(funcDeclStmt.subroutine_decl(),
                 GlobalScopeObjectExprNodeGen.create());
     }
@@ -441,7 +441,7 @@ public final class EasyScriptTruffleParser {
         this.localScopes.firstElement().put(className, new ClassPrototypeMember(classPrototype));
         this.currentClassPrototype = classPrototype;
 
-        List<FuncDeclStmtNode> classMethods = new ArrayList<>();
+        List<EasyScriptStmtNode> classMethods = new ArrayList<>();
         for (var classMember : classDeclStmt.class_member()) {
             classMethods.add(this.parseSubroutineDecl(classMember.subroutine_decl(),
                     new DynamicObjectReferenceExprNode(classPrototype)));
@@ -455,22 +455,30 @@ public final class EasyScriptTruffleParser {
                 className, DeclarationKind.LET);
     }
 
-    private FuncDeclStmtNode parseSubroutineDecl(EasyScriptParser.Subroutine_declContext subroutineDecl,
+    private EasyScriptStmtNode parseSubroutineDecl(EasyScriptParser.Subroutine_declContext subroutineDecl,
             EasyScriptExprNode containerObjectExpr) {
-        if (this.state == ParserState.FUNC_DEF) {
-            // we do not allow nested functions (yet 😉)
-            throw new EasyScriptException("nested functions are not supported in EasyScript yet");
+        String subroutineName = subroutineDecl.name.getText();
+        boolean isNestedFunction = this.state == ParserState.FUNC_DEF;
+        // make the default a characteristic value,
+        // so we can easily find where it came from if we accidentally use it
+        int nestedFuncFrameSlot = -123;
+        if (isNestedFunction) {
+            // reserve a slot in the FrameDescriptor of the parent function for the nested function
+            var frameSlotId = new LocalVariableFrameSlotId(subroutineName, ++this.localVariablesCounter);
+            DeclarationKind declarationKind = DeclarationKind.LET;
+            nestedFuncFrameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Object, frameSlotId, declarationKind);
+            if (this.localScopes.peek().putIfAbsent(subroutineName, new LocalVariable(nestedFuncFrameSlot, declarationKind)) != null) {
+                throw new EasyScriptException("Identifier '" + subroutineName + "' has already been declared");
+            }
         }
 
         // save the current state of the parser (before entering the function)
         FrameDescriptor.Builder previousFrameDescriptor = this.frameDescriptor;
         ParserState previousParserState = this.state;
-        var previousLocalScopes = this.localScopes;
 
         // initialize the new state
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.state = ParserState.FUNC_DEF;
-        this.localScopes = new Stack<>();
 
         var localVariables = new HashMap<String, FrameMember>();
         // add each parameter to the map, with the correct index
@@ -491,13 +499,21 @@ public final class EasyScriptTruffleParser {
         // bring back the old state
         this.frameDescriptor = previousFrameDescriptor;
         this.state = previousParserState;
-        this.localScopes = previousLocalScopes;
+        this.localScopes.pop();
 
-        return FuncDeclStmtNodeGen.create(containerObjectExpr,
-                subroutineDecl.name.getText(),
-                frameDescriptor,
-                new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
-                argumentCount);
+        return isNestedFunction
+                ? NestedFuncDeclStmtNodeGen.create(
+                        nestedFuncFrameSlot,
+                        subroutineName,
+                        frameDescriptor,
+                        new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
+                        argumentCount)
+                : FuncDeclStmtNodeGen.create(
+                        containerObjectExpr,
+                        subroutineName,
+                        frameDescriptor,
+                        new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
+                        argumentCount);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
