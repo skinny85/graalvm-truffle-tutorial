@@ -287,23 +287,6 @@ class FunctionDefinitionsTest {
     }
 
     @Test
-    void nested_functions_are_unsupported() {
-        try {
-            this.context.eval("ezs", "" +
-                    "function outer() { " +
-                    "    function inner() { " +
-                    "    } " +
-                    "}"
-            );
-            fail("expected PolyglotException to be thrown");
-        } catch (PolyglotException e) {
-            assertTrue(e.isGuestException());
-            assertFalse(e.isInternalError());
-            assertEquals("nested functions are not supported in EasyScript yet", e.getMessage());
-        }
-    }
-
-    @Test
     void functions_can_be_reassigned_as_simple_values() {
         Value result = this.context.eval("ezs", "" +
                 "function f() { " +
