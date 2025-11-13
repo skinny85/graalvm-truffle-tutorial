@@ -109,6 +109,13 @@ public final class EasyScriptTruffleParser {
      */
     private FrameDescriptor.Builder frameDescriptor;
 
+    /**
+     * The level of nesting of functions & methods.
+     * Top-level functions and methods are at 1,
+     * one-level nested functions are at 2, etc.
+     */
+    private int functionNestingLevel = 0;
+
     private static abstract class FrameMember {}
     private static final class FunctionArgument extends FrameMember {
         public final int argumentIndex;
@@ -479,6 +486,7 @@ public final class EasyScriptTruffleParser {
         // initialize the new state
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.state = ParserState.FUNC_DEF;
+        this.functionNestingLevel++;
 
         var localVariables = new HashMap<String, FrameMember>();
         // add each parameter to the map, with the correct index
@@ -488,7 +496,7 @@ public final class EasyScriptTruffleParser {
         for (int i = 0; i < argumentCount; i++) {
             // offset the arguments by one,
             // because the first argument is always `this`
-            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1));
+            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + this.functionNestingLevel));
         }
         this.localScopes.push(localVariables);
 
@@ -500,6 +508,7 @@ public final class EasyScriptTruffleParser {
         this.frameDescriptor = previousFrameDescriptor;
         this.state = previousParserState;
         this.localScopes.pop();
+        this.functionNestingLevel--;
 
         return isNestedFunction
                 ? NestedFuncDeclStmtNodeGen.create(

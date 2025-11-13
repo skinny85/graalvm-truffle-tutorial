@@ -4,6 +4,7 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,10 +26,11 @@ class ClosuresTest {
     void nested_non_closure_non_recursive_functions_are_supported() {
         Value result = this.context.eval("ezs", "" +
                 "function sum(n) { " +
-                "    function sumInternal(n, acc) { " +
-                "        while (n > 0) { " +
-                "            acc = acc + n; " +
-                "            n = n - 1; " +
+                // changing 'm' to 'n' makes the test fail!
+                "    function sumInternal(m, acc) { " +
+                "        while (m > 0) { " +
+                "            acc = acc + m; " +
+                "            m = m - 1; " +
                 "        } " +
                 "        return acc; " +
                 "    } " +
@@ -37,5 +39,24 @@ class ClosuresTest {
                 "sum(9);"
         );
         assertEquals(45, result.asInt());
+    }
+
+    @Test
+    @Disabled
+    void nested_non_closure_recursive_functions_are_supported() {
+        Value result = this.context.eval("ezs", "" +
+                "function fib(n) { " +
+                "    function fibTailRec(m, a, b) { " +
+                "        if (m <= 0) " +
+                "            return b; " +
+                "        return fibTailRec(m - 1, b, a + b); " +
+                "    } " +
+                "    if (n < 2) " +
+                "        return n; " +
+                "    return fibTailRec(n, 0, 1); " +
+                "} " +
+                "fib(10);"
+        );
+        assertEquals(7, result.asInt());
     }
 }

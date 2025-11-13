@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_16.exceptions.EasyScriptException;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionDispatchNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionDispatchNodeGen;
 import com.oracle.truffle.api.CallTarget;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
@@ -19,14 +20,20 @@ import com.oracle.truffle.api.strings.TruffleString;
 public final class FunctionObject extends JavaScriptObject {
     public final CallTarget callTarget;
     public final int argumentCount;
+    public final MaterializedFrame materializedFrame;
 
     private final FunctionDispatchNode functionDispatchNode;
 
     public FunctionObject(Shape shape, ClassPrototypeObject functionPrototype, CallTarget callTarget, int argumentCount) {
+        this(shape, functionPrototype, callTarget, argumentCount, null);
+    }
+
+    public FunctionObject(Shape shape, ClassPrototypeObject functionPrototype, CallTarget callTarget, int argumentCount, MaterializedFrame materializedFrame) {
         super(shape, functionPrototype);
 
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
+        this.materializedFrame = materializedFrame;
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
     }
 

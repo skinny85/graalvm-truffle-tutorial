@@ -69,15 +69,20 @@ public abstract class FunctionDispatchNode extends Node {
 
     private static Object[] extendArguments(Object[] arguments, Object receiver, FunctionObject function) {
         // create a new array of arguments, reserving the first one for 'this',
-        // which means we need to offset the remaining arguments by one
-        int extendedArgumentsLength = function.argumentCount + 1;
+        // and the second one for the materialized frame if 'function' is nested,
+        // which means we need to offset the remaining arguments
+        int extraArgs = function.materializedFrame == null ? 1 : 2;
+        int extendedArgumentsLength = function.argumentCount + extraArgs;
         Object[] ret = new Object[extendedArgumentsLength];
         // the first argument to a subroutine call is always 'this',
         // which is 'undefined' for global functions
         ret[0] = receiver;
-        for (int i = 1; i < extendedArgumentsLength; i++) {
+        if (function.materializedFrame != null) {
+            ret[1] = function.materializedFrame;
+        }
+        for (int i = extraArgs; i < extendedArgumentsLength; i++) {
             // we need to offset the provided arguments by one, because of 'this'
-            int j = i - 1;
+            int j = i - extraArgs;
             // if a function was called with fewer arguments than it declares,
             // we fill the remaining ones with `undefined`
             ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
