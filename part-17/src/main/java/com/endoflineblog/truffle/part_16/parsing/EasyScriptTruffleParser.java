@@ -34,6 +34,7 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.objects.SuperExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.objects.ThisExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.properties.PropertyWriteExprNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.exprs.variables.ClosureLocalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.LocalVarAssignmentExprNode;
@@ -109,6 +110,14 @@ public final class EasyScriptTruffleParser {
      */
     private FrameDescriptor.Builder frameDescriptor;
 
+    /**
+     * The level of nesting of functions & methods.
+     * Global-level statements are at 0,
+     * top-level functions and class methods are at 1,
+     * one-level nested functions are at 2, etc.
+     */
+    private int functionNestingLevel = 0;
+
     private static abstract class FrameMember {}
     private static final class FunctionArgument extends FrameMember {
         public final int argumentIndex;
@@ -120,10 +129,12 @@ public final class EasyScriptTruffleParser {
     private static final class LocalVariable extends FrameMember {
         public final int variableIndex;
         public final DeclarationKind declarationKind;
+        public final int nestingLevel;
 
-        LocalVariable(int variableIndex, DeclarationKind declarationKind) {
+        LocalVariable(int variableIndex, DeclarationKind declarationKind, int nestingLevel) {
             this.variableIndex = variableIndex;
             this.declarationKind = declarationKind;
+            this.nestingLevel = nestingLevel;
         }
     }
     private static final class ClassPrototypeMember extends FrameMember {
@@ -274,7 +285,7 @@ public final class EasyScriptTruffleParser {
         String exceptionVar = tryCatchStmt.ID().getText();
         var frameSlotId = new LocalVariableFrameSlotId(exceptionVar, ++this.localVariablesCounter);
         int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Object, frameSlotId, DeclarationKind.LET);
-        if (this.localScopes.peek().putIfAbsent(exceptionVar, new LocalVariable(frameSlot, DeclarationKind.LET)) != null) {
+        if (this.localScopes.peek().putIfAbsent(exceptionVar, new LocalVariable(frameSlot, DeclarationKind.LET, this.functionNestingLevel)) != null) {
             throw new EasyScriptException("Identifier '" + exceptionVar + "' has already been declared");
         }
 
@@ -400,7 +411,7 @@ public final class EasyScriptTruffleParser {
                 // this is a local variable (either of a function, or on the top-level)
                 var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
                 int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, frameSlotId, declarationKind);
-                if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
+                if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind, this.functionNestingLevel)) != null) {
                     throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                 }
                 LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(initializerExpr, variableId, frameSlot);
@@ -465,7 +476,7 @@ public final class EasyScriptTruffleParser {
             var frameSlotId = new LocalVariableFrameSlotId(subroutineName, ++this.localVariablesCounter);
             DeclarationKind declarationKind = DeclarationKind.LET;
             nestedFuncFrameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Object, frameSlotId, declarationKind);
-            if (this.localScopes.peek().putIfAbsent(subroutineName, new LocalVariable(nestedFuncFrameSlot, declarationKind)) != null) {
+            if (this.localScopes.peek().putIfAbsent(subroutineName, new LocalVariable(nestedFuncFrameSlot, declarationKind, this.functionNestingLevel)) != null) {
                 throw new EasyScriptException("Identifier '" + subroutineName + "' has already been declared");
             }
         }
@@ -477,16 +488,18 @@ public final class EasyScriptTruffleParser {
         // initialize the new state
         this.frameDescriptor = FrameDescriptor.newBuilder();
         this.state = ParserState.FUNC_DEF;
+        this.functionNestingLevel++;
 
         var localVariables = new HashMap<String, FrameMember>();
         // add each parameter to the map, with the correct index
         List<TerminalNode> funcArgs = subroutineDecl.args.ID();
         int argumentCount = funcArgs.size();
+        // all arguments need to be offset by 1 because of 'this',
+        // and closures need offset by 2, to account for the parent frame
+        int offset = isNestedFunction ? 2 : 1;
         // first, initialize the locals with function arguments
         for (int i = 0; i < argumentCount; i++) {
-            // offset the arguments by one,
-            // because the first argument is always `this`
-            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1));
+            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + offset));
         }
         this.localScopes.push(localVariables);
 
@@ -498,6 +511,7 @@ public final class EasyScriptTruffleParser {
         this.frameDescriptor = previousFrameDescriptor;
         this.state = previousParserState;
         this.localScopes.pop();
+        this.functionNestingLevel--;
 
         return isNestedFunction
                 ? NestedFuncDeclStmtNodeGen.create(
@@ -686,10 +700,13 @@ public final class EasyScriptTruffleParser {
         if (frameMember == null || frameMember instanceof ClassPrototypeMember) {
             // we know for sure this is a reference to a global variable
             return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
+        } else if (frameMember instanceof FunctionArgument) {
+            return new ReadFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex, variableId);
         } else {
-            return frameMember instanceof FunctionArgument
-                    ? new ReadFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex, variableId)
-                    : LocalVarReferenceExprNodeGen.create(((LocalVariable) frameMember).variableIndex);
+            var localVariable = (LocalVariable) frameMember;
+            return this.functionNestingLevel > localVariable.nestingLevel
+                    ? new ClosureLocalVarReferenceExprNode(localVariable.variableIndex)
+                    : LocalVarReferenceExprNodeGen.create(localVariable.variableIndex);
         }
     }
 

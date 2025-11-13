@@ -46,10 +46,10 @@ public abstract class NestedFuncDeclStmtNode extends EasyScriptStmtNode {
             this.cachedCallTarget = funcRootNode.getCallTarget();
         }
 
-//        MaterializedFrame materializedFrame = frame.materialize();
+        MaterializedFrame materializedFrame = frame.materialize();
         ShapesAndPrototypes shapesAndPrototypes = this.currentLanguageContext().shapesAndPrototypes;
         var func = new FunctionObject(shapesAndPrototypes.rootShape, shapesAndPrototypes.functionPrototype,
-                this.cachedCallTarget, this.getArgumentCount());
+                this.cachedCallTarget, this.getArgumentCount(), materializedFrame);
         frame.setObject(this.getNestedFuncFrameSlot(), func);
 
         return Undefined.INSTANCE;

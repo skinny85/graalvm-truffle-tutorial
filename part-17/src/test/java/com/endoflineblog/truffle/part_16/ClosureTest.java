@@ -38,4 +38,22 @@ class ClosuresTest {
         );
         assertEquals(45, result.asInt());
     }
+
+    @Test
+    void nested_non_closure_recursive_functions_are_supported() {
+        Value result = this.context.eval("ezs", "" +
+                "function fib(n) { " +
+                "    function fibTailRec(m, a, b) { " +
+                "        if (m <= 0) " +
+                "            return a; " +
+                "        return fibTailRec(m - 1, b, a + b); " +
+                "    } " +
+                "    if (n < 2) " +
+                "        return n; " +
+                "    return fibTailRec(n, 0, 1); " +
+                "} " +
+                "fib(10);"
+        );
+        assertEquals(55, result.asInt());
+    }
 }
