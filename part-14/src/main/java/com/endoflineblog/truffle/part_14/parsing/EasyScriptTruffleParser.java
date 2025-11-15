@@ -351,14 +351,14 @@ public final class EasyScriptTruffleParser {
                 ? "Object"
                 : classDeclStmt.spr_cls.getText();
         ClassPrototypeObject classPrototype;
-        FrameMember frameMember = this.localScopes.get(0).get(superClass);
+        FrameMember frameMember = this.localScopes.firstElement().get(superClass);
         if (frameMember instanceof ClassPrototypeMember) {
             ClassPrototypeObject superClassPrototype = ((ClassPrototypeMember) frameMember).classPrototypeObject;
             classPrototype = new ClassPrototypeObject(this.objectShape, className, superClassPrototype);
         } else {
             throw new EasyScriptException("class '" + className + "' extends unknown class '" + superClass + "'");
         }
-        this.localScopes.get(0).put(className, new ClassPrototypeMember(classPrototype));
+        this.localScopes.firstElement().put(className, new ClassPrototypeMember(classPrototype));
         this.currentClassPrototype = classPrototype;
 
         List<FuncDeclStmtNode> classMethods = new ArrayList<>();
@@ -647,8 +647,8 @@ public final class EasyScriptTruffleParser {
     }
 
     private FrameMember findFrameMember(String memberName) {
-        for (var scope : this.localScopes) {
-            FrameMember ret = scope.get(memberName);
+        for (var iter = this.localScopes.listIterator(this.localScopes.size()); iter.hasPrevious();) {
+            FrameMember ret = iter.previous().get(memberName);
             if (ret != null) {
                 return ret;
             }

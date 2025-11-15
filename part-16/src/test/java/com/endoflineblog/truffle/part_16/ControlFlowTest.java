@@ -57,6 +57,21 @@ class ControlFlowTest {
     }
 
     @Test
+    void nested_variables_shadow_outer_ones() {
+        Value result = this.context.eval("ezs", "" +
+                "function f() { " +
+                "    var v = 3; " +
+                "    { " +
+                "        var v = 5; " +
+                "        return v; " +
+                "    } " +
+                "} " +
+                "f()"
+        );
+        assertEquals(5, result.asInt());
+    }
+
+    @Test
     void a_function_is_equal_to_itself_but_not_lte() {
         this.context.eval("ezs", "" +
                 "function f() { return false; } " +

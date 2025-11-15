@@ -588,8 +588,8 @@ public final class EasyScriptTruffleParser {
     }
 
     private FrameMember findFrameMember(String memberName) {
-        for (var scope : this.localScopes) {
-            FrameMember ret = scope.get(memberName);
+        for (var iter = this.localScopes.listIterator(this.localScopes.size()); iter.hasPrevious();) {
+            FrameMember ret = iter.previous().get(memberName);
             if (ret != null) {
                 return ret;
             }
