@@ -56,4 +56,45 @@ class ClosuresTest {
         );
         assertEquals(55, result.asInt());
     }
+
+    @Test
+    void nested_closures_can_read_parent_local_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "function fib(n) { " +
+                "    const zero = 0; " +
+                "    function fibTailRec(m, a, b) { " +
+                "        if (m <= zero) " +
+                "            return a; " +
+                "        return fibTailRec(m - 1, b, a + b); " +
+                "    } " +
+                "    if (n < 2) " +
+                "        return n; " +
+                "    return fibTailRec(n, 0, 1); " +
+                "} " +
+                "fib(11);"
+        );
+        assertEquals(89, result.asInt());
+    }
+
+    @Test
+    void nested_closures_can_read_parent_local_variables_two_levels_deep() {
+        Value result = this.context.eval("ezs", "" +
+                "function fib(n) { " +
+                "    const zero = 0; " +
+                "    function fibTailRec(m, a, b) { " +
+                "        function fibTailRec2(m, a, b) { " +
+                "            if (m <= zero) " +
+                "                return a; " +
+                "            return fibTailRec(m - 1, b, a + b); " +
+                "        } " +
+                "        return fibTailRec2(m - 1, b, a + b); " +
+                "    } " +
+                "    if (n < 2) " +
+                "        return n; " +
+                "    return fibTailRec(n, 0, 1); " +
+                "} " +
+                "fib(11);"
+        );
+        assertEquals(89, result.asInt());
+    }
 }

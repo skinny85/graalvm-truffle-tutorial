@@ -20,6 +20,9 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.GreaterOrEqualE
 import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.InequalityExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.LesserExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.LesserOrEqualExprNodeGen;
+import com.endoflineblog.truffle.part_16.nodes.exprs.frame.AbstractFrameGetNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.frame.CurrentFrameGetNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.frame.ParentFrameGetNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionCallExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteFunctionArgExprNode;
@@ -34,7 +37,6 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.objects.SuperExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.objects.ThisExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.properties.PropertyReadExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.properties.PropertyWriteExprNodeGen;
-import com.endoflineblog.truffle.part_16.nodes.exprs.variables.ClosureLocalVarReferenceExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.GlobalVarAssignmentExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.GlobalVarReferenceExprNodeGen;
 import com.endoflineblog.truffle.part_16.nodes.exprs.variables.LocalVarAssignmentExprNode;
@@ -704,9 +706,11 @@ public final class EasyScriptTruffleParser {
             return new ReadFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex, variableId);
         } else {
             var localVariable = (LocalVariable) frameMember;
-            return this.functionNestingLevel > localVariable.nestingLevel
-                    ? new ClosureLocalVarReferenceExprNode(localVariable.variableIndex)
-                    : LocalVarReferenceExprNodeGen.create(localVariable.variableIndex);
+            AbstractFrameGetNode currentOrParentFrameGetNode = new CurrentFrameGetNode();
+            for (int i = 0; i < this.functionNestingLevel - localVariable.nestingLevel; i++) {
+                currentOrParentFrameGetNode = new ParentFrameGetNode(currentOrParentFrameGetNode);
+            }
+            return LocalVarReferenceExprNodeGen.create(currentOrParentFrameGetNode, localVariable.variableIndex);
         }
     }
 
