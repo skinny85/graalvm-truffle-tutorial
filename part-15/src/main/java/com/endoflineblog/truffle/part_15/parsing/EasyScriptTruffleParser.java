@@ -188,19 +188,12 @@ public final class EasyScriptTruffleParser {
     }
 
     private List<EasyScriptStmtNode> parseStmtsList(List<EasyScriptParser.StmtContext> stmts) {
-        // in the first pass, only handle function declarations,
-        // as it's legal to invoke functions before they are declared
         var funcDecls = new ArrayList<FuncDeclStmtNode>();
+        var nonFuncDeclStmts = new ArrayList<EasyScriptStmtNode>();
         for (EasyScriptParser.StmtContext stmt : stmts) {
             if (stmt instanceof EasyScriptParser.FuncDeclStmtContext) {
                 funcDecls.add(this.parseFuncDeclStmt((EasyScriptParser.FuncDeclStmtContext) stmt));
-            }
-        }
-
-        // in the second pass, handle the remaining statements that are not function declarations
-        var nonFuncDeclStmts = new ArrayList<EasyScriptStmtNode>();
-        for (EasyScriptParser.StmtContext stmt : stmts) {
-            if (stmt instanceof EasyScriptParser.ExprStmtContext) {
+            } else if (stmt instanceof EasyScriptParser.ExprStmtContext) {
                 nonFuncDeclStmts.add(this.parseExprStmt((EasyScriptParser.ExprStmtContext) stmt));
             } else if (stmt instanceof EasyScriptParser.ClassDeclStmtContext) {
                 nonFuncDeclStmts.add(this.parseClassDeclStmt((EasyScriptParser.ClassDeclStmtContext) stmt));

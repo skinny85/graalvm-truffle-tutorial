@@ -52,9 +52,15 @@ we don't need an equivalent of `GlobalVarDeclStmtNode` for local variables.
 Because of that, we transform a local variable declaration into an assignment expression when parsing.
 
 Because it's legal to invoke a function in JavaScript before it's declared,
-we have to do two passes over a given block of statements.
-In the first pass, we only process the function declarations;
-in the second pass, we handle the remaining, non-function declaration statements.
+we change the order of the statements once we are finished parsing them:
+we always put the function definitions at the beginning,
+so they are executed (and thus added to the global scope)
+before the other statements that can use them,
+like variable declarations
+(functions can still reference each other,
+including being mutually recursive,
+since executing a function's definition doesn't look at its body,
+only at its name).
 
 ## Assignment expressions
 
@@ -90,12 +96,13 @@ A function declaration is implemented by the
 [`FuncDeclStmtNode` class](src/main/java/com/endoflineblog/truffle/part_07/nodes/stmts/FuncDeclStmtNode.java).
 We create a new `StmtBlockRootNode`,
 get a `CallTarget` from it,
-and finally wrap that in the same `FunctionObject` that we've seen
+and wrap that in the same `FunctionObject` that we've seen
 [in the last article](../part-06/src/main/java/com/endoflineblog/truffle/part_06/runtime/FunctionObject.java)
-used for the built-in functions --
-except we pass the number of parameters the function takes,
+used for the built-in functions
+(with one small change -- we pass the number of parameters the function takes,
 in order for the dispatch code mentioned above to be able to extend the arguments with `undefined`
-if the calling code passed fewer of them than the function declares.
+if the calling code passed fewer of them than the function declares),
+and finally add that `FunctionObject` to the global scope.
 
 We need a reference to the `TruffleLanguage`
 instance from an `execute()` method in `FuncDeclStmtNode`
