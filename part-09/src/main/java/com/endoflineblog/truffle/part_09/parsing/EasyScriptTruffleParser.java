@@ -156,38 +156,7 @@ public final class EasyScriptTruffleParser {
             } else if (stmt instanceof EasyScriptParser.ContinueStmtContext) {
                 nonFuncDeclStmts.add(new ContinueStmtNode());
             } else if (stmt instanceof EasyScriptParser.VarDeclStmtContext) {
-                EasyScriptParser.VarDeclStmtContext varDeclStmt = (EasyScriptParser.VarDeclStmtContext) stmt;
-                DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
-                List<EasyScriptParser.BindingContext> varDeclBindings = varDeclStmt.binding();
-                for (EasyScriptParser.BindingContext varBinding : varDeclBindings) {
-                    String variableId = varBinding.ID().getText();
-                    var bindingExpr = varBinding.expr1();
-                    EasyScriptExprNode initializerExpr;
-                    if (bindingExpr == null) {
-                        if (declarationKind == DeclarationKind.CONST) {
-                            throw new EasyScriptException("Missing initializer in const declaration '" + variableId + "'");
-                        }
-                        // if a 'let' or 'var' declaration is missing an initializer,
-                        // it means it will be initialized with 'undefined'
-                        initializerExpr = new UndefinedLiteralExprNode();
-                    } else {
-                        initializerExpr = this.parseExpr1(bindingExpr);
-                    }
-
-                    if (this.state == ParserState.TOP_LEVEL) {
-                        // this is a global variable
-                        nonFuncDeclStmts.add(GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, declarationKind));
-                    } else {
-                        // this is a local variable (either of a function, or on the top-level)
-                        var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
-                        int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, frameSlotId, declarationKind);
-                        if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
-                            throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
-                        }
-                        LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(initializerExpr, frameSlot);
-                        nonFuncDeclStmts.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
-                    }
-                }
+                nonFuncDeclStmts.addAll(this.parseVarDeclStmt((EasyScriptParser.VarDeclStmtContext) stmt));
             }
         }
 
@@ -283,6 +252,42 @@ public final class EasyScriptTruffleParser {
         this.localScopes.pop();
 
         return new BlockStmtNode(ret);
+    }
+
+    private List<EasyScriptStmtNode> parseVarDeclStmt(EasyScriptParser.VarDeclStmtContext varDeclStmt) {
+        DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
+        List<EasyScriptParser.BindingContext> varDeclBindings = varDeclStmt.binding();
+        List<EasyScriptStmtNode> ret = new ArrayList<>(varDeclBindings.size());
+        for (EasyScriptParser.BindingContext varBinding : varDeclBindings) {
+            String variableId = varBinding.ID().getText();
+            var bindingExpr = varBinding.expr1();
+            EasyScriptExprNode initializerExpr;
+            if (bindingExpr == null) {
+                if (declarationKind == DeclarationKind.CONST) {
+                    throw new EasyScriptException("Missing initializer in const declaration '" + variableId + "'");
+                }
+                // if a 'let' or 'var' declaration is missing an initializer,
+                // it means it will be initialized with 'undefined'
+                initializerExpr = new UndefinedLiteralExprNode();
+            } else {
+                initializerExpr = this.parseExpr1(bindingExpr);
+            }
+
+            if (this.state == ParserState.TOP_LEVEL) {
+                // this is a global variable
+                ret.add(GlobalVarDeclStmtNodeGen.create(initializerExpr, variableId, declarationKind));
+            } else {
+                // this is a local variable (either of a function, or on the top-level)
+                var frameSlotId = new LocalVariableFrameSlotId(variableId, ++this.localVariablesCounter);
+                int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, frameSlotId, declarationKind);
+                if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
+                    throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
+                }
+                LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(initializerExpr, frameSlot);
+                ret.add(new ExprStmtNode(assignmentExpr, /* discardExpressionValue */ true));
+            }
+        }
+        return ret;
     }
 
     private FuncDeclStmtNode parseFuncDeclStmt(EasyScriptParser.FuncDeclStmtContext funcDeclStmt) {
