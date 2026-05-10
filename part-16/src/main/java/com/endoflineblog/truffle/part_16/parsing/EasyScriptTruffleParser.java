@@ -519,16 +519,14 @@ public final class EasyScriptTruffleParser {
         EasyScriptExprNode initializerExpr = this.parseExpr1(assignmentExpr.expr1());
         if (frameMember == null || frameMember instanceof ClassPrototypeMember) {
             return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
+        } else if (frameMember instanceof FunctionArgument) {
+            return new WriteFunctionArgExprNode(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
         } else {
-            if (frameMember instanceof FunctionArgument) {
-                return new WriteFunctionArgExprNode(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
-            } else {
-                var localVariable = (LocalVariable) frameMember;
-                if (localVariable.declarationKind == DeclarationKind.CONST) {
-                    throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
-                }
-                return LocalVarAssignmentExprNodeGen.create(initializerExpr, variableId, localVariable.variableIndex);
+            var localVariable = (LocalVariable) frameMember;
+            if (localVariable.declarationKind == DeclarationKind.CONST) {
+                throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
             }
+            return LocalVarAssignmentExprNodeGen.create(initializerExpr, variableId, localVariable.variableIndex);
         }
     }
 
