@@ -555,7 +555,9 @@ public final class EasyScriptTruffleParser {
         if (frameMember == null || frameMember instanceof ClassPrototypeMember) {
             return GlobalVarAssignmentExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), initializerExpr, variableId);
         } else if (frameMember instanceof FunctionArgument) {
-            return new WriteFunctionArgExprNode(initializerExpr, ((FunctionArgument) frameMember).argumentIndex);
+            var functionArgument = (FunctionArgument) frameMember;
+            AbstractFrameGetNode currentOrParentFrameGetNode = this.establishCurrentOrParentGetFrameNode(functionArgument.nestingLevel);
+            return new WriteFunctionArgExprNode(currentOrParentFrameGetNode, initializerExpr, functionArgument.argumentIndex);
         } else {
             var localVariable = (LocalVariable) frameMember;
             if (localVariable.declarationKind == DeclarationKind.CONST) {

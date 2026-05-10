@@ -133,4 +133,22 @@ class ClosuresTest {
         );
         assertEquals(55, result.asInt());
     }
+
+    @Test
+    void nested_closures_can_write_parent_function_arguments() {
+        Value result = this.context.eval("ezs", "" +
+                "function sum(n) { " +
+                "    let sum = 0; " +
+                "    function sumInternal() { " +
+                "        for (; n > 0; n = n - 1) { " +
+                "            sum = sum + n; " +
+                "        } " +
+                "    } " +
+                "    sumInternal(); " +
+                "    return sum; " +
+                "} " +
+                "sum(11);"
+        );
+        assertEquals(66, result.asInt());
+    }
 }

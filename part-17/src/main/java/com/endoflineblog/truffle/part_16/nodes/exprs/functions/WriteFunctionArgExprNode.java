@@ -1,6 +1,8 @@
 package com.endoflineblog.truffle.part_16.nodes.exprs.functions;
 
 import com.endoflineblog.truffle.part_16.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.frame.AbstractFrameGetNode;
+import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
@@ -8,13 +10,19 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * Identical to the class with the same name from part 15.
  */
 public final class WriteFunctionArgExprNode extends EasyScriptExprNode {
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    private AbstractFrameGetNode currentOrParentFrameGetNode;
+
     private final int index;
 
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode initializerExpr;
 
-    public WriteFunctionArgExprNode(EasyScriptExprNode initializerExpr, int index) {
+    public WriteFunctionArgExprNode(AbstractFrameGetNode currentOrParentFrameGetNode,
+                EasyScriptExprNode initializerExpr, int index) {
+        this.currentOrParentFrameGetNode = currentOrParentFrameGetNode;
         this.index = index;
         this.initializerExpr = initializerExpr;
     }
@@ -22,9 +30,10 @@ public final class WriteFunctionArgExprNode extends EasyScriptExprNode {
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         Object value = this.initializerExpr.executeGeneric(frame);
+        Frame currentOrParentFrame = this.currentOrParentFrameGetNode.executeFrame(frame);
         // we are guaranteed the argument array has enough elements,
         // because of the logic in FunctionDispatchNode
-        frame.getArguments()[this.index] = value;
+        currentOrParentFrame.getArguments()[this.index] = value;
         return value;
     }
 }
