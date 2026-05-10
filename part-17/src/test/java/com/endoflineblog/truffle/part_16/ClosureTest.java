@@ -97,4 +97,22 @@ class ClosuresTest {
         );
         assertEquals(89, result.asInt());
     }
+
+    @Test
+    void nested_closures_can_write_parent_local_variables() {
+        Value result = this.context.eval("ezs", "" +
+                "function sum(n) { " +
+                "    let sum = 0; " +
+                "    function sumInternal(n) { " +
+                "        for (let i = n; i > 0; i = i - 1) { " +
+                "            sum = sum + i; " +
+                "        } " +
+                "    } " +
+                "    sumInternal(n); " +
+                "    return sum; " +
+                "} " +
+                "sum(10);"
+        );
+        assertEquals(55, result.asInt());
+    }
 }

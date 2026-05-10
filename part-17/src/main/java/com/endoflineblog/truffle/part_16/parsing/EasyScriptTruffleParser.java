@@ -416,7 +416,8 @@ public final class EasyScriptTruffleParser {
                 if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind, this.functionNestingLevel)) != null) {
                     throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                 }
-                LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(initializerExpr, variableId, frameSlot);
+                LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(
+                        new CurrentFrameGetNode(), initializerExpr, variableId, frameSlot);
                 ret.add(new ExprStmtNode(assignmentExpr,
                         this.createSourceSection(varDeclStmt), /* discardExpressionValue */ true));
             }
@@ -558,7 +559,9 @@ public final class EasyScriptTruffleParser {
             if (localVariable.declarationKind == DeclarationKind.CONST) {
                 throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
             }
-            return LocalVarAssignmentExprNodeGen.create(initializerExpr, variableId, localVariable.variableIndex);
+            AbstractFrameGetNode currentOrParentFrameGetNode = this.establishCurrentOrParentGetFrameNode(localVariable);
+            return LocalVarAssignmentExprNodeGen.create(
+                    currentOrParentFrameGetNode, initializerExpr, variableId, localVariable.variableIndex);
         }
     }
 
@@ -706,10 +709,7 @@ public final class EasyScriptTruffleParser {
             return new ReadFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex, variableId);
         } else {
             var localVariable = (LocalVariable) frameMember;
-            AbstractFrameGetNode currentOrParentFrameGetNode = new CurrentFrameGetNode();
-            for (int i = 0; i < this.functionNestingLevel - localVariable.nestingLevel; i++) {
-                currentOrParentFrameGetNode = new ParentFrameGetNode(currentOrParentFrameGetNode);
-            }
+            AbstractFrameGetNode currentOrParentFrameGetNode = this.establishCurrentOrParentGetFrameNode(localVariable);
             return LocalVarReferenceExprNodeGen.create(currentOrParentFrameGetNode, localVariable.variableIndex);
         }
     }
@@ -760,6 +760,14 @@ public final class EasyScriptTruffleParser {
 
     private DoubleLiteralExprNode parseDoubleLiteral(String text) {
         return new DoubleLiteralExprNode(Double.parseDouble(text));
+    }
+
+    private AbstractFrameGetNode establishCurrentOrParentGetFrameNode(LocalVariable localVariable) {
+        AbstractFrameGetNode currentOrParentFrameGetNode = new CurrentFrameGetNode();
+        for (int i = 0; i < this.functionNestingLevel - localVariable.nestingLevel; i++) {
+            currentOrParentFrameGetNode = new ParentFrameGetNode(currentOrParentFrameGetNode);
+        }
+        return currentOrParentFrameGetNode;
     }
 
     private FrameMember findFrameMember(String memberName) {
