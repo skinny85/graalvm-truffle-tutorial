@@ -345,16 +345,16 @@ public final class EasyScriptTruffleParser {
         }
 
         String className = classDeclStmt.cls.getText();
-        String superClass = classDeclStmt.spr_cls == null
+        String superClassName = classDeclStmt.spr_cls == null
                 ? "Object"
                 : classDeclStmt.spr_cls.getText();
         ClassPrototypeObject classPrototype;
-        FrameMember frameMember = this.localScopes.firstElement().get(superClass);
-        if (frameMember instanceof ClassPrototypeMember) {
-            ClassPrototypeObject superClassPrototype = ((ClassPrototypeMember) frameMember).classPrototypeObject;
+        FrameMember superClassFrameMember = this.localScopes.firstElement().get(superClassName);
+        if (superClassFrameMember instanceof ClassPrototypeMember) {
+            ClassPrototypeObject superClassPrototype = ((ClassPrototypeMember) superClassFrameMember).classPrototypeObject;
             classPrototype = new ClassPrototypeObject(this.objectShape, className, superClassPrototype);
         } else {
-            throw new EasyScriptException("class '" + className + "' extends unknown class '" + superClass + "'");
+            throw new EasyScriptException("class '" + className + "' extends unknown class '" + superClassName + "'");
         }
         this.localScopes.firstElement().put(className, new ClassPrototypeMember(classPrototype));
         this.currentClassPrototype = classPrototype;
