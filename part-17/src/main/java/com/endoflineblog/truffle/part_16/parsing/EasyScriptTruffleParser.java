@@ -123,9 +123,11 @@ public final class EasyScriptTruffleParser {
     private static abstract class FrameMember {}
     private static final class FunctionArgument extends FrameMember {
         public final int argumentIndex;
+        public final int nestingLevel;
 
-        FunctionArgument(int argumentIndex) {
+        FunctionArgument(int argumentIndex, int nestingLevel) {
             this.argumentIndex = argumentIndex;
+            this.nestingLevel = nestingLevel;
         }
     }
     private static final class LocalVariable extends FrameMember {
@@ -502,7 +504,7 @@ public final class EasyScriptTruffleParser {
         int offset = isNestedFunction ? 2 : 1;
         // first, initialize the locals with function arguments
         for (int i = 0; i < argumentCount; i++) {
-            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + offset));
+            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + offset, this.functionNestingLevel));
         }
         this.localScopes.push(localVariables);
 
@@ -559,7 +561,7 @@ public final class EasyScriptTruffleParser {
             if (localVariable.declarationKind == DeclarationKind.CONST) {
                 throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
             }
-            AbstractFrameGetNode currentOrParentFrameGetNode = this.establishCurrentOrParentGetFrameNode(localVariable);
+            AbstractFrameGetNode currentOrParentFrameGetNode = this.establishCurrentOrParentGetFrameNode(localVariable.nestingLevel);
             return LocalVarAssignmentExprNodeGen.create(
                     currentOrParentFrameGetNode, initializerExpr, variableId, localVariable.variableIndex);
         }
@@ -706,10 +708,12 @@ public final class EasyScriptTruffleParser {
             // we know for sure this is a reference to a global variable
             return GlobalVarReferenceExprNodeGen.create(GlobalScopeObjectExprNodeGen.create(), variableId);
         } else if (frameMember instanceof FunctionArgument) {
-            return new ReadFunctionArgExprNode(((FunctionArgument) frameMember).argumentIndex, variableId);
+            var functionArgument = (FunctionArgument) frameMember;
+            AbstractFrameGetNode currentOrParentGetFrameNode = this.establishCurrentOrParentGetFrameNode(functionArgument.nestingLevel);
+            return new ReadFunctionArgExprNode(currentOrParentGetFrameNode, functionArgument.argumentIndex, variableId);
         } else {
             var localVariable = (LocalVariable) frameMember;
-            AbstractFrameGetNode currentOrParentFrameGetNode = this.establishCurrentOrParentGetFrameNode(localVariable);
+            AbstractFrameGetNode currentOrParentFrameGetNode = this.establishCurrentOrParentGetFrameNode(localVariable.nestingLevel);
             return LocalVarReferenceExprNodeGen.create(currentOrParentFrameGetNode, localVariable.variableIndex);
         }
     }
@@ -762,9 +766,9 @@ public final class EasyScriptTruffleParser {
         return new DoubleLiteralExprNode(Double.parseDouble(text));
     }
 
-    private AbstractFrameGetNode establishCurrentOrParentGetFrameNode(LocalVariable localVariable) {
+    private AbstractFrameGetNode establishCurrentOrParentGetFrameNode(int referenceNestingLevel) {
         AbstractFrameGetNode currentOrParentFrameGetNode = new CurrentFrameGetNode();
-        for (int i = 0; i < this.functionNestingLevel - localVariable.nestingLevel; i++) {
+        for (int i = 0; i < this.functionNestingLevel - referenceNestingLevel; i++) {
             currentOrParentFrameGetNode = new ParentFrameGetNode(currentOrParentFrameGetNode);
         }
         return currentOrParentFrameGetNode;

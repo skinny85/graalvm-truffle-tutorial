@@ -115,4 +115,22 @@ class ClosuresTest {
         );
         assertEquals(55, result.asInt());
     }
+
+    @Test
+    void nested_closures_can_read_parent_function_arguments() {
+        Value result = this.context.eval("ezs", "" +
+                "function sum(n) { " +
+                "    let sum = 0; " +
+                "    function sumInternal() { " +
+                "        for (let i = n; i > 0; i = i - 1) { " +
+                "            sum = sum + i; " +
+                "        } " +
+                "    } " +
+                "    sumInternal(); " +
+                "    return sum; " +
+                "} " +
+                "sum(10);"
+        );
+        assertEquals(55, result.asInt());
+    }
 }

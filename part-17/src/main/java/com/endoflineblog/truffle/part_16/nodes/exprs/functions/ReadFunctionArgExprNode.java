@@ -1,6 +1,8 @@
 package com.endoflineblog.truffle.part_16.nodes.exprs.functions;
 
 import com.endoflineblog.truffle.part_16.nodes.exprs.EasyScriptExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.frame.AbstractFrameGetNode;
+import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
@@ -12,6 +14,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * {@link com.endoflineblog.truffle.part_16.nodes.stmts.blocks.UserFuncBodyStmtNode}.
  */
 public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child
+    private AbstractFrameGetNode currentOrParentFrameGetNode;
+
     /**
      * We reference this field in {@link com.endoflineblog.truffle.part_16.nodes.stmts.blocks.UserFuncBodyStmtNode},
      * so we need to make it {@code public}.
@@ -20,15 +26,17 @@ public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
 
     public final String argName;
 
-    public ReadFunctionArgExprNode(int index, String argName) {
+    public ReadFunctionArgExprNode(AbstractFrameGetNode currentOrParentFrameGetNode, int index, String argName) {
+        this.currentOrParentFrameGetNode = currentOrParentFrameGetNode;
         this.index = index;
         this.argName = argName;
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
+        Frame currentOrParentFrame = this.currentOrParentFrameGetNode.executeFrame(frame);
         // we are guaranteed the argument array has enough elements,
         // because of the logic in FunctionDispatchNode
-        return frame.getArguments()[this.index];
+        return currentOrParentFrame.getArguments()[this.index];
     }
 }

@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_16;
 
 import com.endoflineblog.truffle.part_16.common.ErrorPrototypes;
 import com.endoflineblog.truffle.part_16.common.ShapesAndPrototypes;
+import com.endoflineblog.truffle.part_16.nodes.exprs.frame.CurrentFrameGetNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.AbsFunctionBodyExprNodeFactory;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.built_in.BuiltInFunctionBodyExprNode;
@@ -143,7 +144,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
                                             // this.message = args[1];
                                             new ExprStmtNode(PropertyWriteExprNodeGen.create(
                                                     new ThisExprNode(),
-                                                    new ReadFunctionArgExprNode(1, "message"),
+                                                    new ReadFunctionArgExprNode(new CurrentFrameGetNode(), 1, "message"),
                                                     "message"
                                             )),
                                             // this.name = <name>;
@@ -209,7 +210,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
             boolean offsetArguments) {
         int argumentCount = nodeFactory.getExecutionSignature().size();
         ReadFunctionArgExprNode[] functionArguments = IntStream.range(0, argumentCount)
-                .mapToObj(i -> new ReadFunctionArgExprNode(offsetArguments ? i + 1 : i, "arg" + i))
+                .mapToObj(i -> new ReadFunctionArgExprNode(new CurrentFrameGetNode(), offsetArguments ? i + 1 : i, "arg" + i))
                 .toArray(ReadFunctionArgExprNode[]::new);
         var rootNode = new BuiltInFuncRootNode(this,
                 nodeFactory.createNode((Object) functionArguments));
