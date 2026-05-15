@@ -35,7 +35,7 @@ public abstract class NestedFuncDeclStmtNode extends EasyScriptStmtNode {
         super(null);
     }
 
-    @Specialization(limit = "2")
+    @Specialization
     protected Object declareNestedFunction(VirtualFrame frame) {
         if (this.cachedCallTarget == null) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
