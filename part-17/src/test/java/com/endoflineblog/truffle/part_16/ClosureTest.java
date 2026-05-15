@@ -151,4 +151,19 @@ class ClosuresTest {
         );
         assertEquals(66, result.asInt());
     }
+
+    @Test
+    void returning_a_closure_is_supported() {
+        Value result = this.context.eval("ezs", "" +
+                "function makeAdder(add) { " +
+                "    function adder(arg) { " +
+                "        return arg + add; " +
+                "    } " +
+                "    return adder; " +
+                "} " +
+                "const add3 = makeAdder(3); " +
+                "add3(4); "
+        );
+        assertEquals(7, result.asInt());
+    }
 }
