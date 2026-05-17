@@ -31,6 +31,7 @@ stmt_block : '{' stmt* '}' ;
 expr1 : ID '=' expr1                                       #AssignmentExpr1
       | object=expr5 '.' ID '=' rvalue=expr1               #PropertyWriteExpr1
       | arr=expr5 '[' index=expr1 ']' '=' rvalue=expr1     #ArrayIndexWriteExpr1
+      | '(' args=func_args ')' '=>' stmt_block             #LambdaExpr1
       | expr2                                              #PrecedenceTwoExpr1
       ;
 expr2 : left=expr2 c=('===' | '!==') right=expr3           #EqNotEqExpr2

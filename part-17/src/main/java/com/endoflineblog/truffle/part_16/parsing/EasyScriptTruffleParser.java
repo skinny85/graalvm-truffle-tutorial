@@ -24,6 +24,7 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.frame.AbstractFrameGetNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.frame.CurrentFrameGetNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.frame.ParentFrameGetNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionCallExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionDefinitionExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteFunctionArgExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.BoolLiteralExprNode;
@@ -486,51 +487,19 @@ public final class EasyScriptTruffleParser {
             }
         }
 
-        // save the current state of the parser (before entering the function)
-        FrameDescriptor.Builder previousFrameDescriptor = this.frameDescriptor;
-        ParserState previousParserState = this.state;
-
-        // initialize the new state
-        this.frameDescriptor = FrameDescriptor.newBuilder();
-        this.state = ParserState.FUNC_DEF;
-        this.functionNestingLevel++;
-
-        var localVariables = new HashMap<String, FrameMember>();
-        // add each parameter to the map, with the correct index
-        List<TerminalNode> funcArgs = subroutineDecl.args.ID();
-        int argumentCount = funcArgs.size();
-        // all arguments need to be offset by 1 because of 'this',
-        // and closures need offset by 2, to account for the parent frame
-        int offset = isNestedFunction ? 2 : 1;
-        // first, initialize the locals with function arguments
-        for (int i = 0; i < argumentCount; i++) {
-            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + offset, this.functionNestingLevel));
-        }
-        this.localScopes.push(localVariables);
-
-        // parse the statements in the function definition
-        List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(subroutineDecl.stmt_block().stmt());
-
-        FrameDescriptor frameDescriptor = this.frameDescriptor.build();
-        // bring back the old state
-        this.frameDescriptor = previousFrameDescriptor;
-        this.state = previousParserState;
-        this.localScopes.pop();
-        this.functionNestingLevel--;
+        FunctionDefinitionExprNode functionDefinitionExprNode = this.parseFuncExpr(
+                subroutineDecl.args, subroutineDecl.stmt_block(),
+                subroutineName, this.createSourceSection(subroutineDecl),
+                isNestedFunction);
 
         return isNestedFunction
                 ? NestedFuncDeclStmtNodeGen.create(
-                        nestedFuncFrameSlot,
-                        subroutineName,
-                        frameDescriptor,
-                        new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
-                        argumentCount)
+                        functionDefinitionExprNode,
+                        nestedFuncFrameSlot)
                 : FuncDeclStmtNodeGen.create(
                         containerObjectExpr,
-                        subroutineName,
-                        frameDescriptor,
-                        new UserFuncBodyStmtNode(funcStmts, this.createSourceSection(subroutineDecl)),
-                        argumentCount);
+                        functionDefinitionExprNode,
+                        subroutineName);
     }
 
     private EasyScriptExprNode parseExpr1(EasyScriptParser.Expr1Context expr1) {
@@ -543,9 +512,58 @@ public final class EasyScriptTruffleParser {
             return this.parsePropertyWriteExpr((EasyScriptParser.PropertyWriteExpr1Context) expr1);
         } else if (expr1 instanceof EasyScriptParser.ArrayIndexWriteExpr1Context) {
             return this.parseArrayIndexWriteExpr((EasyScriptParser.ArrayIndexWriteExpr1Context) expr1);
+        } else if (expr1 instanceof EasyScriptParser.LambdaExpr1Context) {
+            return this.parseLambdaExpr((EasyScriptParser.LambdaExpr1Context) expr1);
         } else {
             return parseExpr2(((EasyScriptParser.PrecedenceTwoExpr1Context) expr1).expr2());
         }
+    }
+
+    private FunctionDefinitionExprNode parseLambdaExpr(EasyScriptParser.LambdaExpr1Context lambdaExpr) {
+        return this.parseFuncExpr(lambdaExpr.args, lambdaExpr.stmt_block(), null,
+                this.createSourceSection(lambdaExpr), /* isClosure */ true);
+    }
+
+    private FunctionDefinitionExprNode parseFuncExpr(
+        EasyScriptParser.Func_argsContext args, EasyScriptParser.Stmt_blockContext stmtBlock,
+        String funcName, SourceSection sourceSection, boolean isClosure
+    ) {
+        // save the current state of the parser (before entering the function)
+        FrameDescriptor.Builder previousFrameDescriptor = this.frameDescriptor;
+        ParserState previousParserState = this.state;
+
+        // initialize the new state
+        this.frameDescriptor = FrameDescriptor.newBuilder();
+        this.state = ParserState.FUNC_DEF;
+        this.functionNestingLevel++;
+
+        var localVariables = new HashMap<String, FrameMember>();
+        // add each parameter to the map, with the correct index
+        List<TerminalNode> funcArgs = args.ID();
+        int argumentCount = funcArgs.size();
+        // all arguments need to be offset by 1 because of 'this',
+        // and closures need offset by 2, to account for the parent frame
+        int offset = isClosure ? 2 : 1;
+        // first, initialize the locals with function arguments
+        for (int i = 0; i < argumentCount; i++) {
+            localVariables.put(funcArgs.get(i).getText(), new FunctionArgument(i + offset, this.functionNestingLevel));
+        }
+        this.localScopes.push(localVariables);
+
+        // parse the statements in the function definition
+        List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(stmtBlock.stmt());
+
+        FrameDescriptor frameDescriptor = this.frameDescriptor.build();
+        // bring back the old state
+        this.frameDescriptor = previousFrameDescriptor;
+        this.state = previousParserState;
+        this.localScopes.pop();
+        this.functionNestingLevel--;
+
+        return new FunctionDefinitionExprNode(
+                frameDescriptor,
+                new UserFuncBodyStmtNode(funcStmts, sourceSection),
+                funcName, argumentCount, isClosure);
     }
 
     private EasyScriptExprNode parseAssignmentExpr(EasyScriptParser.AssignmentExpr1Context assignmentExpr) {

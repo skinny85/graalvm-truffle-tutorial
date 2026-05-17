@@ -166,4 +166,21 @@ class ClosuresTest {
         );
         assertEquals(7, result.asInt());
     }
+
+    @Test
+    void anonymous_functions_are_supported() {
+        Value result = this.context.eval("ezs", "" +
+                "function sum(n) { " +
+                "    let sum = 0; " +
+                "    ((m) => { " +
+                "        for (; m > 0; m = m - 1) { " +
+                "            sum = sum + m; " +
+                "        } " +
+                "    })(n); " +
+                "    return sum; " +
+                "} " +
+                "sum(12);"
+        );
+        assertEquals(78, result.asInt());
+    }
 }
