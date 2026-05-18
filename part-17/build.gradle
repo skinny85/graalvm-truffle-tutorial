@@ -27,7 +27,7 @@ jmh {
 }
 
 application {
-    mainClass = 'com.endoflineblog.truffle.part_16.Main'
+    mainClass = 'com.endoflineblog.truffle.part_17.Main'
     applicationDefaultJvmArgs = [
         '-Dgraalvm.locatorDisabled=true',
     ]
