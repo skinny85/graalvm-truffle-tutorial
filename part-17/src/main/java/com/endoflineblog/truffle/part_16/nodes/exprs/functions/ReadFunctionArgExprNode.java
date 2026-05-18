@@ -2,16 +2,16 @@ package com.endoflineblog.truffle.part_16.nodes.exprs.functions;
 
 import com.endoflineblog.truffle.part_16.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.frame.AbstractFrameGetNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.frame.CurrentFrameGetNode;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * An expression Node that represents referencing a given argument of a function -
  * either built-in, or user-defined.
- * Very similar to the class with the same name from part 15,
- * the only difference is that we save the name of the argument this references.
- * We use that when searching for function argument references in
- * {@link com.endoflineblog.truffle.part_16.nodes.stmts.blocks.UserFuncBodyStmtNode}.
+ * Very similar to the class with the same name from part 16,
+ * the only difference is the {@link AbstractFrameGetNode}
+ * that gets used for local variables in closures.
  */
 public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
@@ -25,6 +25,10 @@ public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
     public final int index;
 
     public final String argName;
+
+    public ReadFunctionArgExprNode(int index, String argName) {
+        this(new CurrentFrameGetNode(), index, argName);
+    }
 
     public ReadFunctionArgExprNode(AbstractFrameGetNode currentOrParentFrameGetNode, int index, String argName) {
         this.currentOrParentFrameGetNode = currentOrParentFrameGetNode;

@@ -2,6 +2,9 @@ package com.endoflineblog.truffle.part_16;
 
 import org.openjdk.jmh.annotations.Benchmark;
 
+/**
+ * A benchmark that measures the performance of the EasyScript closure implementation.
+ */
 public class ClosureBenchmark extends TruffleBenchmark {
     private static final int INPUT = 1_000_000;
 
@@ -31,6 +34,15 @@ public class ClosureBenchmark extends TruffleBenchmark {
             "        } " +
             "    } " +
             "    countDownInternal(); " +
+            "    return count; " +
+            "} " +
+            "function countDownLambda(n) { " +
+            "    let count = 0; " +
+            "    (() => { " +
+            "        for (let i = n; i > 0; i = i - 1) { " +
+            "            count = count + 1; " +
+            "        } " +
+            "    })(); " +
             "    return count; " +
             "}";
 
@@ -71,5 +83,15 @@ public class ClosureBenchmark extends TruffleBenchmark {
     @Benchmark
     public int count_down_closure_js() {
         return this.truffleContext.eval("js", "countDownClosure(" + INPUT + ");").asInt();
+    }
+
+    @Benchmark
+    public int count_down_lambda_ezs() {
+        return this.truffleContext.eval("ezs", "countDownLambda(" + INPUT + ");").asInt();
+    }
+
+    @Benchmark
+    public int count_down_lambda_js() {
+        return this.truffleContext.eval("js", "countDownLambda(" + INPUT + ");").asInt();
     }
 }

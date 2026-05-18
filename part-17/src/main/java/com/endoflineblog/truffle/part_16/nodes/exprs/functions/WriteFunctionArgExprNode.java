@@ -7,7 +7,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 /**
  * An expression Node that represents an assignment to a function argument.
- * Identical to the class with the same name from part 15.
+ * Very similar to the class with the same name from part 16,
+ * the only difference is the {@link AbstractFrameGetNode}
+ * that gets used for function arguments in closures.
  */
 public final class WriteFunctionArgExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")

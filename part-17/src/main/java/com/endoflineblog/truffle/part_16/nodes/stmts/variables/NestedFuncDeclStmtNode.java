@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_16.nodes.stmts.variables;
 
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionDefinitionExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FuncDefExprNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_16.runtime.Undefined;
 import com.oracle.truffle.api.dsl.NodeChild;
@@ -9,7 +9,11 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.instrumentation.Tag;
 
-@NodeChild(value = "functionDefinitionExprNode", type = FunctionDefinitionExprNode.class)
+/**
+ * A statement that represents a function declaration nested inside another function
+ * (or method).
+ */
+@NodeChild(value = "funcDefExpr", type = FuncDefExprNode.class)
 @NodeField(name = "nestedFuncFrameSlot", type = int.class)
 public abstract class NestedFuncDeclStmtNode extends EasyScriptStmtNode {
     protected abstract int getNestedFuncFrameSlot();
@@ -20,6 +24,8 @@ public abstract class NestedFuncDeclStmtNode extends EasyScriptStmtNode {
 
     @Specialization
     protected Object declareNestedFunction(VirtualFrame frame, Object func) {
+        // we need to save the function object resulting from executing the child
+        // FuncDefExprNode as a local variable of the parent function
         frame.setObject(this.getNestedFuncFrameSlot(), func);
 
         return Undefined.INSTANCE;

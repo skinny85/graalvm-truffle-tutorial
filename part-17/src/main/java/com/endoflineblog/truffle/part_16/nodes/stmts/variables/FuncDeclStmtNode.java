@@ -1,7 +1,7 @@
 package com.endoflineblog.truffle.part_16.nodes.stmts.variables;
 
 import com.endoflineblog.truffle.part_16.nodes.exprs.EasyScriptExprNode;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionDefinitionExprNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FuncDefExprNode;
 import com.endoflineblog.truffle.part_16.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_16.runtime.Undefined;
 import com.oracle.truffle.api.dsl.NodeChild;
@@ -14,13 +14,13 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
- * Almost identical to the class with the same name from part 15,
- * the only difference is that we override the {@link #hasTag}
- * method to return {@code false} for all possible tags,
- * so that this statement is ignored by the debugger.
+ * Almost identical to the class with the same name from part 16,
+ * the only difference is that we moved the logic of creating and caching a
+ * {@link com.oracle.truffle.api.CallTarget} into {@link FuncDefExprNode},
+ * to share it with the new {@link NestedFuncDeclStmtNode}.
  */
 @NodeChild(value = "containerObjectExpr", type = EasyScriptExprNode.class)
-@NodeChild(value = "functionDefinitionExpr", type = FunctionDefinitionExprNode.class)
+@NodeChild(value = "funcDefExpr", type = FuncDefExprNode.class)
 @NodeField(name = "funcName", type = String.class)
 public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
     protected abstract String getFuncName();
@@ -32,10 +32,10 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
     }
 
     @Specialization(limit = "2")
-    protected Object declareFunction(DynamicObject containerObject, Object function,
+    protected Object declareFunction(DynamicObject containerObject, Object func,
             @CachedLibrary("containerObject") DynamicObjectLibrary objectLibrary) {
         // we allow functions to be redefined, to comply with JavaScript semantics
-        objectLibrary.putConstant(containerObject, this.getFuncName(), function, 0);
+        objectLibrary.putConstant(containerObject, this.getFuncName(), func, 0);
 
         // we return 'undefined' for statements that declare functions
         return Undefined.INSTANCE;

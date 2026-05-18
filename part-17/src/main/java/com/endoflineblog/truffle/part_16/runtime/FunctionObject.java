@@ -14,7 +14,9 @@ import com.oracle.truffle.api.strings.TruffleString;
 
 /**
  * The object that represents a function in EasyScript.
- * Identical to the class with the same name from part 15.
+ * Very similar to the class with the same name from part 16,
+ * the only difference is the added {@link #materializedFrame}
+ * field, which is not-{@code null} for functions that are closures.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FunctionObject extends JavaScriptObject {

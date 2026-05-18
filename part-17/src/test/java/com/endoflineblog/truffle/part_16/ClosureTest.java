@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * This is a set of unit tests for closures
+ * (including anonymous functions).
+ */
 class ClosuresTest {
     private Context context;
 

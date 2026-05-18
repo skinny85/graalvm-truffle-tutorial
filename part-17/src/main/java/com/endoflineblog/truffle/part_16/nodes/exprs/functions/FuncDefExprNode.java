@@ -12,7 +12,12 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-public final class FunctionDefinitionExprNode extends EasyScriptExprNode {
+/**
+ * An expression that represents the definition of a function.
+ * Used by {@link com.endoflineblog.truffle.part_16.nodes.stmts.variables.FuncDeclStmtNode}
+ * and {@link com.endoflineblog.truffle.part_16.nodes.stmts.variables.NestedFuncDeclStmtNode}.
+ */
+public final class FuncDefExprNode extends EasyScriptExprNode {
     private final FrameDescriptor frameDescriptor;
     private final UserFuncBodyStmtNode funcBody;
     private final String funcName;
@@ -25,8 +30,8 @@ public final class FunctionDefinitionExprNode extends EasyScriptExprNode {
     @CompilationFinal
     private FunctionObject cachedFunction;
 
-    public FunctionDefinitionExprNode(FrameDescriptor frameDescriptor, UserFuncBodyStmtNode funcBody,
-            String funcName, int argumentCount, boolean isClosure) {
+    public FuncDefExprNode(FrameDescriptor frameDescriptor, UserFuncBodyStmtNode funcBody,
+                String funcName, int argumentCount, boolean isClosure) {
         this.frameDescriptor = frameDescriptor;
         this.funcBody = funcBody;
         this.funcName = funcName;

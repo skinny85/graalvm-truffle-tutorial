@@ -12,7 +12,9 @@ import com.oracle.truffle.api.nodes.Node;
 
 /**
  * A helper Node that contains specialization for functions calls.
- * Identical to the class with the same name from part 15.
+ * Very similar to the class with the same name from part 16,
+ * the only difference is that we handle the new {@link com.oracle.truffle.api.frame.MaterializedFrame}
+ * field of {@link FunctionObject}.
  */
 public abstract class FunctionDispatchNode extends Node {
     /**
@@ -69,7 +71,7 @@ public abstract class FunctionDispatchNode extends Node {
 
     private static Object[] extendArguments(Object[] arguments, Object receiver, FunctionObject function) {
         // create a new array of arguments, reserving the first one for 'this',
-        // and the second one for the materialized frame if 'function' is nested,
+        // and the second one for the materialized frame if 'function' is a closure,
         // which means we need to offset the remaining arguments
         int extraArgs = function.materializedFrame == null ? 1 : 2;
         int extendedArgumentsLength = function.argumentCount + extraArgs;

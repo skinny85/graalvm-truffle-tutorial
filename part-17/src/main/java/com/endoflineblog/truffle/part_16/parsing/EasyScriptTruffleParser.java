@@ -23,8 +23,8 @@ import com.endoflineblog.truffle.part_16.nodes.exprs.comparisons.LesserOrEqualEx
 import com.endoflineblog.truffle.part_16.nodes.exprs.frame.AbstractFrameGetNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.frame.CurrentFrameGetNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.frame.ParentFrameGetNode;
+import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FuncDefExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionCallExprNode;
-import com.endoflineblog.truffle.part_16.nodes.exprs.functions.FunctionDefinitionExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.ReadFunctionArgExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.functions.WriteFunctionArgExprNode;
 import com.endoflineblog.truffle.part_16.nodes.exprs.literals.BoolLiteralExprNode;
@@ -476,6 +476,7 @@ public final class EasyScriptTruffleParser {
         boolean isNestedFunction = this.state == ParserState.FUNC_DEF;
         // make the default a characteristic value,
         // so we can easily find where it came from if we accidentally use it
+        // (without assigning it the correct value first)
         int nestedFuncFrameSlot = -123;
         if (isNestedFunction) {
             // reserve a slot in the FrameDescriptor of the parent function for the nested function
@@ -487,18 +488,18 @@ public final class EasyScriptTruffleParser {
             }
         }
 
-        FunctionDefinitionExprNode functionDefinitionExprNode = this.parseFuncExpr(
+        FuncDefExprNode funcDefExprNode = this.parseFuncDefExpr(
                 subroutineDecl.args, subroutineDecl.stmt_block(),
                 subroutineName, this.createSourceSection(subroutineDecl),
                 isNestedFunction);
 
         return isNestedFunction
                 ? NestedFuncDeclStmtNodeGen.create(
-                        functionDefinitionExprNode,
+                        funcDefExprNode,
                         nestedFuncFrameSlot)
                 : FuncDeclStmtNodeGen.create(
                         containerObjectExpr,
-                        functionDefinitionExprNode,
+                        funcDefExprNode,
                         subroutineName);
     }
 
@@ -519,12 +520,12 @@ public final class EasyScriptTruffleParser {
         }
     }
 
-    private FunctionDefinitionExprNode parseLambdaExpr(EasyScriptParser.LambdaExpr1Context lambdaExpr) {
-        return this.parseFuncExpr(lambdaExpr.args, lambdaExpr.stmt_block(), null,
+    private FuncDefExprNode parseLambdaExpr(EasyScriptParser.LambdaExpr1Context lambdaExpr) {
+        return this.parseFuncDefExpr(lambdaExpr.args, lambdaExpr.stmt_block(), null,
                 this.createSourceSection(lambdaExpr), /* isClosure */ true);
     }
 
-    private FunctionDefinitionExprNode parseFuncExpr(
+    private FuncDefExprNode parseFuncDefExpr(
         EasyScriptParser.Func_argsContext args, EasyScriptParser.Stmt_blockContext stmtBlock,
         String funcName, SourceSection sourceSection, boolean isClosure
     ) {
@@ -560,7 +561,7 @@ public final class EasyScriptTruffleParser {
         this.localScopes.pop();
         this.functionNestingLevel--;
 
-        return new FunctionDefinitionExprNode(
+        return new FuncDefExprNode(
                 frameDescriptor,
                 new UserFuncBodyStmtNode(funcStmts, sourceSection),
                 funcName, argumentCount, isClosure);

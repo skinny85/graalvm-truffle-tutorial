@@ -11,7 +11,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 
 /**
  * A Node that represents the assignment to a variable local to a function.
- * Very similar to the class with the same name from part 15,
+ * Very similar to the class with the same name from part 16,
  * the only difference is the {@link AbstractFrameGetNode}
  * that gets used for local variables in closures.
  */
