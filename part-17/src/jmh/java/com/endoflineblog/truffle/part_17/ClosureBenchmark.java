@@ -44,6 +44,16 @@ public class ClosureBenchmark extends TruffleBenchmark {
             "        } " +
             "    })(); " +
             "    return count; " +
+            "} " +
+            "function countDownClosureArg(n) { " +
+            "    let count = 0; " +
+            "    function countDownInternal() { " +
+            "        for (; n > 0; n = n - 1) { " +
+            "            count = count + 1; " +
+            "        } " +
+            "    } " +
+            "    countDownInternal(); " +
+            "    return count; " +
             "}";
 
     @Override
@@ -93,5 +103,15 @@ public class ClosureBenchmark extends TruffleBenchmark {
     @Benchmark
     public int count_down_lambda_js() {
         return this.truffleContext.eval("js", "countDownLambda(" + INPUT + ");").asInt();
+    }
+
+    @Benchmark
+    public int count_down_closure_arg_ezs() {
+        return this.truffleContext.eval("ezs", "countDownClosureArg(" + INPUT + ");").asInt();
+    }
+
+    @Benchmark
+    public int count_down_closure_arg_js() {
+        return this.truffleContext.eval("js", "countDownClosureArg(" + INPUT + ");").asInt();
     }
 }
