@@ -788,11 +788,10 @@ public final class EasyScriptTruffleParser {
     }
 
     private AbstractFrameGetNode establishCurrentOrParentGetFrameNode(int referenceNestingLevel) {
-        AbstractFrameGetNode currentOrParentFrameGetNode = new CurrentFrameGetNode();
-        for (int i = 0; i < this.functionNestingLevel - referenceNestingLevel; i++) {
-            currentOrParentFrameGetNode = new ParentFrameGetNode(currentOrParentFrameGetNode);
-        }
-        return currentOrParentFrameGetNode;
+        int frameLevel = this.functionNestingLevel - referenceNestingLevel;
+        return frameLevel == 0
+                ? new CurrentFrameGetNode()
+                : new ParentFrameGetNode(frameLevel);
     }
 
     private FrameMember findFrameMember(String memberName) {

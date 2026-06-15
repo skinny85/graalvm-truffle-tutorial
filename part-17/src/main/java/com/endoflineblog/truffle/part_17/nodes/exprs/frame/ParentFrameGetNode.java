@@ -5,17 +5,20 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 /**
  * An implementation of {@link AbstractFrameGetNode}
- * that returns the parent {@link Frame}.
+ * that returns the parent {@link Frame},
+ * walking up {@link #frameLevel} levels of nesting.
  * Because of how closures are implemented in
  * {@link com.endoflineblog.truffle.part_17.nodes.exprs.functions.FunctionDispatchNode},
- * we know that the materialized parent frame is kept in the argument with index 1.
- * We use a child instance of {@link AbstractFrameGetNode},
- * instead of referencing the provided {@link VirtualFrame},
- * so that we can support arbitrary levels of nesting functions within each other.
- * The cast of the parent frame to {@link MaterializedFrame} uses
+ * we know that the materialized parent frame is kept in the argument with index 1
+ * of every closure call.
+ * The walk is performed in a single {@link ExplodeLoop @ExplodeLoop}-annotated method,
+ * so that the partial evaluator unrolls the loop at compile time -
+ * this matches what GraalJS does in {@code ScopeFrameNode.EnclosingFunctionFrameNode}.
+ * The cast of each parent frame to {@link MaterializedFrame} uses
  * {@link CompilerDirectives#castExact(Object, Class)},
  * which gives the partial evaluator an exact type and skips the runtime checkcast -
  * this matches what GraalJS does in {@code JSFrameUtil.castMaterializedFrame}.
@@ -29,18 +32,20 @@ public final class ParentFrameGetNode extends AbstractFrameGetNode {
     private static final Class<? extends MaterializedFrame> MATERIALIZED_FRAME_CLASS =
             Truffle.getRuntime().createMaterializedFrame(new Object[0]).getClass();
 
-    @SuppressWarnings("FieldMayBeFinal")
-    @Child
-    private AbstractFrameGetNode currentOrParentFrameGetNode;
+    private final int frameLevel;
 
-    public ParentFrameGetNode(AbstractFrameGetNode currentOrParentFrameGetNode) {
-        this.currentOrParentFrameGetNode = currentOrParentFrameGetNode;
+    public ParentFrameGetNode(int frameLevel) {
+        assert frameLevel >= 1;
+        this.frameLevel = frameLevel;
     }
 
     @Override
+    @ExplodeLoop
     public Frame executeFrame(VirtualFrame frame) {
-        return CompilerDirectives.castExact(
-                this.currentOrParentFrameGetNode.executeFrame(frame).getArguments()[1],
-                MATERIALIZED_FRAME_CLASS);
+        Frame result = frame;
+        for (int i = 0; i < this.frameLevel; i++) {
+            result = CompilerDirectives.castExact(result.getArguments()[1], MATERIALIZED_FRAME_CLASS);
+        }
+        return result;
     }
 }
