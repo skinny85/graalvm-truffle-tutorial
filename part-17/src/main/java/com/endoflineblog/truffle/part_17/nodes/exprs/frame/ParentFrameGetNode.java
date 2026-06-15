@@ -1,6 +1,7 @@
 package com.endoflineblog.truffle.part_17.nodes.exprs.frame;
 
 import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -18,8 +19,16 @@ import com.oracle.truffle.api.frame.VirtualFrame;
  * {@link CompilerDirectives#castExact(Object, Class)},
  * which gives the partial evaluator an exact type and skips the runtime checkcast -
  * this matches what GraalJS does in {@code JSFrameUtil.castMaterializedFrame}.
+ * Because {@link MaterializedFrame} is an interface, we cannot pass
+ * {@code MaterializedFrame.class} to {@link CompilerDirectives#castExact}
+ * (which requires an exact class match);
+ * instead, we capture the concrete runtime class once at class-load time -
+ * this is the same trick GraalJS uses.
  */
 public final class ParentFrameGetNode extends AbstractFrameGetNode {
+    private static final Class<? extends MaterializedFrame> MATERIALIZED_FRAME_CLASS =
+            Truffle.getRuntime().createMaterializedFrame(new Object[0]).getClass();
+
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private AbstractFrameGetNode currentOrParentFrameGetNode;
@@ -32,6 +41,6 @@ public final class ParentFrameGetNode extends AbstractFrameGetNode {
     public Frame executeFrame(VirtualFrame frame) {
         return CompilerDirectives.castExact(
                 this.currentOrParentFrameGetNode.executeFrame(frame).getArguments()[1],
-                MaterializedFrame.class);
+                MATERIALIZED_FRAME_CLASS);
     }
 }
