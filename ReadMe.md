@@ -70,3 +70,4 @@ $ ./gradlew build
 * [Part 14 - classes 3: inheritance, `super`](part-14)
 * [Part 15 - exceptions](part-15)
 * [Part 16 - debuggers](part-16)
+* [Part 17 - anonymous functions and closures](part-17)

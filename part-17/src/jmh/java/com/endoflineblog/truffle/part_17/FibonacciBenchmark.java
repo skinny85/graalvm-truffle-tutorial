@@ -1,10 +1,10 @@
-package com.endoflineblog.truffle.part_16;
+package com.endoflineblog.truffle.part_17;
 
 import org.openjdk.jmh.annotations.Benchmark;
 
 /**
  * A benchmark that uses the naive implementation of the Fibonacci function.
- * Identical to the class with the same name from part 14.
+ * Identical to the class with the same name from part 16.
  */
 public class FibonacciBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_JS_PROGRAM = "" +
