@@ -3,3 +3,4 @@
 .gradle/
 build/
 .java-version
+bin
