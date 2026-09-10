@@ -29,4 +29,14 @@ public final class FuncDebuggerScopeObject extends AbstractDebuggerScopeObject {
     Object toDisplayString(@SuppressWarnings("unused") boolean allowSideEffects) {
         return this.userFuncBodyStmtNode.getRootNode().getName();
     }
+
+    @ExportMessage
+    boolean hasLanguageId() {
+        return true;
+    }
+
+    @ExportMessage
+    String getLanguageId() {
+        return "ezs";
+    }
 }

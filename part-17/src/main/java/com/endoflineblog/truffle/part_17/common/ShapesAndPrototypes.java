@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_17.common;
 import com.endoflineblog.truffle.part_17.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_17.runtime.ObjectPrototype;
 import com.endoflineblog.truffle.part_17.EasyScriptLanguageContext;
+import com.oracle.truffle.api.dsl.NeverDefault;
 import com.oracle.truffle.api.object.Shape;
 
 import java.util.Collections;
@@ -19,9 +20,11 @@ import java.util.Map;
 public final class ShapesAndPrototypes {
     public final Shape rootShape;
     public final Shape arrayShape;
+    @NeverDefault
     public final ObjectPrototype objectPrototype;
     public final ClassPrototypeObject functionPrototype;
     public final ClassPrototypeObject arrayPrototype;
+    @NeverDefault
     public final ClassPrototypeObject stringPrototype;
     public final ErrorPrototypes errorPrototypes;
     public final Map<String, ClassPrototypeObject> allBuiltInClasses;

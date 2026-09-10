@@ -6,7 +6,9 @@ import com.endoflineblog.truffle.part_17.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_17.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_17.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -18,6 +20,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * An AST node that represents reading properties of strings.
  * Identical to the class with the same name from part 16.
  */
+@GenerateInline(false)
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     public static final String LENGTH_PROP = "length";
 
@@ -32,7 +35,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected Object readStringIndex(
             TruffleString truffleString,
             int index,
-            @Cached TruffleString.CodePointLengthNode lengthNode,
+            @Cached @Shared("length") TruffleString.CodePointLengthNode lengthNode,
             @Cached TruffleString.SubstringNode substringNode) {
         return index < 0 || index >= EasyScriptTruffleStrings.length(truffleString, lengthNode)
                 ? Undefined.INSTANCE
@@ -48,7 +51,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected int readLengthProperty(
             TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
-            @Cached TruffleString.CodePointLengthNode lengthNode) {
+            @Cached @Shared("length") TruffleString.CodePointLengthNode lengthNode) {
         return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 

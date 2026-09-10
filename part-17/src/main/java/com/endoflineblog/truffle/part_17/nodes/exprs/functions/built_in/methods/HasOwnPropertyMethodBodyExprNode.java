@@ -5,9 +5,9 @@ import com.endoflineblog.truffle.part_17.nodes.exprs.strings.ReadTruffleStringPr
 import com.endoflineblog.truffle.part_17.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -20,11 +20,19 @@ public abstract class HasOwnPropertyMethodBodyExprNode extends BuiltInFunctionBo
      * The specialization for calling {@code hasOwnProperty()}
      * on an object.
      */
-    @Specialization(limit = "2")
+    @Specialization(guards = "property == cachedProperty", limit = "3")
     protected boolean hasOwnPropertyDynamicObject(
             DynamicObject self, Object property,
-            @CachedLibrary("self") DynamicObjectLibrary dynamicObjectLibrary) {
-        return dynamicObjectLibrary.containsKey(self, EasyScriptTruffleStrings.toString(property));
+            @Cached("property") Object cachedProperty,
+            @Cached @Shared("containsKey") DynamicObject.ContainsKeyNode containsKeyNode) {
+        return containsKeyNode.execute(self, EasyScriptTruffleStrings.toString(cachedProperty));
+    }
+
+    @Specialization(replaces = "hasOwnPropertyDynamicObject")
+    protected boolean hasOwnPropertyDynamicObjectGeneric(
+            DynamicObject self, Object property,
+            @Cached @Shared("containsKey") DynamicObject.ContainsKeyNode containsKeyNode) {
+        return containsKeyNode.execute(self, EasyScriptTruffleStrings.toString(property));
     }
 
     /**

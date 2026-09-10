@@ -11,12 +11,13 @@ import com.endoflineblog.truffle.part_17.runtime.ObjectPrototype;
 import com.endoflineblog.truffle.part_17.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.strings.TruffleString;
 
 /**
@@ -24,6 +25,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * Used by {@link PropertyReadExprNode} and {@link ArrayIndexReadExprNode}.
  * Identical to the class with the same name from part 16.
  */
+@GenerateInline(false)
 public abstract class CommonReadPropertyNode extends EasyScriptNode {
     public abstract Object executeReadProperty(Object target, Object property);
 
@@ -59,12 +61,10 @@ public abstract class CommonReadPropertyNode extends EasyScriptNode {
             @SuppressWarnings("unused") Object target,
             Object property,
             @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary,
-            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary,
             @Cached("currentLanguageContext().shapesAndPrototypes") ShapesAndPrototypes shapesAndPrototypes) {
         var typeError = new ErrorJavaScriptObject(
                 "TypeError",
                 "Cannot read properties of undefined (reading '" + property + "')",
-                dynamicObjectLibrary,
                 shapesAndPrototypes.rootShape,
                 shapesAndPrototypes.errorPrototypes.typeErrorPrototype);
         throw new EasyScriptException(typeError, this);
@@ -76,10 +76,10 @@ public abstract class CommonReadPropertyNode extends EasyScriptNode {
      */
     @Fallback
     protected Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
-            @SuppressWarnings("unused") Object property,
+            Object property,
             @Cached("currentLanguageContext().shapesAndPrototypes.objectPrototype") ObjectPrototype objectPrototype,
-            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
-        return dynamicObjectLibrary.getOrDefault(objectPrototype,
+            @Cached DynamicObject.GetNode getNode) {
+        return getNode.execute(objectPrototype,
                 EasyScriptTruffleStrings.toString(property), Undefined.INSTANCE);
     }
 }

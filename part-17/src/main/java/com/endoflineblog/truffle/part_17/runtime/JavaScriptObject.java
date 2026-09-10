@@ -1,5 +1,7 @@
 package com.endoflineblog.truffle.part_17.runtime;
 
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
@@ -7,7 +9,6 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 /**
@@ -43,18 +44,18 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     boolean isMemberReadable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode,
             @CachedLibrary("this.prototype") InteropLibrary prototypeInteropLibrary) {
-        return thisObjectLibrary.containsKey(this, member) ||
+        return containsKeyNode.execute(this, member) ||
                 prototypeInteropLibrary.isMemberReadable(this.prototype, member);
     }
 
     @ExportMessage
     Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @Cached DynamicObject.GetNode getNode,
             @CachedLibrary("this.prototype") InteropLibrary prototypeInteropLibrary)
             throws UnknownIdentifierException, UnsupportedMessageException {
-        Object value = thisObjectLibrary.getOrDefault(this, member, null);
+        Object value = getNode.execute(this, member, null);
         if (value == null) {
             return prototypeInteropLibrary.readMember(this.prototype, member);
         }
@@ -63,27 +64,27 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary) {
-        return new MemberNamesObject(thisObjectLibrary.getKeyArray(this));
+            @Cached DynamicObject.GetKeyArrayNode getKeyArrayNode) {
+        return new MemberNamesObject(getKeyArrayNode.execute(this));
     }
 
     @ExportMessage
     boolean isMemberModifiable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode,
             @CachedLibrary("this.prototype") InteropLibrary prototypeInteropLibrary) {
-        return this.isMemberReadable(member, thisObjectLibrary, prototypeInteropLibrary);
+        return this.isMemberReadable(member, containsKeyNode, prototypeInteropLibrary);
     }
 
     @ExportMessage
     boolean isMemberInsertable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary,
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode,
             @CachedLibrary("this.prototype") InteropLibrary prototypeInteropLibrary) {
-        return !this.isMemberModifiable(member, thisObjectLibrary, prototypeInteropLibrary);
+        return !this.isMemberModifiable(member, containsKeyNode, prototypeInteropLibrary);
     }
 
     @ExportMessage
     void writeMember(String member, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary) {
-        thisObjectLibrary.put(this, member, value);
+            @Cached DynamicObject.PutNode putNode) {
+        putNode.execute(this, member, value);
     }
 }

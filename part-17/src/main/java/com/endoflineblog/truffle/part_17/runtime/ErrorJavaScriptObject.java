@@ -1,6 +1,6 @@
 package com.endoflineblog.truffle.part_17.runtime;
 
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.Shape;
 
 /**
@@ -14,13 +14,13 @@ public final class ErrorJavaScriptObject extends JavaScriptObject {
     public final String name, message;
 
     public ErrorJavaScriptObject(String name, String message,
-            DynamicObjectLibrary dynamicObjectLibrary,
             Shape shape, ClassPrototypeObject prototype) {
         super(shape, prototype);
 
         this.name = name;
         this.message = message;
-        dynamicObjectLibrary.put(this, "name", EasyScriptTruffleStrings.fromJavaString(name));
-        dynamicObjectLibrary.put(this, "message", EasyScriptTruffleStrings.fromJavaString(message));
+        var putNode = DynamicObject.PutNode.getUncached();
+        putNode.execute(this, "name", EasyScriptTruffleStrings.fromJavaString(name));
+        putNode.execute(this, "message", EasyScriptTruffleStrings.fromJavaString(message));
     }
 }

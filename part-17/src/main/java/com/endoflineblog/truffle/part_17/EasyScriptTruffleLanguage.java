@@ -31,7 +31,6 @@ import com.oracle.truffle.api.instrumentation.ProvidedTags;
 import com.oracle.truffle.api.instrumentation.StandardTags;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 import java.util.Collections;
@@ -83,9 +82,9 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var objectLibrary = DynamicObjectLibrary.getUncached();
+        var putConstantNode = DynamicObject.PutConstantNode.getUncached();
         return new EasyScriptLanguageContext(
-                this.createGlobalScopeObject(objectLibrary),
+                this.createGlobalScopeObject(putConstantNode),
                 this.shapesAndPrototypes,
                 // empty function, used for default constructors by SuperExprNode
                 new FunctionObject(
@@ -104,32 +103,32 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return context.globalScopeObject;
     }
 
-    private DynamicObject createGlobalScopeObject(DynamicObjectLibrary objectLibrary) {
+    private DynamicObject createGlobalScopeObject(DynamicObject.PutConstantNode putConstantNode) {
         var globalScopeObject = new GlobalScopeObject(this.rootShape);
         // the 0 flag indicates that these are variables, and can be reassigned
-        objectLibrary.putConstant(globalScopeObject, "Math",
-                this.createMathObject(objectLibrary), 0);
+        putConstantNode.executeWithFlags(globalScopeObject, "Math",
+                this.createMathObject(putConstantNode), 0);
 
         // initialize the Object prototype
-        objectLibrary.putConstant(this.objectPrototype, "hasOwnProperty",
+        putConstantNode.executeWithFlags(this.objectPrototype, "hasOwnProperty",
                 this.defineBuiltInMethod(HasOwnPropertyMethodBodyExprNodeFactory.getInstance()),
                 0);
 
         // initialize the String prototype
-        objectLibrary.putConstant(this.shapesAndPrototypes.stringPrototype, "charAt",
+        putConstantNode.executeWithFlags(this.shapesAndPrototypes.stringPrototype, "charAt",
                 this.defineBuiltInMethod(CharAtMethodBodyExprNodeFactory.getInstance()),
                 0);
 
         // add all built-in class prototypes to the global scope
         for (var entry : this.shapesAndPrototypes.allBuiltInClasses.entrySet()) {
-            objectLibrary.putConstant(globalScopeObject, entry.getKey(),
+            putConstantNode.executeWithFlags(globalScopeObject, entry.getKey(),
                     entry.getValue(), 0);
         }
 
         // add a constructor to all Error types
         for (Map.Entry<String, ClassPrototypeObject> entry :
                 this.shapesAndPrototypes.errorPrototypes.allBuiltInErrorClasses.entrySet()) {
-            objectLibrary.putConstant(entry.getValue(), "constructor",
+            putConstantNode.executeWithFlags(entry.getValue(), "constructor",
                     // error subtype constructor
                     new FunctionObject(
                             this.rootShape,
@@ -159,13 +158,13 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return globalScopeObject;
     }
 
-    private Object createMathObject(DynamicObjectLibrary objectLibrary) {
+    private Object createMathObject(DynamicObject.PutConstantNode putConstantNode) {
         var mathPrototype = new ClassPrototypeObject(this.rootShape, "Math", this.objectPrototype);
         var mathObject = new JavaScriptObject(this.rootShape, mathPrototype);
-        objectLibrary.putConstant(mathObject, "abs",
+        putConstantNode.executeWithFlags(mathObject, "abs",
                 this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
                 0);
-        objectLibrary.putConstant(mathObject, "pow",
+        putConstantNode.executeWithFlags(mathObject, "pow",
                 this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance()),
                 0);
         return mathObject;

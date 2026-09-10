@@ -8,9 +8,8 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.instrumentation.Tag;
-import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the declaration of a function in EasyScript.
@@ -31,11 +30,11 @@ public abstract class FuncDeclStmtNode extends EasyScriptStmtNode {
         super(null);
     }
 
-    @Specialization(limit = "2")
+    @Specialization
     protected Object declareFunction(DynamicObject containerObject, Object func,
-            @CachedLibrary("containerObject") DynamicObjectLibrary objectLibrary) {
+            @Cached DynamicObject.PutConstantNode putConstantNode) {
         // we allow functions to be redefined, to comply with JavaScript semantics
-        objectLibrary.putConstant(containerObject, this.getFuncName(), func, 0);
+        putConstantNode.executeWithFlags(containerObject, this.getFuncName(), func, 0);
 
         // we return 'undefined' for statements that declare functions
         return Undefined.INSTANCE;

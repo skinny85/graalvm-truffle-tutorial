@@ -6,9 +6,8 @@ import com.endoflineblog.truffle.part_17.nodes.exprs.GlobalScopeObjectExprNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 
 /**
  * A Node that represents the expression of referencing a global variable in EasyScript.
@@ -19,11 +18,11 @@ import com.oracle.truffle.api.object.DynamicObjectLibrary;
 public abstract class GlobalVarReferenceExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
-    @Specialization(limit = "2")
+    @Specialization
     protected Object readVariable(DynamicObject globalScopeObject,
-            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
+            @Cached DynamicObject.GetNode getNode) {
         String variableId = this.getName();
-        var value = objectLibrary.getOrDefault(globalScopeObject, variableId, null);
+        var value = getNode.execute(globalScopeObject, variableId, null);
         if (value == null) {
             throw new EasyScriptException(this, "'" + variableId + "' is not defined");
         } else {

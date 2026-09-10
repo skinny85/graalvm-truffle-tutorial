@@ -1,8 +1,6 @@
 package com.endoflineblog.truffle.part_17.runtime.debugger;
 
-import com.endoflineblog.truffle.part_17.EasyScriptTruffleLanguage;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
-import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.Frame;
@@ -35,13 +33,13 @@ abstract class AbstractDebuggerScopeObject implements TruffleObject {
     }
 
     @ExportMessage
-    boolean hasLanguage() {
+    boolean hasLanguageId() {
         return true;
     }
 
     @ExportMessage
-    Class<? extends TruffleLanguage<?>> getLanguage() {
-        return EasyScriptTruffleLanguage.class;
+    String getLanguageId() {
+        return "ezs";
     }
 
     @ExportMessage

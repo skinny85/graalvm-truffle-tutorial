@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_17;
 import com.endoflineblog.truffle.part_17.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_17.runtime.FunctionObject;
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.dsl.NeverDefault;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
 
@@ -26,6 +27,7 @@ public final class EasyScriptLanguageContext {
      * The object containing the shapes and prototypes,
      * both for user-defined class instances, and for built-in objects.
      */
+    @NeverDefault
     public final ShapesAndPrototypes shapesAndPrototypes;
 
     public final FunctionObject emptyFunction;
