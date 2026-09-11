@@ -18,6 +18,7 @@ import com.oracle.truffle.api.nodes.RootNode;
  * This can be either any block except the top-level block of a user-defined function
  * (which is handled by {@link FuncDebuggerScopeObject}),
  * or any block (including the top-level one) in the main program.
+ * Identical to the class with the same name from part 16.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class BlockDebuggerScopeObject extends AbstractDebuggerScopeObject {
@@ -38,7 +39,7 @@ public final class BlockDebuggerScopeObject extends AbstractDebuggerScopeObject 
     @ExportMessage
     Object toDisplayString(
             @SuppressWarnings("unused") boolean allowSideEffects,
-            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock
+            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock
     ) {
         return nodeGrandParentBlock instanceof RootNode
                 ? ((RootNode) nodeGrandParentBlock).getName()
@@ -47,13 +48,13 @@ public final class BlockDebuggerScopeObject extends AbstractDebuggerScopeObject 
 
     @ExportMessage
     boolean hasScopeParent(
-            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock) {
+            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock) {
         return !(nodeGrandParentBlock instanceof StmtBlockRootNode);
     }
 
     @ExportMessage
     Object getScopeParent(
-            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock)
+            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock)
             throws UnsupportedMessageException {
         if (nodeGrandParentBlock instanceof BlockStmtNode) {
             return new BlockDebuggerScopeObject((BlockStmtNode) nodeGrandParentBlock, this.frame);
@@ -62,5 +63,15 @@ public final class BlockDebuggerScopeObject extends AbstractDebuggerScopeObject 
         } else {
             throw UnsupportedMessageException.create();
         }
+    }
+
+    @ExportMessage
+    boolean hasLanguageId() {
+        return true;
+    }
+
+    @ExportMessage
+    String getLanguageId() {
+        return "ezs";
     }
 }

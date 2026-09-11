@@ -2,11 +2,10 @@ package com.endoflineblog.truffle.part_12.runtime;
 
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
-import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 /**
@@ -28,7 +27,7 @@ public final class ArrayObject extends DynamicObject {
 
     public ArrayObject(Shape arrayShape, Object[] arrayElements) {
         super(arrayShape);
-        this.setArrayElements(arrayElements, DynamicObjectLibrary.getUncached());
+        this.setArrayElements(arrayElements, DynamicObject.PutNode.getUncached());
     }
 
     @ExportMessage
@@ -70,7 +69,7 @@ public final class ArrayObject extends DynamicObject {
 
     @ExportMessage
     void writeArrayElement(long index, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
+            @Cached DynamicObject.PutNode putNode) {
         if (this.isArrayElementModifiable(index)) {
             this.arrayElements[(int) index] = value;
         } else {
@@ -82,7 +81,7 @@ public final class ArrayObject extends DynamicObject {
                         : Undefined.INSTANCE;
             }
             newArrayElements[(int) index] = value;
-            this.setArrayElements(newArrayElements, objectLibrary);
+            this.setArrayElements(newArrayElements, putNode);
         }
     }
 
@@ -98,9 +97,9 @@ public final class ArrayObject extends DynamicObject {
 
     @ExportMessage
     Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) throws UnknownIdentifierException {
+            @Cached DynamicObject.GetNode getNode) throws UnknownIdentifierException {
         switch (member) {
-            case "length": return objectLibrary.getOrDefault(this, "length", 0);
+            case "length": return getNode.execute(this, "length", 0);
             default: throw UnknownIdentifierException.create(member);
         }
     }
@@ -110,8 +109,9 @@ public final class ArrayObject extends DynamicObject {
         return new MemberNamesObject(new String[]{"length"});
     }
 
-    private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {
+    private void setArrayElements(Object[] arrayElements, DynamicObject.PutNode putNode) {
         this.arrayElements = arrayElements;
-        objectLibrary.putInt(this, "length", arrayElements.length);
+        putNode.execute(this, "length", arrayElements.length);
     }
 }
+

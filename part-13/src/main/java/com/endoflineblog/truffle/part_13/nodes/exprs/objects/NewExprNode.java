@@ -7,13 +7,13 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.functions.FunctionDispatchN
 import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_13.runtime.JavaScriptObject;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Executed;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
 
 import java.util.List;
 
@@ -47,9 +47,9 @@ public abstract class NewExprNode extends EasyScriptExprNode {
      */
     @Specialization(limit = "2")
     protected Object instantiateObject(VirtualFrame frame, ClassPrototypeObject classPrototypeObject,
-            @CachedLibrary("classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary) {
+            @Cached DynamicObject.GetNode getNode) {
         var object = new JavaScriptObject(this.currentLanguageContext().shapesAndPrototypes.rootShape, classPrototypeObject);
-        var constructor = dynamicObjectLibrary.getOrDefault(classPrototypeObject, "constructor", null);
+        var constructor = getNode.execute(classPrototypeObject, "constructor", null);
         if (constructor instanceof FunctionObject) {
             // instanceof always returns 'false' for 'null'
             Object[] args = this.executeArguments(frame);

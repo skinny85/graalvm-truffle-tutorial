@@ -3,13 +3,14 @@ package com.endoflineblog.truffle.part_16;
 import com.endoflineblog.truffle.part_16.common.ShapesAndPrototypes;
 import com.endoflineblog.truffle.part_16.runtime.FunctionObject;
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.dsl.NeverDefault;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
 
 /**
  * The class of the context for the
  * {@link EasyScriptTruffleLanguage TruffleLanguage implementaton in this part of the series}.
- * Identical to the class with the same name from part 15.
+ * Identical to the class with the same name from part 16.
  */
 public final class EasyScriptLanguageContext {
     private static final TruffleLanguage.ContextReference<EasyScriptLanguageContext> REF =
@@ -26,6 +27,7 @@ public final class EasyScriptLanguageContext {
      * The object containing the shapes and prototypes,
      * both for user-defined class instances, and for built-in objects.
      */
+    @NeverDefault
     public final ShapesAndPrototypes shapesAndPrototypes;
 
     public final FunctionObject emptyFunction;

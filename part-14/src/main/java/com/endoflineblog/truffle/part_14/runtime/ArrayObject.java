@@ -1,19 +1,20 @@
 package com.endoflineblog.truffle.part_14.runtime;
 
 import com.endoflineblog.truffle.part_14.exceptions.EasyScriptException;
+import com.endoflineblog.truffle.part_14.EasyScriptTruffleLanguage;
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 /**
  * A Truffle {@link DynamicObject} that implements integer-indexed JavaScript arrays.
- * Identical to the class with the same name from part 13.
+ * Identical to the class with the same name from part 16.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ArrayObject extends JavaScriptObject {
@@ -24,7 +25,7 @@ public final class ArrayObject extends JavaScriptObject {
      * The field that signifies this {@link DynamicObject}
      * always has a property called {@code length}.
      * Used in the array shape created in the
-     * {@link com.endoflineblog.truffle.part_14.EasyScriptTruffleLanguage TruffleLanguage class for this chapter}.
+     * {@link EasyScriptTruffleLanguage TruffleLanguage class for this chapter}.
      */
     @DynamicField
     private long length;
@@ -33,7 +34,7 @@ public final class ArrayObject extends JavaScriptObject {
 
     public ArrayObject(Shape arrayShape, ClassPrototypeObject arrayPrototype, Object[] arrayElements) {
         super(arrayShape, arrayPrototype);
-        this.setArrayElements(arrayElements, DynamicObjectLibrary.getUncached());
+        this.setArrayElements(arrayElements, DynamicObject.PutNode.getUncached());
     }
 
     @ExportMessage
@@ -75,10 +76,10 @@ public final class ArrayObject extends JavaScriptObject {
 
     @ExportMessage
     void writeArrayElement(long index, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
+            @Cached @Shared("put") DynamicObject.PutNode putNode) {
         if (!this.isArrayElementModifiable(index)) {
             // in JavaScript, it's legal to write past the array size
-            this.resetArray(index + 1, objectLibrary);
+            this.resetArray(index + 1, putNode);
         }
         this.arrayElements[(int) index] = value;
     }
@@ -93,8 +94,8 @@ public final class ArrayObject extends JavaScriptObject {
         @Specialization(guards = {"LENGTH_PROP.equals(member)", "length >= 0"})
         static void writeNonNegativeIntLength(ArrayObject arrayObject,
                 @SuppressWarnings("unused") String member, int length,
-                @CachedLibrary("arrayObject") DynamicObjectLibrary dynamicObjectLibrary) {
-            arrayObject.resetArray(length, dynamicObjectLibrary);
+                @Cached @Shared("put") DynamicObject.PutNode putNode) {
+            arrayObject.resetArray(length, putNode);
         }
 
         @Specialization(guards = "LENGTH_PROP.equals(member)")
@@ -107,23 +108,23 @@ public final class ArrayObject extends JavaScriptObject {
 
         @Fallback
         static void writeNonLength(ArrayObject arrayObject, String member, Object value,
-                @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
-            arrayObject.writeMember(member, value, dynamicObjectLibrary);
+                @Cached @Shared("put") DynamicObject.PutNode putNode) {
+            putNode.execute(arrayObject, member, value);
         }
     }
 
-    private void resetArray(long length, DynamicObjectLibrary objectLibrary) {
+    private void resetArray(long length, DynamicObject.PutNode putNode) {
         Object[] newArrayElements = new Object[(int) length];
         for (int i = 0; i < length; i++) {
             newArrayElements[i] = i < this.arrayElements.length
                     ? this.arrayElements[i]
                     : Undefined.INSTANCE;
         }
-        this.setArrayElements(newArrayElements, objectLibrary);
+        this.setArrayElements(newArrayElements, putNode);
     }
 
-    private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {
+    private void setArrayElements(Object[] arrayElements, DynamicObject.PutNode putNode) {
         this.arrayElements = arrayElements;
-        this.writeMember(LENGTH_PROP, arrayElements.length, objectLibrary);
+        putNode.execute(this, LENGTH_PROP, arrayElements.length);
     }
 }

@@ -51,7 +51,7 @@ to avoid duplicating code between the two.
 
 We change `JavaScriptObject` to use the
 [interop library](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html)
-instead of the [dynamic object library](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObjectLibrary.html)
+together with [`DynamicObject.*Node`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObject.html) helpers on the object itself
 when reading properties of its prototype,
 which allows classes to inherit methods from their superclass.
 

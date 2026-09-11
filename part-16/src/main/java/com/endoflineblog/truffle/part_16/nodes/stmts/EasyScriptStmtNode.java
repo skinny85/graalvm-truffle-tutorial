@@ -25,30 +25,7 @@ import com.oracle.truffle.api.source.SourceSection;
 /**
  * The abstract common ancestor of all AST Nodes that represent statements in EasyScript,
  * like declaring a variable or constant.
- * Similar to the class with the same name from part 15,
- * but has a few additions related to debugger support:
- * <ul>
- *     <li>
- *         Implements the {@link InstrumentableNode} interface.
- *         To help with implementing the {@link #createWrapper(ProbeNode)} method of that interface,
- *         we annotate the class with {@link GenerateWrapper}.
- *         We also override the {@link #hasTag(Class)} method to return true for {@link StandardTags.StatementTag}.
- *     </li>
- *     <li>
- *         We store the {@link SourceSection} of the statement in a field,
- *         and return it in the override of the {@link #getSourceSection()} method.
- *         We initialize the field in the constructor,
- *         and each statement subclass must pass a value to it.
- *     </li>
- *     <li>
- *         We add a {@link #findParentBlock()} method that returns the block containing the given statement.
- *         It's used in {@link BlockStmtNode} and {@link BlockDebuggerScopeObject}.
- *     </li>
- *     <li>
- *         We export the {@link NodeLibrary}, and implement the {@link #hasScope} and {@link #getScope} methods from it,
- *         which is needed for the debugger to show the variables in current scope.
- *     </li>
- * </ul>
+ * Identical to the class with the same name from part 16.
  */
 @GenerateWrapper
 @ExportLibrary(value = NodeLibrary.class)
@@ -111,7 +88,7 @@ public abstract class EasyScriptStmtNode extends EasyScriptNode implements Instr
     @ExportMessage
     boolean hasScope(
             @SuppressWarnings("unused") Frame frame,
-            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true) @Shared("thisParentBlock") Node thisParentBlock) {
+            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("thisParentBlock") Node thisParentBlock) {
         return !(thisParentBlock instanceof StmtBlockRootNode);
     }
 
@@ -126,7 +103,7 @@ public abstract class EasyScriptStmtNode extends EasyScriptNode implements Instr
     Object getScope(
             Frame frame,
             @SuppressWarnings("unused") boolean nodeEnter,
-            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true) @Shared("thisParentBlock") Node thisParentBlock) {
+            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("thisParentBlock") Node thisParentBlock) {
         return thisParentBlock instanceof BlockStmtNode
                 ? new BlockDebuggerScopeObject((BlockStmtNode) thisParentBlock, frame)
                 : new FuncDebuggerScopeObject((UserFuncBodyStmtNode) thisParentBlock, frame);

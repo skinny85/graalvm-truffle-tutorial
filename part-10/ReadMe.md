@@ -50,10 +50,11 @@ There is a field in `ArrayObject` annotated with the
 [`@DynamicField` annotation](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObject.DynamicField.html)
 that tells the Truffle object system that this dynamic object always has the `length` property.
 
-The logic inside `ArrayObject` stores the `length` property directly in the object instance using a different Truffle library,
-[`DynamicObjectLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObjectLibrary.html).
-To get a reference to an instance of the library,
-we again use the `@CachedLibrary` annotation,
+The logic inside `ArrayObject` stores the `length` property directly in the object instance using
+[`DynamicObject.PutNode`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObject.PutNode.html)
+(and related `DynamicObject.*Node` helpers for reads and key checks).
+To get a reference to these nodes in export messages,
+we use the `@Cached` annotation from the Truffle DSL,
 which can be placed not only on parameters of `@Specialization` methods,
 but also of `@ExportMessage` methods.
 
@@ -138,11 +139,11 @@ This change to `GlobalScopeObject` means we need to adjust the Nodes that intera
 and [`GlobalVarAssignmentExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/variables/GlobalVarAssignmentExprNode.java).
 
 We use the
-[`flags` parameter](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObjectLibrary.html#putConstant(com.oracle.truffle.api.object.DynamicObject,java.lang.Object,java.lang.Object,int))
-to save whether a given variable is a constant or not,
+[`flags` argument](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObject.PutConstantNode.html#executeWithFlags(com.oracle.truffle.api.object.DynamicObject,java.lang.Object,java.lang.Object,int))
+to `DynamicObject.PutConstantNode.executeWithFlags()` when saving variables,
 and we check that when performing assignment.
 
-In order to be able to use the `@CachedLibrary` annotation with the `GlobalScopeObject`,
+In order to pass the global scope object into variable Nodes,
 we create a special Node,
 [`GlobalScopeObjectExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/GlobalScopeObjectExprNode.java),
 that just returns the global scope object from the `TruffleLanguage` Context
@@ -150,7 +151,7 @@ using the `currentLanguageContext()` method defined in the
 [base class of all Nodes](src/main/java/com/endoflineblog/truffle/part_10/nodes/EasyScriptNode.java).
 We then add `GlobalScopeObjectExprNode` as the first child to of each Node that deals with global variables.
 This way, they can receive the `GlobalScopeObject` instance as the first argument to their `@Specialization` methods,
-and use it in the `@CachedLibrary` annotation.
+and use `@Cached DynamicObject.*Node` parameters to read and write properties.
 
 ### Performance results
 

@@ -15,7 +15,7 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.Shape;
 
 import java.util.stream.IntStream;
@@ -68,9 +68,9 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         var context = new EasyScriptLanguageContext(this.globalScopeShape);
         var globalScopeObject = context.globalScopeObject;
 
-        var objectLibrary = DynamicObjectLibrary.getUncached();
+        var putConstantNode = DynamicObject.PutConstantNode.getUncached();
         // the 1 flag indicates Math is a constant, and cannot be reassigned
-        objectLibrary.putConstant(globalScopeObject, "Math", MathObject.create(this,
+        putConstantNode.executeWithFlags(globalScopeObject, "Math", MathObject.create(this,
             this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
             this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance())), 1);
 

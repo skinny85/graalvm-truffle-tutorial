@@ -1,14 +1,12 @@
 package com.endoflineblog.truffle.part_10.runtime;
 
-import com.endoflineblog.truffle.part_10.EasyScriptTruffleLanguage;
-import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 /**
@@ -17,13 +15,7 @@ import com.oracle.truffle.api.object.Shape;
  * Similar to the class with the same name from part 9,
  * the biggest difference is that we no longer store the variables and their values in a {@link java.util.Map},
  * but instead make it a Truffle {@link DynamicObject}
- * that uses {@link DynamicObjectLibrary} to store and retrieve the variables.
- *
- * @see com.endoflineblog.truffle.part_10.nodes.exprs.GlobalScopeObjectExprNode
- * @see com.endoflineblog.truffle.part_10.nodes.stmts.variables.GlobalVarDeclStmtNode
- * @see com.endoflineblog.truffle.part_10.nodes.stmts.variables.FuncDeclStmtNode
- * @see com.endoflineblog.truffle.part_10.nodes.exprs.variables.GlobalVarReferenceExprNode
- * @see com.endoflineblog.truffle.part_10.nodes.exprs.variables.GlobalVarAssignmentExprNode
+ * that uses {@link DynamicObject.PutNode} and related nodes to store and retrieve the variables.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class GlobalScopeObject extends DynamicObject {
@@ -43,20 +35,20 @@ public final class GlobalScopeObject extends DynamicObject {
 
     @ExportMessage
     boolean isMemberReadable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        return objectLibrary.containsKey(this, member);
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode) {
+        return containsKeyNode.execute(this, member);
     }
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        return new MemberNamesObject(objectLibrary.getKeyArray(this));
+            @Cached DynamicObject.GetKeyArrayNode getKeyArrayNode) {
+        return new MemberNamesObject(getKeyArrayNode.execute(this));
     }
 
     @ExportMessage
     Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) throws UnknownIdentifierException {
-        Object value = objectLibrary.getOrDefault(this, member, null);
+            @Cached DynamicObject.GetNode getNode) throws UnknownIdentifierException {
+        Object value = getNode.execute(this, member, null);
         if (null == value) {
             throw UnknownIdentifierException.create(member);
         }
@@ -65,20 +57,20 @@ public final class GlobalScopeObject extends DynamicObject {
 
     @ExportMessage
     boolean isMemberModifiable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        return objectLibrary.containsKey(this, member);
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode) {
+        return containsKeyNode.execute(this, member);
     }
 
     @ExportMessage
     boolean isMemberInsertable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        return !objectLibrary.containsKey(this, member);
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode) {
+        return !containsKeyNode.execute(this, member);
     }
 
     @ExportMessage
     void writeMember(String member, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary objectLibrary) {
-        objectLibrary.put(this, member, value);
+            @Cached DynamicObject.PutNode putNode) {
+        putNode.execute(this, member, value);
     }
 
     @ExportMessage
@@ -87,12 +79,12 @@ public final class GlobalScopeObject extends DynamicObject {
     }
 
     @ExportMessage
-    boolean hasLanguage() {
+    boolean hasLanguageId() {
         return true;
     }
 
     @ExportMessage
-    Class<? extends TruffleLanguage<?>> getLanguage() {
-        return EasyScriptTruffleLanguage.class;
+    String getLanguageId() {
+        return "ezs";
     }
 }

@@ -1,13 +1,13 @@
 package com.endoflineblog.truffle.part_13.runtime;
 
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 /**
@@ -20,12 +20,10 @@ import com.oracle.truffle.api.object.Shape;
  */
 @ExportLibrary(InteropLibrary.class)
 public class JavaScriptObject extends DynamicObject {
-    // this can't be private, because it's used in specialization guard expressions
     final ClassPrototypeObject classPrototypeObject;
 
     public JavaScriptObject(Shape shape, ClassPrototypeObject classPrototypeObject) {
         super(shape);
-
         this.classPrototypeObject = classPrototypeObject;
     }
 
@@ -46,21 +44,20 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     boolean isMemberReadable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary) {
-        return instanceObjectLibrary.containsKey(this, member) ||
-                prototypeObjectLibrary.containsKey(this.classPrototypeObject, member);
+            @Cached @Shared("instance") DynamicObject.ContainsKeyNode instanceContainsKeyNode,
+            @Cached @Shared("prototype") DynamicObject.ContainsKeyNode prototypeContainsKeyNode) {
+        return instanceContainsKeyNode.execute(this, member) ||
+                prototypeContainsKeyNode.execute(this.classPrototypeObject, member);
     }
 
     @ExportMessage
     Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary)
+            @Cached DynamicObject.GetNode instanceGetNode,
+            @Cached DynamicObject.GetNode prototypeGetNode)
             throws UnknownIdentifierException {
-        // since ClassInstanceObject is mutable, we need to check it first, before the prototype
-        Object value = instanceObjectLibrary.getOrDefault(this, member, null);
+        Object value = instanceGetNode.execute(this, member, null);
         if (value == null) {
-            value = prototypeObjectLibrary.getOrDefault(this.classPrototypeObject, member, null);
+            value = prototypeGetNode.execute(this.classPrototypeObject, member, null);
         }
         if (value == null) {
             throw UnknownIdentifierException.create(member);
@@ -70,27 +67,27 @@ public class JavaScriptObject extends DynamicObject {
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary) {
-        return new MemberNamesObject(instanceObjectLibrary.getKeyArray(this));
+            @Cached DynamicObject.GetKeyArrayNode getKeyArrayNode) {
+        return new MemberNamesObject(getKeyArrayNode.execute(this));
     }
 
     @ExportMessage
     boolean isMemberModifiable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary) {
-        return this.isMemberReadable(member, instanceObjectLibrary, prototypeObjectLibrary);
+            @Cached @Shared("instance") DynamicObject.ContainsKeyNode instanceContainsKeyNode,
+            @Cached @Shared("prototype") DynamicObject.ContainsKeyNode prototypeContainsKeyNode) {
+        return this.isMemberReadable(member, instanceContainsKeyNode, prototypeContainsKeyNode);
     }
 
     @ExportMessage
     boolean isMemberInsertable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary prototypeObjectLibrary) {
-        return !this.isMemberModifiable(member, instanceObjectLibrary, prototypeObjectLibrary);
+            @Cached @Shared("instance") DynamicObject.ContainsKeyNode instanceContainsKeyNode,
+            @Cached @Shared("prototype") DynamicObject.ContainsKeyNode prototypeContainsKeyNode) {
+        return !this.isMemberModifiable(member, instanceContainsKeyNode, prototypeContainsKeyNode);
     }
 
     @ExportMessage
     void writeMember(String member, Object value,
-            @CachedLibrary("this") DynamicObjectLibrary instanceObjectLibrary) {
-        instanceObjectLibrary.put(this, member, value);
+            @Cached DynamicObject.PutNode putNode) {
+        putNode.execute(this, member, value);
     }
 }

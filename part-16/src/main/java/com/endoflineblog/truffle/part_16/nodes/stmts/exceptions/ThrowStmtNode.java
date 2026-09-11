@@ -11,10 +11,10 @@ import com.oracle.truffle.api.TruffleStackTrace;
 import com.oracle.truffle.api.TruffleStackTraceElement;
 import com.oracle.truffle.api.dsl.Executed;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.RootNode;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.source.SourceSection;
 import com.oracle.truffle.api.strings.TruffleString;
 import com.oracle.truffle.api.strings.TruffleStringBuilder;
@@ -23,10 +23,7 @@ import java.util.List;
 
 /**
  * This Node represents the implementation of the {@code throw} statement.
- * Almost identical to the class with the same name from part 15,
- * the only difference is that we get rid of the {@link #getSourceSection()}
- * method, since it has now been moved into {@link EasyScriptStmtNode},
- * to which we pass the {@link SourceSection} through its constructor.
+ * Identical to the class with the same name from part 16.
  */
 public abstract class ThrowStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
@@ -39,16 +36,16 @@ public abstract class ThrowStmtNode extends EasyScriptStmtNode {
         this.exceptionExpr = exceptionExpr;
     }
 
-    @Specialization(limit = "2")
+    @Specialization
     protected Object throwJavaScriptObject(
             JavaScriptObject value,
-            @CachedLibrary("value") DynamicObjectLibrary nameObjectLibrary,
-            @CachedLibrary("value") DynamicObjectLibrary messageObjectLibrary,
-            @CachedLibrary("value") DynamicObjectLibrary stackObjectLibrary) {
-        Object name = nameObjectLibrary.getOrDefault(value, "name", null);
-        Object message = messageObjectLibrary.getOrDefault(value, "message", null);
+            @Cached DynamicObject.GetNode getNameNode,
+            @Cached DynamicObject.GetNode getMessageNode,
+            @Cached DynamicObject.PutNode putStackNode) {
+        Object name = getNameNode.execute(value, "name", null);
+        Object message = getMessageNode.execute(value, "message", null);
         var easyScriptException = new EasyScriptException(name, message, value, this);
-        stackObjectLibrary.put(value, "stack", this.formStackTrace(name, message, easyScriptException));
+        putStackNode.execute(value, "stack", this.formStackTrace(name, message, easyScriptException));
         throw easyScriptException;
     }
 

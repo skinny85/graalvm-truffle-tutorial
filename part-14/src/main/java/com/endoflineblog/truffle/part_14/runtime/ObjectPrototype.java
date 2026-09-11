@@ -1,23 +1,18 @@
 package com.endoflineblog.truffle.part_14.runtime;
 
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 /**
  * The class representing the prototype of the {@code Object}
  * class in JavaScript.
- * This is a unique prototype,
- * as it's the only one in the language that doesn't have a parent class prototype
- * (as {@code Object} is the root of the class hierarchy).
- * Because of that, we re-implement the logic of property reads to not reference the parent prototype
- * (which we pass as an anonymous subclass of {@link DynamicObject}
- * to {@link ClassPrototypeObject}).
+ * Identical to the class with the same name from part 16.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class ObjectPrototype extends ClassPrototypeObject {
@@ -27,15 +22,15 @@ public final class ObjectPrototype extends ClassPrototypeObject {
 
     @ExportMessage
     boolean isMemberReadable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary) {
-        return thisObjectLibrary.containsKey(this, member);
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode) {
+        return containsKeyNode.execute(this, member);
     }
 
     @ExportMessage
     Object readMember(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary)
+            @Cached DynamicObject.GetNode getNode)
             throws UnknownIdentifierException {
-        Object value = thisObjectLibrary.getOrDefault(this, member, null);
+        Object value = getNode.execute(this, member, null);
         if (value == null) {
             throw UnknownIdentifierException.create(member);
         }
@@ -44,13 +39,13 @@ public final class ObjectPrototype extends ClassPrototypeObject {
 
     @ExportMessage
     boolean isMemberModifiable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary) {
-        return this.isMemberReadable(member, thisObjectLibrary);
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode) {
+        return this.isMemberReadable(member, containsKeyNode);
     }
 
     @ExportMessage
     boolean isMemberInsertable(String member,
-            @CachedLibrary("this") DynamicObjectLibrary thisObjectLibrary) {
-        return !this.isMemberModifiable(member, thisObjectLibrary);
+            @Cached @Shared DynamicObject.ContainsKeyNode containsKeyNode) {
+        return !this.isMemberModifiable(member, containsKeyNode);
     }
 }

@@ -5,10 +5,9 @@ import com.endoflineblog.truffle.part_11.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_11.nodes.exprs.GlobalScopeObjectExprNode;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Property;
 
 /**
@@ -21,18 +20,19 @@ import com.oracle.truffle.api.object.Property;
 public abstract class GlobalVarAssignmentExprNode extends EasyScriptExprNode {
     protected abstract String getName();
 
-    @Specialization(limit = "2")
+    @Specialization
     protected Object assignVariable(DynamicObject globalScopeObject, Object value,
-            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
+            @Cached DynamicObject.GetPropertyNode getPropertyNode,
+            @Cached DynamicObject.PutNode putNode) {
         String variableId = this.getName();
-        Property property = objectLibrary.getProperty(globalScopeObject, variableId);
+        Property property = getPropertyNode.execute(globalScopeObject, variableId);
         if (property == null) {
             throw new EasyScriptException(this, "'" + variableId + "' is not defined");
         }
         if (property.getFlags() == 1) {
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
         }
-        objectLibrary.put(globalScopeObject, variableId, value);
+        putNode.execute(globalScopeObject, variableId, value);
         return value;
     }
 }

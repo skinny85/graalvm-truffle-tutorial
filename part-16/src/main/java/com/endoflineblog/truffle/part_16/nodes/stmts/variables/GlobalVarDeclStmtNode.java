@@ -12,18 +12,14 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.instrumentation.Tag;
-import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.source.SourceSection;
 
 /**
  * A Node that represents the declaration of a global
  * (as opposed to local to a function) variable or constant in EasyScript.
- * Almost identical to the class with the same name from part 15,
- * the only difference is that we add a {@link SourceSection}
- * parameter to the constructor, which we pass to the constructor of the superclass,
- * {@link EasyScriptStmtNode}.
+ * Identical to the class with the same name from part 16.
  */
 @NodeChild(value = "globalScopeObjectExpr", type = GlobalScopeObjectExprNode.class)
 @NodeChild(value = "initializerExpr", type = EasyScriptExprNode.class)
@@ -40,22 +36,23 @@ public abstract class GlobalVarDeclStmtNode extends EasyScriptStmtNode {
         super(sourceSection);
     }
 
-    @Specialization(limit = "2")
+    @Specialization
     protected Object createVariable(DynamicObject globalScopeObject, Object value,
-            @CachedLibrary("globalScopeObject") DynamicObjectLibrary objectLibrary) {
+            @Cached DynamicObject.ContainsKeyNode containsKeyNode,
+            @Cached DynamicObject.PutNode putNode) {
         var variableId = this.getName();
 
         if (this.checkVariableExists) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             this.checkVariableExists = false;
 
-            if (objectLibrary.containsKey(globalScopeObject, variableId)) {
+            if (containsKeyNode.execute(globalScopeObject, variableId)) {
                 throw new EasyScriptException(this, "Identifier '" + variableId + "' has already been declared");
             }
         }
 
         int flags = this.getDeclarationKind() == DeclarationKind.CONST ? 1 : 0;
-        objectLibrary.putWithFlags(globalScopeObject, variableId, value, flags);
+        putNode.executeWithFlags(globalScopeObject, variableId, value, flags);
 
         // we return 'undefined' for statements that declare variables
         return Undefined.INSTANCE;

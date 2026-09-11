@@ -20,7 +20,6 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
 import java.util.stream.IntStream;
@@ -85,10 +84,10 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var objectLibrary = DynamicObjectLibrary.getUncached();
+        var putConstantNode = DynamicObject.PutConstantNode.getUncached();
         return new EasyScriptLanguageContext(
-                this.createGlobalScopeObject(objectLibrary),
-                this.createShapesAndPrototypes(objectLibrary));
+                this.createGlobalScopeObject(putConstantNode),
+                this.createShapesAndPrototypes(putConstantNode));
     }
 
     @Override
@@ -96,36 +95,36 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
         return context.globalScopeObject;
     }
 
-    private DynamicObject createGlobalScopeObject(DynamicObjectLibrary objectLibrary) {
+    private DynamicObject createGlobalScopeObject(DynamicObject.PutConstantNode putConstantNode) {
         var globalScopeObject = new GlobalScopeObject(this.rootShape);
         // the 0 flag indicates Math is a variable, and can be reassigned
-        objectLibrary.putConstant(globalScopeObject, "Math",
-                this.createMathObject(objectLibrary), 0);
+        putConstantNode.executeWithFlags(globalScopeObject, "Math",
+                this.createMathObject(putConstantNode), 0);
         return globalScopeObject;
     }
 
-    private Object createMathObject(DynamicObjectLibrary objectLibrary) {
+    private Object createMathObject(DynamicObject.PutConstantNode putConstantNode) {
         var mathPrototype = new ClassPrototypeObject(this.rootShape, "Math");
         var mathObject = new JavaScriptObject(this.rootShape, mathPrototype);
-        objectLibrary.putConstant(mathObject, "abs",
+        putConstantNode.executeWithFlags(mathObject, "abs",
                 this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
                 0);
-        objectLibrary.putConstant(mathObject, "pow",
+        putConstantNode.executeWithFlags(mathObject, "pow",
                 this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance()),
                 0);
         return mathObject;
     }
 
-    private ShapesAndPrototypes createShapesAndPrototypes(DynamicObjectLibrary objectLibrary) {
+    private ShapesAndPrototypes createShapesAndPrototypes(DynamicObject.PutConstantNode putConstantNode) {
         var arrayPrototype = new ClassPrototypeObject(this.rootShape, "Array");
         return new ShapesAndPrototypes(this.rootShape, this.arrayShape,
                 this.functionPrototype, arrayPrototype,
-                this.createStringPrototype(objectLibrary));
+                this.createStringPrototype(putConstantNode));
     }
 
-    private ClassPrototypeObject createStringPrototype(DynamicObjectLibrary objectLibrary) {
+    private ClassPrototypeObject createStringPrototype(DynamicObject.PutConstantNode putConstantNode) {
         var stringPrototype = new ClassPrototypeObject(this.rootShape, "String");
-        objectLibrary.putConstant(stringPrototype, "charAt",
+        putConstantNode.executeWithFlags(stringPrototype, "charAt",
                 this.defineBuiltInMethod(CharAtMethodBodyExprNodeFactory.getInstance()),
                 0);
         return stringPrototype;

@@ -23,7 +23,7 @@ import java.util.List;
  * The Node for handling {@code new} expressions.
  * Very similar to the class with the same name from part 13,
  * the only difference is using {@link InteropLibrary}
- * instead of {@link com.oracle.truffle.api.object.DynamicObjectLibrary}
+ * instead of {@link com.oracle.truffle.api.object.DynamicObject} property nodes
  * to find the constructor of the class
  * (as it could be inherited from a superclass).
  */

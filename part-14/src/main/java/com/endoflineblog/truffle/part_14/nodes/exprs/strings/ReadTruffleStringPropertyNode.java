@@ -18,7 +18,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * An AST node that represents reading properties of strings.
  * Almost identical to the class with the same name from part 13,
  * the only difference is using the {@link InteropLibrary}
- * instead of {@link com.oracle.truffle.api.object.DynamicObjectLibrary}
+ * instead of {@link com.oracle.truffle.api.object.DynamicObject} property nodes
  * in the {@link #readNonLengthProperty} specialization
  * to read the property from the {@code String} prototype
  * (to correctly inherit from the {@code Object} prototype).

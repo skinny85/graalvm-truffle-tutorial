@@ -9,12 +9,12 @@ import com.endoflineblog.truffle.part_15.runtime.Undefined;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.TruffleStackTrace;
 import com.oracle.truffle.api.TruffleStackTraceElement;
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Executed;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.RootNode;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.source.SourceSection;
 import com.oracle.truffle.api.strings.TruffleString;
 import com.oracle.truffle.api.strings.TruffleStringBuilder;
@@ -37,16 +37,16 @@ public abstract class ThrowStmtNode extends EasyScriptStmtNode {
         this.sourceSection = sourceSection;
     }
 
-    @Specialization(limit = "2")
+    @Specialization
     protected Object throwJavaScriptObject(
             JavaScriptObject value,
-            @CachedLibrary("value") DynamicObjectLibrary nameObjectLibrary,
-            @CachedLibrary("value") DynamicObjectLibrary messageObjectLibrary,
-            @CachedLibrary("value") DynamicObjectLibrary stackObjectLibrary) {
-        Object name = nameObjectLibrary.getOrDefault(value, "name", null);
-        Object message = messageObjectLibrary.getOrDefault(value, "message", null);
+            @Cached DynamicObject.GetNode getNameNode,
+            @Cached DynamicObject.GetNode getMessageNode,
+            @Cached DynamicObject.PutNode putStackNode) {
+        Object name = getNameNode.execute(value, "name", null);
+        Object message = getMessageNode.execute(value, "message", null);
         var easyScriptException = new EasyScriptException(name, message, value, this);
-        stackObjectLibrary.put(value, "stack", this.formStackTrace(name, message, easyScriptException));
+        putStackNode.execute(value, "stack", this.formStackTrace(name, message, easyScriptException));
         throw easyScriptException;
     }
 
@@ -70,19 +70,18 @@ public abstract class ThrowStmtNode extends EasyScriptStmtNode {
             Node location = truffleStackTracEl.getLocation();
             RootNode rootNode = location.getRootNode();
             String funcName = rootNode.getName();
-            // we want to ignore the top-level program RootNode name in this stack trace
             boolean isFunc = !":program".equals(funcName);
             if (isFunc) {
                 sb.appendJavaStringUTF16Uncached(funcName);
                 sb.appendJavaStringUTF16Uncached(" (");
             }
 
-            SourceSection sourceSection = location.getEncapsulatingSourceSection();
-            sb.appendJavaStringUTF16Uncached(sourceSection.getSource().getName());
+            SourceSection locationSourceSection = location.getEncapsulatingSourceSection();
+            sb.appendJavaStringUTF16Uncached(locationSourceSection.getSource().getName());
             sb.appendJavaStringUTF16Uncached(":");
-            sb.appendJavaStringUTF16Uncached(String.valueOf(sourceSection.getStartLine()));
+            sb.appendJavaStringUTF16Uncached(String.valueOf(locationSourceSection.getStartLine()));
             sb.appendJavaStringUTF16Uncached(":");
-            sb.appendJavaStringUTF16Uncached(String.valueOf(sourceSection.getStartColumn()));
+            sb.appendJavaStringUTF16Uncached(String.valueOf(locationSourceSection.getStartColumn()));
 
             if (isFunc) {
                 sb.appendJavaStringUTF16Uncached(")");

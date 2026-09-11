@@ -1,25 +1,15 @@
 package com.endoflineblog.truffle.part_12.runtime;
 
+import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
-import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
+import com.oracle.truffle.api.object.DynamicObject;
 
-/**
- * A {@link TruffleObject} that represents an instance of a user-defined class.
- * Instances of this class are created in the
- * {@link com.endoflineblog.truffle.part_12.nodes.exprs.objects.NewExprNode 'new' operator expression Node}.
- * It contains a pointer to the {@link ClassPrototypeObject prototype object of the class it belongs to},
- * and it delegates all member reads from the {@link InteropLibrary}
- * to that prototype, since, in this part of the series,
- * we only support instance methods of classes, not fields.
- */
 @ExportLibrary(InteropLibrary.class)
 public final class ClassInstanceObject implements TruffleObject {
-    // this can't be private, because it's used in specialization guard expressions
     final ClassPrototypeObject classPrototypeObject;
 
     public ClassInstanceObject(ClassPrototypeObject classPrototypeObject) {
@@ -43,15 +33,15 @@ public final class ClassInstanceObject implements TruffleObject {
 
     @ExportMessage
     boolean isMemberReadable(String member,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary) {
-        return dynamicObjectLibrary.containsKey(this.classPrototypeObject, member);
+            @Cached DynamicObject.ContainsKeyNode containsKeyNode) {
+        return containsKeyNode.execute(this.classPrototypeObject, member);
     }
 
     @ExportMessage
     Object readMember(String member,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary)
+            @Cached DynamicObject.GetNode getNode)
             throws UnknownIdentifierException {
-        Object value = dynamicObjectLibrary.getOrDefault(this.classPrototypeObject, member, null);
+        Object value = getNode.execute(this.classPrototypeObject, member, null);
         if (value == null) {
             throw UnknownIdentifierException.create(member);
         }
@@ -60,7 +50,7 @@ public final class ClassInstanceObject implements TruffleObject {
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal,
-            @CachedLibrary("this.classPrototypeObject") DynamicObjectLibrary dynamicObjectLibrary) {
-        return new MemberNamesObject(dynamicObjectLibrary.getKeyArray(this.classPrototypeObject));
+            @Cached DynamicObject.GetKeyArrayNode getKeyArrayNode) {
+        return new MemberNamesObject(getKeyArrayNode.execute(this.classPrototypeObject));
     }
 }

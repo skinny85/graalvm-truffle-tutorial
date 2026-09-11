@@ -9,6 +9,7 @@ import com.oracle.truffle.api.library.ExportMessage;
 /**
  * A debugger scope for the first level of a user-defined function.
  * It will contain the function arguments and local variables from that block.
+ * Identical to the class with the same name from part 16.
  */
 @ExportLibrary(InteropLibrary.class)
 public final class FuncDebuggerScopeObject extends AbstractDebuggerScopeObject {
@@ -27,5 +28,15 @@ public final class FuncDebuggerScopeObject extends AbstractDebuggerScopeObject {
     @ExportMessage
     Object toDisplayString(@SuppressWarnings("unused") boolean allowSideEffects) {
         return this.userFuncBodyStmtNode.getRootNode().getName();
+    }
+
+    @ExportMessage
+    boolean hasLanguageId() {
+        return true;
+    }
+
+    @ExportMessage
+    String getLanguageId() {
+        return "ezs";
     }
 }

@@ -1,8 +1,6 @@
 package com.endoflineblog.truffle.part_16.runtime.debugger;
 
-import com.endoflineblog.truffle.part_16.EasyScriptTruffleLanguage;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
-import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.Frame;
@@ -17,6 +15,7 @@ import java.util.Objects;
 /**
  * The common base class for objects that represent a debugger scope containing all references of a statement block.
  * Extended by {@link FuncDebuggerScopeObject} and {@link BlockDebuggerScopeObject}.
+ * Identical to the class with the same name from part 16.
  */
 @ExportLibrary(InteropLibrary.class)
 abstract class AbstractDebuggerScopeObject implements TruffleObject {
@@ -34,13 +33,13 @@ abstract class AbstractDebuggerScopeObject implements TruffleObject {
     }
 
     @ExportMessage
-    boolean hasLanguage() {
+    boolean hasLanguageId() {
         return true;
     }
 
     @ExportMessage
-    Class<? extends TruffleLanguage<?>> getLanguage() {
-        return EasyScriptTruffleLanguage.class;
+    String getLanguageId() {
+        return "ezs";
     }
 
     @ExportMessage

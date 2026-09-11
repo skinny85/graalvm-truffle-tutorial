@@ -3,6 +3,7 @@ package com.endoflineblog.truffle.part_16.common;
 import com.endoflineblog.truffle.part_16.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_16.runtime.ObjectPrototype;
 import com.endoflineblog.truffle.part_16.EasyScriptLanguageContext;
+import com.oracle.truffle.api.dsl.NeverDefault;
 import com.oracle.truffle.api.object.Shape;
 
 import java.util.Collections;
@@ -14,14 +15,16 @@ import java.util.Map;
  * that are used by various EasyScript {@link com.oracle.truffle.api.nodes.Node}s.
  * They get access to this class through the
  * {@link EasyScriptLanguageContext EasyScript TruffleLanguage context}.
- * Identical to the class with the same name from part 15.
+ * Identical to the class with the same name from part 16.
  */
 public final class ShapesAndPrototypes {
     public final Shape rootShape;
     public final Shape arrayShape;
+    @NeverDefault
     public final ObjectPrototype objectPrototype;
     public final ClassPrototypeObject functionPrototype;
     public final ClassPrototypeObject arrayPrototype;
+    @NeverDefault
     public final ClassPrototypeObject stringPrototype;
     public final ErrorPrototypes errorPrototypes;
     public final Map<String, ClassPrototypeObject> allBuiltInClasses;

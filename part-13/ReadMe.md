@@ -51,8 +51,8 @@ The handling of the `writeMember()` interop library message is in the new
 (which is just the renamed
 [`ClassInstanceObject` from the previous part](../part-12/src/main/java/com/endoflineblog/truffle/part_12/runtime/ClassInstanceObject.java)
 to reflect its more generic nature).
-Writing a property simply means saving it using the
-[dynamic object library](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObjectLibrary.html).
+Writing a property simply means saving it using
+[`DynamicObject.PutNode`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObject.PutNode.html).
 
 Note that performing writes also changes the logic of reads -
 instead of always delegating to the prototype,
