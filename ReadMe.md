@@ -19,8 +19,8 @@ and so gets built when you build the top-level project.
 To build and execute this project, you need a GraalVM installation on your local machine.
 The free Community Edition works fine if you don't have the paid Enterprise Edition.
 You can download it from here: https://github.com/graalvm/graalvm-ce-builds/releases.
-This repository uses Java 11 features,
-so make sure to download a version for Java 11.
+This repository targets **Java 25** and Truffle **25.3.4.1**,
+so use a GraalVM **25.3** (or newer matching) release that includes JDK 25.
 
 Once you've downloaded the correct archive for your operating system and extracted it somewhere on your machine,
 you need to set the `JAVA_HOME`
@@ -36,17 +36,17 @@ command using `JAVA_HOME`:
 ```shell script
 $ $JAVA_HOME/bin/java -version
 
-openjdk version "17.0.5" 2022-10-18
-OpenJDK Runtime Environment GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08)
-OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08, mixed mode, sharing)
+openjdk version "25" ...
+OpenJDK Runtime Environment GraalVM CE 25.3.4.1 (build 25+...)
+OpenJDK 64-Bit Server VM GraalVM CE 25.3.4.1 (build 25+..., mixed mode, sharing)
 ```
 
 ## Building
 
 Once you have GraalVM installed,
-you can build the project -
-it uses [Gradle](https://gradle.org)
-as its build system:
+you can build the project.
+The repo includes the [Gradle](https://gradle.org) wrapper (Gradle 9.1);
+set `JAVA_HOME` to your GraalVM installation, then run:
 
 ```shell script
 $ ./gradlew build
