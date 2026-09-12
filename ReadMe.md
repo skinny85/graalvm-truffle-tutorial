@@ -18,29 +18,25 @@ and so gets built when you build the top-level project.
 
 To build and execute this project, you need a GraalVM installation on your local machine.
 The free Community Edition works fine if you don't have the paid Enterprise Edition.
-This project uses version `22.3.0` of GraalVM,
+This project uses version `25.0.2` of GraalVM,
 which you can download in the Community Edition
-[here](https://github.com/graalvm/graalvm-ce-builds/releases/tag/vm-22.3.0).
-This repository uses a Gradle version that requires at least Java 17,
-so make sure to download the Java 17 version of the VM.
+[here](https://github.com/graalvm/graalvm-ce-builds/releases/tag/jdk-25.0.2).
 
 Once you've downloaded the correct archive for your operating system and extracted it somewhere on your machine,
-you need to set the `JAVA_HOME`
-environment variable to point to the directory containing the uncompressed contents:
+you need to set the `JAVA_HOME` environment variable to point to the directory containing the uncompressed contents:
 
 ```shell script
 $ export JAVA_HOME=/path/to/extracted/archive
 ```
 
-You can verify the installation works by executing the `java`
-command using `JAVA_HOME`:
+You can verify the installation works by executing the `java` command using `JAVA_HOME`:
 
 ```shell script
 $ $JAVA_HOME/bin/java -version
 
-openjdk version "17.0.5" 2022-10-18
-OpenJDK Runtime Environment GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08)
-OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08, mixed mode, sharing)
+openjdk version "25.0.2" 2026-01-20
+OpenJDK Runtime Environment GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01)
+OpenJDK 64-Bit Server VM GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01, mixed mode, sharing)
 ```
 
 ## Building

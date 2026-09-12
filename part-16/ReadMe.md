@@ -101,7 +101,7 @@ and attaches a debugger to it by specifying the
 [`Context` object](https://www.graalvm.org/truffle/javadoc/org/graalvm/polyglot/Context.html),
 whose value will be the port the debugger will listen on
 (note that you need the
-[`org.graalvm.tools:chromeinspector` dependency](https://search.maven.org/search?q=g:org.graalvm.tools%20AND%20a:chromeinspector)
+[`org.graalvm.polyglot:inspect` dependency](https://central.sonatype.com/artifact/org.graalvm.polyglot/inspect)
 for this to work).
 When you run that program with the `./gradlew :part-16:run` command,
 it will print out a URL, similar to
@@ -207,7 +207,7 @@ you should see the values of the function arguments and local variables:
 ## Unit tests
 
 A really nice feature of debugger support in Truffle is that it ships with a library,
-[`org.graalvm.truffle:truffle-tck`](https://search.maven.org/search?q=g:org.graalvm.truffle%20AND%20a:truffle-tck),
+[`org.graalvm.truffle:truffle-tck`](https://central.sonatype.com/artifact/org.graalvm.truffle/truffle-tck),
 that allows you to control the debugger programmatically,
 and thus write unit tests validating the debugger support works as expected.
 While the library is not a perfect simulation of Chrome DevTools,

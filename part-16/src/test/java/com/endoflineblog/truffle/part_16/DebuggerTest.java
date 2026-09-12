@@ -8,6 +8,7 @@ import com.oracle.truffle.api.debug.DebuggerSession;
 import com.oracle.truffle.api.debug.SuspendAnchor;
 import com.oracle.truffle.api.debug.SuspendedEvent;
 import com.oracle.truffle.tck.DebuggerTester;
+import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +49,9 @@ class DebuggerTest {
 
     @BeforeEach
     void setUp() {
-        this.debuggerTester = new DebuggerTester();
+        // experimental options are required for using TCK defaults
+        this.debuggerTester = new DebuggerTester(Context.newBuilder()
+                .allowExperimentalOptions(true));
     }
 
     @AfterEach

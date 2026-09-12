@@ -15,18 +15,10 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    // These arguments are required because of the JVM 11's module system -
-    // we grant this module access to the packages from the Truffle API JAR
     test {
         useJUnitPlatform()
 
-        jvmArgs '-ea',
-                '--add-exports',
-                    'org.graalvm.truffle/com.oracle.truffle.api=ALL-UNNAMED',
-                '--add-exports',
-                    'org.graalvm.truffle/com.oracle.truffle.api.nodes=ALL-UNNAMED',
-                '--add-exports',
-                    'org.graalvm.truffle/com.oracle.truffle.api.staticobject=ALL-UNNAMED'
+        jvmArgs '-ea', '--enable-native-access=ALL-UNNAMED'
 
         testLogging {
             events 'failed'
@@ -35,8 +27,8 @@ subprojects {
     }
 
     ext {
-        graal_version = '22.3.0'
-        antlr_version = '4.9.2'
+        graal_version = '25.0.2'
+        antlr_version = '4.13.2'
     }
 
     dependencies {

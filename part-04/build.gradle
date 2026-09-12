@@ -4,8 +4,3 @@ dependencies {
     implementation project(':part-03')
     antlr "org.antlr:antlr4:$antlr_version"
 }
-
-// required to allow GraalVM to discover our EasyScript language class
-test {
-    jvmArgs '-Dgraalvm.locatorDisabled=true'
-}

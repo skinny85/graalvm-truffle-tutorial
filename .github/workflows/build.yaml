@@ -6,8 +6,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # disable the demon, as it's causing some problems
-      GRADLE_OPTS: -Dorg.gradle.daemon=false
+      # disable the demon, as it's causing some problems,
+      # and also silence a Gradle 9.1.0 native-access warning
+      GRADLE_OPTS: -Dorg.gradle.daemon=false --enable-native-access=ALL-UNNAMED
 
     steps:
       - uses: actions/checkout@v2
@@ -15,8 +16,8 @@ jobs:
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.3.0'
-          java-version: '17'
+          version: '25.0.2'
+          distribution: 'graalvm'
 
       - name: Cache Gradle packages
         uses: gradle/actions/setup-gradle@v4
