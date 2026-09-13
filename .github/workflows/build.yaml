@@ -12,11 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up GraalVM with Java 11
+      - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
           version: '22.3.0'
-          java-version: '11'
+          java-version: '17'
 
       - name: Cache Gradle packages
         uses: gradle/actions/setup-gradle@v4

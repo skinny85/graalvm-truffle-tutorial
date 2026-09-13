@@ -18,9 +18,11 @@ and so gets built when you build the top-level project.
 
 To build and execute this project, you need a GraalVM installation on your local machine.
 The free Community Edition works fine if you don't have the paid Enterprise Edition.
-You can download it from here: https://github.com/graalvm/graalvm-ce-builds/releases.
-This repository uses Java 11 features,
-so make sure to download a version for Java 11.
+This project uses version `22.3.0` of GraalVM,
+which you can download in the Community Edition
+[here](https://github.com/graalvm/graalvm-ce-builds/releases/tag/vm-22.3.0).
+This repository uses a Gradle version that requires at least Java 17,
+so make sure to download the Java 17 version of the VM.
 
 Once you've downloaded the correct archive for your operating system and extracted it somewhere on your machine,
 you need to set the `JAVA_HOME`
