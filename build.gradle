@@ -1,6 +1,6 @@
 allprojects {
-    group 'com.endoflineblog.truffle'
-    version '1.0'
+    group = 'com.endoflineblog.truffle'
+    version = '1.0'
 }
 
 subprojects {
@@ -23,7 +23,7 @@ subprojects {
 
         testLogging {
             events 'failed'
-            exceptionFormat 'full'
+            exceptionFormat = 'full'
         }
     }
 
