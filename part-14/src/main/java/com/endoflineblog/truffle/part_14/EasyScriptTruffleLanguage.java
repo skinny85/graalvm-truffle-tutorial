@@ -27,6 +27,7 @@ import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.stream.IntStream;
 
@@ -54,7 +55,7 @@ public final class EasyScriptTruffleLanguage extends TruffleLanguage<EasyScriptL
     }
 
     /** The root {@link Shape} for {@link ArrayObject} */
-    private final Shape arrayShape = Shape.newBuilder().layout(ArrayObject.class).build();
+    private final Shape arrayShape = Shape.newBuilder().layout(ArrayObject.class, MethodHandles.lookup()).build();
 
     /**
      * The root {@link Shape} for {@link GlobalScopeObject}
