@@ -21,7 +21,7 @@ public abstract class PropertyWriteExprNode extends EasyScriptExprNode {
 
     @Specialization
     protected Object writeProperty(Object target, Object rvalue,
-            @Cached CommonWritePropertyNode commonWritePropertyNode) {
-        return commonWritePropertyNode.executeWriteProperty(target, this.getPropertyName(), rvalue);
+            @Cached(inline = true) CommonWritePropertyNode commonWritePropertyNode) {
+        return commonWritePropertyNode.executeWriteProperty(this, target, this.getPropertyName(), rvalue);
     }
 }

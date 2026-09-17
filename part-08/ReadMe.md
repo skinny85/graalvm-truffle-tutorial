@@ -83,7 +83,7 @@ The implementation of `if` is
 we check the condition, and, if it’s satisfied, we execute the “then” part;
 if it’s not, and an “else” part was provided, we execute that.
 
-The interesting part of this Node is using the `ConditionProfile`
+The interesting part of this Node is using the `CountingConditionProfile`
 Truffle class that is used for profiling the condition.
 Graal might use this information when doing JIT compilation --
 for example, if it sees a given condition was never `true`,

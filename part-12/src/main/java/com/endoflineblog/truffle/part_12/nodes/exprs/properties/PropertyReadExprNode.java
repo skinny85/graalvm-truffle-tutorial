@@ -18,7 +18,7 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
 
     @Specialization
     protected Object readProperty(Object target,
-            @Cached CommonReadPropertyNode commonReadPropertyNode) {
-        return commonReadPropertyNode.executeReadProperty(target, this.getPropertyName());
+            @Cached(inline = true) CommonReadPropertyNode commonReadPropertyNode) {
+        return commonReadPropertyNode.executeReadProperty(this, target, this.getPropertyName());
     }
 }

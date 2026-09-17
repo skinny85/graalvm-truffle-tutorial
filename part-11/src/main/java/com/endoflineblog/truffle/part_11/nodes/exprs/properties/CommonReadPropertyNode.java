@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPr
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -17,29 +18,30 @@ import com.oracle.truffle.api.strings.TruffleString;
  * A Node containing the shared logic of reading a property of a JavaScript object.
  * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_11.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  */
+@GenerateInline(true)
 public abstract class CommonReadPropertyNode extends Node {
-    public abstract Object executeReadProperty(Object target, Object property);
+    public abstract Object executeReadProperty(Node node, Object target, Object property);
 
     /**
      * The specialization for reading a property of a {@link TruffleString}.
      * Simply delegates to {@link ReadTruffleStringPropertyNode}.
      */
     @Specialization
-    protected Object readPropertyOfString(TruffleString target, Object property,
+    protected static Object readPropertyOfString(Node node, TruffleString target, Object property,
             @Cached ReadTruffleStringPropertyNode readStringPropertyNode) {
         return readStringPropertyNode.executeReadTruffleStringProperty(
-                target, property);
+                node, target, property);
     }
 
     @Specialization(guards = "interopLibrary.hasMembers(target)", limit = "2")
-    protected Object readProperty(Object target, String propertyName,
+    protected static Object readProperty(Node node, Object target, String propertyName,
             @CachedLibrary("target") InteropLibrary interopLibrary) {
         try {
             return interopLibrary.readMember(target, propertyName);
         } catch (UnknownIdentifierException e) {
             return Undefined.INSTANCE;
         } catch (UnsupportedMessageException e) {
-            throw new EasyScriptException(this, e.getMessage());
+            throw new EasyScriptException(node, e.getMessage());
         }
     }
 
@@ -48,7 +50,7 @@ public abstract class CommonReadPropertyNode extends Node {
      * results in an error in JavaScript.
      */
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "2")
-    protected Object readPropertyOfUndefined(@SuppressWarnings("unused") Object target, Object property,
+    protected static Object readPropertyOfUndefined(@SuppressWarnings("unused") Object target, Object property,
             @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary) {
         throw new EasyScriptException("Cannot read properties of undefined (reading '" + property + "')");
     }
@@ -59,7 +61,7 @@ public abstract class CommonReadPropertyNode extends Node {
      * in JavaScript.
      */
     @Fallback
-    protected Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
+    protected static Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
             @SuppressWarnings("unused") Object property) {
         return Undefined.INSTANCE;
     }

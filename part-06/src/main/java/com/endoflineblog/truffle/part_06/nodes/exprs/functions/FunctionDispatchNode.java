@@ -4,6 +4,7 @@ import com.endoflineblog.truffle.part_06.EasyScriptException;
 import com.endoflineblog.truffle.part_06.runtime.FunctionObject;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
@@ -14,6 +15,7 @@ import com.oracle.truffle.api.nodes.Node;
  * Used by {@link FunctionCallExprNode},
  * and by {@link FunctionObject}.
  */
+@GenerateInline(false)
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 

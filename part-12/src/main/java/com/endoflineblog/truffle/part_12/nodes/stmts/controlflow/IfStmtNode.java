@@ -4,7 +4,7 @@ import com.endoflineblog.truffle.part_12.nodes.exprs.EasyScriptExprNode;
 import com.endoflineblog.truffle.part_12.nodes.stmts.EasyScriptStmtNode;
 import com.endoflineblog.truffle.part_12.runtime.Undefined;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.profiles.ConditionProfile;
+import com.oracle.truffle.api.profiles.CountingConditionProfile;
 
 /**
  * A Node that represents an {@code if} statement.
@@ -23,7 +23,7 @@ public final class IfStmtNode extends EasyScriptStmtNode {
     @Child
     private EasyScriptStmtNode elseStmt;
 
-    private final ConditionProfile condition = ConditionProfile.createCountingProfile();
+    private final CountingConditionProfile condition = CountingConditionProfile.create();
 
     public IfStmtNode(EasyScriptExprNode conditionExpr, EasyScriptStmtNode thenStmt, EasyScriptStmtNode elseStmt) {
         this.conditionExpr = conditionExpr;

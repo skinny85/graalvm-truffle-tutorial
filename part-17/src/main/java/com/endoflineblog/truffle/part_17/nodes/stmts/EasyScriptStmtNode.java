@@ -88,7 +88,7 @@ public abstract class EasyScriptStmtNode extends EasyScriptNode implements Instr
     @ExportMessage
     boolean hasScope(
             @SuppressWarnings("unused") Frame frame,
-            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true) @Shared("thisParentBlock") Node thisParentBlock) {
+            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("thisParentBlock") Node thisParentBlock) {
         return !(thisParentBlock instanceof StmtBlockRootNode);
     }
 
@@ -103,7 +103,7 @@ public abstract class EasyScriptStmtNode extends EasyScriptNode implements Instr
     Object getScope(
             Frame frame,
             @SuppressWarnings("unused") boolean nodeEnter,
-            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true) @Shared("thisParentBlock") Node thisParentBlock) {
+            @Cached(value = "this.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("thisParentBlock") Node thisParentBlock) {
         return thisParentBlock instanceof BlockStmtNode
                 ? new BlockDebuggerScopeObject((BlockStmtNode) thisParentBlock, frame)
                 : new FuncDebuggerScopeObject((UserFuncBodyStmtNode) thisParentBlock, frame);

@@ -45,6 +45,9 @@ to cache the first two Java `String`s resulting from converting `TruffleString`s
 and uses the
 [`writeMember` message from the `InteropLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeMember(java.lang.Object,java.lang.String,java.lang.Object))
 to perform the actual property writes.
+We make it an
+[inline Node](https://github.com/oracle/graal/blob/master/truffle/docs/DSLNodeObjectInlining.md),
+same as `CommonReadPropertyNode`.
 
 The handling of the `writeMember()` interop library message is in the new
 [`JavaScriptObject` class](src/main/java/com/endoflineblog/truffle/part_13/runtime/JavaScriptObject.java)

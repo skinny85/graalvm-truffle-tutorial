@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_13.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_13.exceptions.EasyScriptException;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -15,16 +16,17 @@ import com.oracle.truffle.api.nodes.Node;
  * Analogous to {@link CommonReadPropertyNode}.
  * Used by {@link PropertyWriteExprNode} and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexWriteExprNode}.
  */
+@GenerateInline(true)
 public abstract class CommonWritePropertyNode extends Node {
-    public abstract Object executeWriteProperty(Object target, Object property, Object rvalue);
+    public abstract Object executeWriteProperty(Node node, Object target, Object property, Object rvalue);
 
     @Specialization(guards = "interopLibrary.isMemberWritable(target, propertyName)", limit = "2")
-    protected Object writeProperty(Object target, String propertyName, Object rvalue,
+    protected static Object writeProperty(Node node, Object target, String propertyName, Object rvalue,
             @CachedLibrary("target") InteropLibrary interopLibrary) {
         try {
             interopLibrary.writeMember(target, propertyName, rvalue);
         } catch (UnsupportedMessageException | UnsupportedTypeException | UnknownIdentifierException e) {
-            throw new EasyScriptException(this, e.getMessage());
+            throw new EasyScriptException(node, e.getMessage());
         }
         return rvalue;
     }
@@ -34,8 +36,8 @@ public abstract class CommonWritePropertyNode extends Node {
      * results in an error in JavaScript.
      */
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "2")
-    protected Object writePropertyOfUndefined(@SuppressWarnings("unused") Object target,
-            Object property, Object rvalue,
+    protected static Object writePropertyOfUndefined(@SuppressWarnings("unused") Object target,
+            Object property, @SuppressWarnings("unused") Object rvalue,
             @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary) {
         throw new EasyScriptException("Cannot set properties of undefined (setting '" + property + "')");
     }
@@ -45,7 +47,7 @@ public abstract class CommonWritePropertyNode extends Node {
      * but doesn't have any members simply returns the right-hand side of the assignment.
      */
     @Fallback
-    protected Object writePropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
+    protected static Object writePropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
             @SuppressWarnings("unused") Object property, Object rvalue) {
         return rvalue;
     }

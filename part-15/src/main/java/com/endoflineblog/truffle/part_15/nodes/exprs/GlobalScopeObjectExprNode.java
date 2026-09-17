@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_15.nodes.exprs;
 
 import com.endoflineblog.truffle.part_15.nodes.EasyScriptNode;
 import com.endoflineblog.truffle.part_15.runtime.GlobalScopeObject;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.object.DynamicObject;
 
@@ -17,6 +18,7 @@ import com.oracle.truffle.api.object.DynamicObject;
  * annotation in their {@link Specialization} methods.
  * Identical to the class with the same name from part 14.
  */
+@GenerateInline(false)
 public abstract class GlobalScopeObjectExprNode extends EasyScriptExprNode {
     @Specialization
     protected DynamicObject returnGlobalScopeObject() {

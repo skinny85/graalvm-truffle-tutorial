@@ -25,7 +25,7 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     @Specialization
     protected Object readProperty(Object target) {
         return this.commonReadPropertyNode.executeReadProperty(
-                target, this.getPropertyName());
+                this, target, this.getPropertyName());
     }
 
     @Override

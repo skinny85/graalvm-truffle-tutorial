@@ -129,7 +129,10 @@ in which case we simply delegate to `ReadTruffleStringPropertyNode`,
 obtained through the `@Cached` annotation,
 as it's a stateless Node;
 the remaining 3 specializations were moved from the `PropertyReadExprNode` class,
-[as it was in the previous part of the series](../part-10/src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/properties/PropertyReadExprNode.java).
+[as it was in the previous part of the series](../part-10/src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/properties/PropertyReadExprNode.java),
+with the small difference that we make the methods `static`,
+since we make both `CommonReadPropertyNode` and `ReadTruffleStringPropertyNode`
+[inlined Nodes](https://github.com/oracle/graal/blob/master/truffle/docs/DSLNodeObjectInlining.md).
 
 Because of this refactoring,
 we can change the

@@ -44,7 +44,7 @@ cached in a field of the
 for this chapter and then passed to the
 [parser class](src/main/java/com/endoflineblog/truffle/part_10/parsing/EasyScriptTruffleParser.java),
 is created by passing the `ArrayObject.class` to the
-[`layout()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/Shape.Builder.html#layout(java.lang.Class))
+[`layout()` method](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/Shape.Builder.html#layout(java.lang.Class,java.lang.invoke.MethodHandles.Lookup))
 of `Shape.Builder`.
 There is a field in `ArrayObject` annotated with the
 [`@DynamicField` annotation](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/object/DynamicObject.DynamicField.html)
