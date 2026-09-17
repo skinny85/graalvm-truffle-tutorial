@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_10.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_10.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
@@ -20,6 +21,7 @@ import com.oracle.truffle.api.nodes.Node;
  * of the {@link FunctionObject}, as those have been removed in this part
  * ({@link FunctionObject} has gone back to being immutable).
  */
+@GenerateInline(false)
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 

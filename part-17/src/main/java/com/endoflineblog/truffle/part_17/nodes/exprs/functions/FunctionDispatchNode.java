@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_17.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_17.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
@@ -16,6 +17,7 @@ import com.oracle.truffle.api.nodes.Node;
  * the only difference is that we handle the new {@link com.oracle.truffle.api.frame.MaterializedFrame}
  * field of {@link FunctionObject}.
  */
+@GenerateInline(false)
 public abstract class FunctionDispatchNode extends Node {
     /**
      * The execution method for this Node.

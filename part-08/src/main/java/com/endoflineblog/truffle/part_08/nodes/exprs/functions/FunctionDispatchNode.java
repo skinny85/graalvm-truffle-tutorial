@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_08.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_08.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.DirectCallNode;
 import com.oracle.truffle.api.nodes.IndirectCallNode;
@@ -16,6 +17,7 @@ import com.oracle.truffle.api.nodes.Node;
  * and by {@link FunctionObject}.
  * Identical to the class with the same name from part 7.
  */
+@GenerateInline(false)
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 
