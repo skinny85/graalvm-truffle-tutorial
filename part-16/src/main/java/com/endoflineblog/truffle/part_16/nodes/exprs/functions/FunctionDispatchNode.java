@@ -14,6 +14,7 @@ import com.oracle.truffle.api.nodes.Node;
  * A helper Node that contains specialization for functions calls.
  * Identical to the class with the same name from part 15.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     /**
      * The execution method for this Node.

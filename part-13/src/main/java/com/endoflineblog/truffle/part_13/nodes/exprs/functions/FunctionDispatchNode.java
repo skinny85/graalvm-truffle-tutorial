@@ -20,6 +20,7 @@ import com.oracle.truffle.api.nodes.Node;
  * {@link com.endoflineblog.truffle.part_13.nodes.exprs.objects.ThisExprNode}
  * works correctly.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     /**
      * The execution method for this Node.

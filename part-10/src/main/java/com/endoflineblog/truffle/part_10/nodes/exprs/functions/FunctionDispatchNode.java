@@ -20,6 +20,7 @@ import com.oracle.truffle.api.nodes.Node;
  * of the {@link FunctionObject}, as those have been removed in this part
  * ({@link FunctionObject} has gone back to being immutable).
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 

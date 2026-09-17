@@ -21,6 +21,7 @@ import com.oracle.truffle.api.nodes.Node;
  * This is in order to allow correctly
  * {@link WriteFunctionArgExprNode writing to function arguments}.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 

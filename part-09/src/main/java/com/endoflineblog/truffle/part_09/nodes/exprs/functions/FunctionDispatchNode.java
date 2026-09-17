@@ -22,6 +22,7 @@ import com.oracle.truffle.api.nodes.Node;
  *
  * @see #dispatchDirectly
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 

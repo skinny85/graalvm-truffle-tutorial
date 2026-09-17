@@ -21,6 +21,7 @@ import com.oracle.truffle.api.nodes.Node;
  * @see FunctionObject#methodTarget
  * @see #extendArguments
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 

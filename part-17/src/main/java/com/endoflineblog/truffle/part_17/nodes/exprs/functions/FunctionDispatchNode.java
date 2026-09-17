@@ -16,6 +16,7 @@ import com.oracle.truffle.api.nodes.Node;
  * the only difference is that we handle the new {@link com.oracle.truffle.api.frame.MaterializedFrame}
  * field of {@link FunctionObject}.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     /**
      * The execution method for this Node.

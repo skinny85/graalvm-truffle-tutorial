@@ -16,6 +16,7 @@ import com.oracle.truffle.api.nodes.Node;
  * and by {@link FunctionObject}.
  * Identical to the class with the same name from part 7.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 
