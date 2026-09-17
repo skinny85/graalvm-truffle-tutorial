@@ -20,7 +20,7 @@ jobs:
           distribution: 'graalvm'
 
       - name: Cache Gradle packages
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build and test the project (all parts)
         run: ./gradlew build
