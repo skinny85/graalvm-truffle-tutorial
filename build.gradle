@@ -18,7 +18,8 @@ subprojects {
     test {
         useJUnitPlatform()
 
-        jvmArgs '-ea', '--enable-native-access=ALL-UNNAMED'
+        jvmArgs '-ea', '--enable-native-access=ALL-UNNAMED',
+                '--sun-misc-unsafe-memory-access=allow'
 
         testLogging {
             events 'failed'
