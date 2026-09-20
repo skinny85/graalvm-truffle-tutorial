@@ -39,7 +39,7 @@ public final class BlockDebuggerScopeObject extends AbstractDebuggerScopeObject 
     @ExportMessage
     Object toDisplayString(
             @SuppressWarnings("unused") boolean allowSideEffects,
-            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock
+            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock
     ) {
         return nodeGrandParentBlock instanceof RootNode
                 ? ((RootNode) nodeGrandParentBlock).getName()
@@ -48,13 +48,13 @@ public final class BlockDebuggerScopeObject extends AbstractDebuggerScopeObject 
 
     @ExportMessage
     boolean hasScopeParent(
-            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock) {
+            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock) {
         return !(nodeGrandParentBlock instanceof StmtBlockRootNode);
     }
 
     @ExportMessage
     Object getScopeParent(
-            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock)
+            @Cached(value = "this.blockStmtNode.findParentBlock()", adopt = false, allowUncached = true, neverDefault = true) @Shared("nodeGrandParentBlock") Node nodeGrandParentBlock)
             throws UnsupportedMessageException {
         if (nodeGrandParentBlock instanceof BlockStmtNode) {
             return new BlockDebuggerScopeObject((BlockStmtNode) nodeGrandParentBlock, this.frame);
