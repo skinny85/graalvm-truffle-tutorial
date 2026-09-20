@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_13.runtime.ClassPrototypeObject;
 import com.endoflineblog.truffle.part_13.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.library.CachedLibrary;
@@ -20,6 +21,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  *
  * @see #readNonLengthProperty
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";
 
@@ -34,7 +36,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected Object readStringIndex(
             TruffleString truffleString,
             int index,
-            @Cached TruffleString.CodePointLengthNode lengthNode,
+            @Cached @Shared TruffleString.CodePointLengthNode lengthNode,
             @Cached TruffleString.SubstringNode substringNode) {
         return index < 0 || index >= EasyScriptTruffleStrings.length(truffleString, lengthNode)
                 ? Undefined.INSTANCE
@@ -50,7 +52,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected int readLengthProperty(
             TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
-            @Cached TruffleString.CodePointLengthNode lengthNode) {
+            @Cached @Shared TruffleString.CodePointLengthNode lengthNode) {
         return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 
@@ -58,7 +60,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected Object readNonLengthProperty(
             @SuppressWarnings("unused") TruffleString truffleString,
             Object property,
-            @Cached("currentLanguageContext().shapesAndPrototypes.stringPrototype") ClassPrototypeObject stringPrototype,
+            @Cached(value = "currentLanguageContext().shapesAndPrototypes.stringPrototype", neverDefault = true) ClassPrototypeObject stringPrototype,
             @CachedLibrary(limit = "2") DynamicObjectLibrary stringPrototypeObjectLibrary) {
         return stringPrototypeObjectLibrary.getOrDefault(stringPrototype, property,
                 Undefined.INSTANCE);

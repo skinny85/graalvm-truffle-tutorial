@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_12.runtime.EasyScriptTruffleStrings;
 import com.endoflineblog.truffle.part_12.runtime.FunctionObject;
 import com.endoflineblog.truffle.part_12.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -15,6 +16,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * Identical to the class with the same name from part 11.
  */
 @ImportStatic(EasyScriptTruffleStrings.class)
+@SuppressWarnings("truffle-inlining")
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected static final String LENGTH_PROP = "length";
     protected static final String CHAR_AT_PROP = "charAt";
@@ -30,7 +32,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected Object readStringIndex(
             TruffleString truffleString,
             int index,
-            @Cached TruffleString.CodePointLengthNode lengthNode,
+            @Cached @Shared TruffleString.CodePointLengthNode lengthNode,
             @Cached TruffleString.SubstringNode substringNode) {
         return index < 0 || index >= EasyScriptTruffleStrings.length(truffleString, lengthNode)
                 ? Undefined.INSTANCE
@@ -46,7 +48,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     protected int readLengthProperty(
             TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
-            @Cached TruffleString.CodePointLengthNode lengthNode) {
+            @Cached @Shared TruffleString.CodePointLengthNode lengthNode) {
         return EasyScriptTruffleStrings.length(truffleString, lengthNode);
     }
 
@@ -61,7 +63,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     @Specialization(guards = {
             "CHAR_AT_PROP.equals(propertyName)",
             "same(charAtMethod.methodTarget, truffleString)"
-    })
+    }, limit = "1")
     protected FunctionObject readCharAtPropertyCached(
             @SuppressWarnings("unused") TruffleString truffleString,
             @SuppressWarnings("unused") String propertyName,
