@@ -2,6 +2,7 @@ package com.endoflineblog.truffle.part_14.nodes.exprs.properties;
 
 import com.endoflineblog.truffle.part_14.exceptions.EasyScriptException;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -16,6 +17,7 @@ import com.oracle.truffle.api.nodes.Node;
  * Used by {@link PropertyWriteExprNode} and {@link com.endoflineblog.truffle.part_14.nodes.exprs.arrays.ArrayIndexWriteExprNode}.
  * Identical to the class with the same name from part 13.
  */
+@GenerateInline(false)
 public abstract class CommonWritePropertyNode extends Node {
     public abstract Object executeWriteProperty(Object target, Object property, Object rvalue);
 
