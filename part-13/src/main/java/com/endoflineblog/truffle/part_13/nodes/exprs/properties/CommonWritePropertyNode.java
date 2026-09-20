@@ -15,6 +15,7 @@ import com.oracle.truffle.api.nodes.Node;
  * Analogous to {@link CommonReadPropertyNode}.
  * Used by {@link PropertyWriteExprNode} and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexWriteExprNode}.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class CommonWritePropertyNode extends Node {
     public abstract Object executeWriteProperty(Object target, Object property, Object rvalue);
 
