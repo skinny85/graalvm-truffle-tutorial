@@ -6,6 +6,7 @@ import com.endoflineblog.truffle.part_17.nodes.exprs.objects.SuperExprNode;
 import com.endoflineblog.truffle.part_17.nodes.exprs.properties.CommonReadPropertyNode;
 import com.endoflineblog.truffle.part_17.runtime.EasyScriptTruffleStrings;
 import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.NodeChild;
@@ -25,6 +26,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  */
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
+@SuppressWarnings("truffle-inlining")
 public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     /**
      * The Node that contains the specializations that in previous parts were in
@@ -64,9 +66,9 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
                 @SuppressWarnings("unused") TruffleString propertyName,
                 @Cached @SuppressWarnings("unused") TruffleString.EqualNode equalNode,
                 @Cached("propertyName") @SuppressWarnings("unused") TruffleString cachedPropertyName,
-                @Cached @SuppressWarnings("unused") TruffleString.ToJavaStringNode toJavaStringNode,
+                @Cached @Shared @SuppressWarnings("unused") TruffleString.ToJavaStringNode toJavaStringNode,
                 @Cached("toJavaStringNode.execute(cachedPropertyName)") String javaStringPropertyName,
-                @Cached CommonReadPropertyNode commonReadPropertyNode) {
+                @Cached @Shared CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(target, javaStringPropertyName);
         }
 
@@ -77,8 +79,8 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
         @Specialization(replaces = "readTruffleStringPropertyCached")
         protected Object readTruffleStringPropertyUncached(
                 Object target, TruffleString propertyName,
-                @Cached TruffleString.ToJavaStringNode toJavaStringNode,
-                @Cached CommonReadPropertyNode commonReadPropertyNode) {
+                @Cached @Shared TruffleString.ToJavaStringNode toJavaStringNode,
+                @Cached @Shared CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(target,
                     toJavaStringNode.execute(propertyName));
         }
@@ -92,7 +94,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
         protected Object readNonTruffleStringPropertyOfObject(
                 Object target, Object property,
                 @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary,
-                @Cached CommonReadPropertyNode commonReadPropertyNode) {
+                @Cached @Shared CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(
                     target, EasyScriptTruffleStrings.toString(property));
         }
@@ -104,7 +106,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
         @Fallback
         protected Object readNonTruffleStringPropertyOfNonObject(
                 Object target, Object index,
-                @Cached CommonReadPropertyNode commonReadPropertyNode) {
+                @Cached @Shared CommonReadPropertyNode commonReadPropertyNode) {
             return commonReadPropertyNode.executeReadProperty(target, index);
         }
     }
