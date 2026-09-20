@@ -25,6 +25,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * to search for the property in the prototype of {@code Object},
  * in code like {@code true.hasOwnProperty('x')}.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class CommonReadPropertyNode extends EasyScriptNode {
     public abstract Object executeReadProperty(Object target, Object property);
 

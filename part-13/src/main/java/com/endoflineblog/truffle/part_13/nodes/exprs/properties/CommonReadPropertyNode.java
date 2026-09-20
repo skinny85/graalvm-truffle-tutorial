@@ -18,6 +18,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  * Identical to the class with the same name from part 12.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class CommonReadPropertyNode extends Node {
     public abstract Object executeReadProperty(Object target, Object property);
 

@@ -17,6 +17,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * A Node containing the shared logic of reading a property of a JavaScript object.
  * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_11.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  */
+@SuppressWarnings("truffle-inlining")
 public abstract class CommonReadPropertyNode extends Node {
     public abstract Object executeReadProperty(Object target, Object property);
 
