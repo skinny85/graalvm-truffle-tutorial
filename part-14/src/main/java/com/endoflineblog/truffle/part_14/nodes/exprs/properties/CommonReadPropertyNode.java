@@ -8,6 +8,7 @@ import com.endoflineblog.truffle.part_14.runtime.ObjectPrototype;
 import com.endoflineblog.truffle.part_14.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -25,6 +26,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * to search for the property in the prototype of {@code Object},
  * in code like {@code true.hasOwnProperty('x')}.
  */
+@GenerateInline(false)
 public abstract class CommonReadPropertyNode extends EasyScriptNode {
     public abstract Object executeReadProperty(Object target, Object property);
 
@@ -68,8 +70,8 @@ public abstract class CommonReadPropertyNode extends EasyScriptNode {
     @Fallback
     protected Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
             @SuppressWarnings("unused") Object property,
-            @Cached("currentLanguageContext().shapesAndPrototypes.objectPrototype") ObjectPrototype objectPrototype,
-            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary) {
+            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary,
+            @Cached("currentLanguageContext().shapesAndPrototypes.objectPrototype") ObjectPrototype objectPrototype) {
         return dynamicObjectLibrary.getOrDefault(objectPrototype,
                 EasyScriptTruffleStrings.toString(property), Undefined.INSTANCE);
     }

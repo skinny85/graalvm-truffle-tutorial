@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_13.nodes.exprs.strings.ReadTruffleStringPr
 import com.endoflineblog.truffle.part_13.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -18,6 +19,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_13.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  * Identical to the class with the same name from part 12.
  */
+@GenerateInline(false)
 public abstract class CommonReadPropertyNode extends Node {
     public abstract Object executeReadProperty(Object target, Object property);
 

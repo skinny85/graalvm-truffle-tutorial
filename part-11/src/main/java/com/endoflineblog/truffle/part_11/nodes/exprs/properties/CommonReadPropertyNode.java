@@ -5,6 +5,7 @@ import com.endoflineblog.truffle.part_11.nodes.exprs.strings.ReadTruffleStringPr
 import com.endoflineblog.truffle.part_11.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
+import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.UnknownIdentifierException;
@@ -17,6 +18,7 @@ import com.oracle.truffle.api.strings.TruffleString;
  * A Node containing the shared logic of reading a property of a JavaScript object.
  * Used by {@link PropertyReadExprNode} and {@link com.endoflineblog.truffle.part_11.nodes.exprs.arrays.ArrayIndexReadExprNode}.
  */
+@GenerateInline(false)
 public abstract class CommonReadPropertyNode extends Node {
     public abstract Object executeReadProperty(Object target, Object property);
 
