@@ -26,7 +26,7 @@ We do that with the [`StringEscapeUtils.unescapeJson()` method](https://commons.
 from the [Apache Commons Text library](https://commons.apache.org/proper/commons-text),
 which we add as a [dependency to Gradle](build.gradle).
 
-We will use the [`TruffleString` class](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/TruffleStrings)
+We will use the [`TruffleString` class](https://www.graalvm.org/jdk25/graalvm-as-a-platform/language-implementation-framework/TruffleStrings)
 provided by Truffle to represent strings at runtime.
 Given that, our [string literal Node](src/main/java/com/endoflineblog/truffle/part_11/nodes/exprs/literals/StringLiteralExprNode.java)
 simply creates an instance of that class from a Java string that we get from the parser.

@@ -18,7 +18,7 @@ The Nodes implementing those expressions are
 and [`ArrayIndexWriteExprNode`](src/main/java/com/endoflineblog/truffle/part_10/nodes/exprs/arrays/ArrayIndexWriteExprNode.java),
 respectively.
 Accessing of the array elements is performed through a
-[Truffle library](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/TruffleLibraries),
+[Truffle library](https://www.graalvm.org/jdk25/graalvm-as-a-platform/language-implementation-framework/TruffleLibraries),
 [`InteropLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html),
 which we've already seen in previous chapters.
 However, we now use it directly, getting an instance of it with the
@@ -31,14 +31,14 @@ as setting it to `1` sometimes makes the code slower for some unknown reason.
 
 The implementations of those Nodes use the
 [`ArrayObject` class](src/main/java/com/endoflineblog/truffle/part_10/runtime/ArrayObject.java).
-This is a Truffle [Dynamic Object](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel),
+This is a Truffle [Dynamic Object](https://www.graalvm.org/jdk21/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel),
 which means it implicitly implements the [`TruffleObject` interface](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/TruffleObject.html).
 It exports the appropriate messages for dealing with arrays, like
 [`getArraySize()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#getArraySize(java.lang.Object)),
 [`readArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readArrayElement(java.lang.Object,long))
 and [`writeArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeArrayElement(java.lang.Object,long,java.lang.Object)).
 
-The [Shape for arrays](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel/#extended-object-layout),
+The [Shape for arrays](https://www.graalvm.org/jdk21/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel/#extended-object-layout),
 cached in a field of the
 [`TruffleLanguage` class](src/main/java/com/endoflineblog/truffle/part_10/EasyScriptTruffleLanguage.java)
 for this chapter and then passed to the
@@ -93,7 +93,7 @@ we need to change the `Math` object.
 Since we know exactly what properties `Math` has,
 and we don't support property assignments in this chapter yet,
 we will implement it using the opposite of Dynamic Object,
-[Static Object](https://www.graalvm.org/latest/graalvm-as-a-platform/language-implementation-framework/StaticObjectModel).
+[Static Object](https://www.graalvm.org/jdk25/graalvm-as-a-platform/language-implementation-framework/StaticObjectModel).
 
 The code is in the
 [`MathObject` class](src/main/java/com/endoflineblog/truffle/part_10/runtime/MathObject.java).
