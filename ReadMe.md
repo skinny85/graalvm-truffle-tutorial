@@ -1,7 +1,7 @@
 # GraalVM Truffle tutorial
 
 This repository contains the code for a tutorial on the
-[Truffle language implementation framework](https://github.com/oracle/graal/blob/master/truffle/docs/README.md)
+[Truffle language implementation framework](https://www.graalvm.org/jdk25/graalvm-as-a-platform/language-implementation-framework)
 that I've [written for my blog](http://endoflineblog.com/graal-truffle-tutorial-part-0-what-is-truffle).
 It focuses on implementing a language I call EasyScript,
 which is a very simplified subset of JavaScript.

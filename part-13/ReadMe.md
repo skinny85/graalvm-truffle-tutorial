@@ -46,7 +46,7 @@ and uses the
 [`writeMember` message from the `InteropLibrary`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeMember(java.lang.Object,java.lang.String,java.lang.Object))
 to perform the actual property writes.
 We make it an
-[inline Node](https://github.com/oracle/graal/blob/master/truffle/docs/DSLNodeObjectInlining.md),
+[inline Node](https://www.graalvm.org/jdk25/graalvm-as-a-platform/language-implementation-framework/DSLNodeObjectInlining),
 same as `CommonReadPropertyNode`.
 
 The handling of the `writeMember()` interop library message is in the new

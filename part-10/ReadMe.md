@@ -38,7 +38,7 @@ It exports the appropriate messages for dealing with arrays, like
 [`readArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#readArrayElement(java.lang.Object,long))
 and [`writeArrayElement()`](https://www.graalvm.org/truffle/javadoc/com/oracle/truffle/api/interop/InteropLibrary.html#writeArrayElement(java.lang.Object,long,java.lang.Object)).
 
-The [Shape for arrays](https://www.graalvm.org/jdk21/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel/#extended-object-layout),
+The [Shape for arrays](https://www.graalvm.org/jdk21/graalvm-as-a-platform/language-implementation-framework/DynamicObjectModel#extended-object-layout),
 cached in a field of the
 [`TruffleLanguage` class](src/main/java/com/endoflineblog/truffle/part_10/EasyScriptTruffleLanguage.java)
 for this chapter and then passed to the
