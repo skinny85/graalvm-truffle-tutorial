@@ -41,7 +41,7 @@ public abstract class FunctionDispatchNode extends Node {
     protected static Object dispatchDirectly(
             FunctionObject function,
             Object[] arguments,
-            @SuppressWarnings("unused") @Cached("function.getFunctionWasNotRedefinedAssumption()") Assumption functionWasNotRedefined,
+            @Cached("function.getFunctionWasNotRedefinedAssumption()") @SuppressWarnings("unused") Assumption functionWasNotRedefined,
             @Cached("create(function.getCallTarget())") DirectCallNode directCallNode) {
         return directCallNode.call(extendArguments(arguments, function));
     }

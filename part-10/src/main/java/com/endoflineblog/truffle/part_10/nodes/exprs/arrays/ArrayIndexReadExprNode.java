@@ -39,7 +39,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "2")
     protected Object indexUndefined(@SuppressWarnings("unused") Object target,
             Object index,
-            @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary) {
+            @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary) {
         throw new EasyScriptException("Cannot read properties of undefined (reading '" + index + "')");
     }
 
