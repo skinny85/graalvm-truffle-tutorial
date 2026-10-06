@@ -12,7 +12,7 @@ You create instances of `AdditionNodeGen` by calling its static factory `create(
 and providing the two child nodes.
 
 See the tests in [`ExecuteNodesDslTest`](src/test/java/com/endoflineblog/truffle/part_03/ExecuteNodesDslTest.java)
-on how to use the generated `AdditonNodeGen` class.
+on how to use the generated `AdditionNodeGen` class.
 
 ## `@TypeSystem`
 

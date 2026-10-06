@@ -76,7 +76,7 @@ in order to not pollute the public API of the class with these interop-specific 
 
 Since we can now return an instance of the
 [`Undefined` class](src/main/java/com/endoflineblog/truffle/part_05/runtime/Undefined.java),
-which represents the JavaScript `undefined` vale,
+which represents the JavaScript `undefined` value,
 when evaluating EasyScript code
 (in programs like `let a; a`),
 it also needs to be a GraalVM interop object,

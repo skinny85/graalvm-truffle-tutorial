@@ -118,7 +118,7 @@ With it, we simply implement a different interface, `RepeatingNode`,
 and its `executeRepeating()` method.
 In that method, we execute the body of the loop, once,
 and then return a boolean from it indicating whether we should continue with the next iteration of the loop.
-If we return `true`, `LoopNode` will call `executeRepating()` again,
+If we return `true`, `LoopNode` will call `executeRepeating()` again,
 if we return `false`, the loop will terminate.
 
 We have to make sure to catch `BreakException` and `ContinueException`

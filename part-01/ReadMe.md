@@ -55,7 +55,7 @@ by calling their `getCallTarget()` method.
 In our case, the root node is `EasyScriptRootNode`.
 
 With a `CallTarget` reference,
-we can finally invoke its `calll` method with no arguments.
+we can finally invoke its `call` method with no arguments.
 That will create a `VirtualFrame` instance,
 and call the `execute` method of the `RootNode` it got passed,
 which in turn calls the `executeInt` method of `EasyScriptNode`.

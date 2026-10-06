@@ -18,7 +18,7 @@ The second is the `try` statement,
 used for handling exceptions,
 and which comes in two flavors:
 one with the `catch` statement followed by an optional `finally` statement
-(which executes regardless whether an option was thrown in the `try` block, or not),
+(which executes, regardless whether an exception was thrown in the `try` block, or not),
 or one where `catch` is missing,
 in which case the `finally` part becomes required --
 for that reason, we have two grammar rules for the `try` statement,
