@@ -84,7 +84,7 @@ public abstract class CommonReadPropertyNode extends EasyScriptNode {
     @Fallback
     protected static Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
             @SuppressWarnings("unused") Object property,
-            @Cached(value = "currentLanguageContext().shapesAndPrototypes.objectPrototype", neverDefault = true) ObjectPrototype objectPrototype,
+            @Cached("currentLanguageContext().shapesAndPrototypes.objectPrototype") ObjectPrototype objectPrototype,
             @CachedLibrary("objectPrototype") DynamicObjectLibrary dynamicObjectLibrary) {
         return dynamicObjectLibrary.getOrDefault(objectPrototype,
                 EasyScriptTruffleStrings.toString(property), Undefined.INSTANCE);
