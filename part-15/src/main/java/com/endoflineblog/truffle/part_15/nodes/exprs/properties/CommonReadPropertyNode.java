@@ -10,7 +10,6 @@ import com.endoflineblog.truffle.part_15.runtime.ErrorJavaScriptObject;
 import com.endoflineblog.truffle.part_15.runtime.ObjectPrototype;
 import com.endoflineblog.truffle.part_15.runtime.Undefined;
 import com.oracle.truffle.api.dsl.Cached;
-import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.GenerateInline;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -67,7 +66,7 @@ public abstract class CommonReadPropertyNode extends EasyScriptNode {
             @SuppressWarnings("unused") Object target,
             Object property,
             @CachedLibrary("target") @SuppressWarnings("unused") InteropLibrary interopLibrary,
-            @CachedLibrary(limit = "2") @Shared DynamicObjectLibrary dynamicObjectLibrary,
+            @CachedLibrary(limit = "2") DynamicObjectLibrary dynamicObjectLibrary,
             @Cached("currentLanguageContext().shapesAndPrototypes") @SuppressWarnings("truffle-neverdefault") ShapesAndPrototypes shapesAndPrototypes) {
         var typeError = new ErrorJavaScriptObject(
                 "TypeError",
@@ -85,8 +84,8 @@ public abstract class CommonReadPropertyNode extends EasyScriptNode {
     @Fallback
     protected static Object readPropertyOfNonUndefinedWithoutMembers(@SuppressWarnings("unused") Object target,
             @SuppressWarnings("unused") Object property,
-            @CachedLibrary(limit = "2") @Shared DynamicObjectLibrary dynamicObjectLibrary,
-            @Cached(value = "currentLanguageContext().shapesAndPrototypes.objectPrototype", neverDefault = true) ObjectPrototype objectPrototype) {
+            @Cached(value = "currentLanguageContext().shapesAndPrototypes.objectPrototype", neverDefault = true) ObjectPrototype objectPrototype,
+            @CachedLibrary("objectPrototype") DynamicObjectLibrary dynamicObjectLibrary) {
         return dynamicObjectLibrary.getOrDefault(objectPrototype,
                 EasyScriptTruffleStrings.toString(property), Undefined.INSTANCE);
     }
