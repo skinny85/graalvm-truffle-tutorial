@@ -83,6 +83,9 @@ With these changes, re-running the benchmark produces the following numbers:
 ```
 Benchmark                              Mode  Cnt    Score   Error  Units
 FibonacciBenchmark.recursive_eval_ezs  avgt    5  102.190 ± 1.099  us/op
+FibonacciBenchmark.recursive_eval_js   avgt    5   78.143 ± 3.453  us/op
+FibonacciBenchmark.recursive_eval_sl   avgt    5   55.662 ± 3.395  us/op
+FibonacciBenchmark.recursive_java      avgt    5   38.383 ± 1.046  us/op
 ```
 
 We have achieved almost a 60x speedup compared to the version from [part 8](../part-08).
@@ -96,36 +99,45 @@ It’s a project maintained by the same team that maintains GraalVM and Truffle,
 and allows visualizing as graphs the many debug trees that Truffle and Graal produce in the process of interpreting your language.
 
 To have your Truffle interpreter emit graphs to consume in IGV,
-you need to add the `-Dgraal.Dump=:1` JVM argument when starting it.
-You can send the dumps directly to the program with the `-Dgraal.PrintGraph=Network`,
-or to a specific file by passing the `-Dgraal.DumpPath` argument
-(the default is to save them in the `graal_dumps` folder in the current directory if they cannot be delivered to a running instance of IGV).
+you need to add the `-Djdk.graal.Dump=:1` JVM argument when starting it.
+The default destination for the graphs is to save them in the `graal_dumps`
+folder in the current directory.
+You can send the graph files to a different folder by passing the `-Djdk.graal.DumpPath` argument.
+Additionally, Graal tends to produce a lot of graphs,
+so it's useful to filter them to only the `RootNode`s
+of your language's implementation with the `-Djdk.graal.MethodFilter` argument.
 
-For example, to dump the data from the EasyScript benchmark,
-you can add the appropriate JVM arguments in the benchmark configuration:
+For example, to save the graphs from the EasyScript benchmark,
+you can add the appropriate JVM arguments to the benchmark configuration:
 
 ```java
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+
+public class FibonacciBenchmark extends TruffleBenchmark {
+    // ...
+
     @Fork(jvmArgsPrepend = {
-            "-Dgraal.Dump=:1",
-            "-Dgraal.PrintGraph=Network"
+            "-Djdk.graal.Dump=:1",
+            "-Djdk.graal.MethodFilter=*StmtBlockRootNode*",
     })
     @Benchmark
     public int recursive_eval_ezs() {
         return this.truffleContext.eval("ezs", FIBONACCI_JS_PROGRAM).asInt();
     }
+}
 ```
 
-After [downloading IGV](https://www.oracle.com/downloads/graalvm-downloads.html)
-(it's under the "Archived Enterprise Releases" tab),
-run it by executing `./idealgraphvisualizer`
-in the `bin` directory of the downloaded and uncompressed program.
-Now, when running the benchmark, you should see in the output:
+With these changes, when running the benchmark, you should see these lines in the output:
 
 ```shell-session
-[Use -Dgraal.LogFile=<path> to redirect Graal log output to a file.]
-Connected to the IGV on 127.0.0.1:4445
+...
+Dumping IGV graphs in /Users/user/graalvm-truffle-tutorial/part-09/graal_dumps/2026.05.13.19.27.59.067
+...
 ```
 
-And a bunch of graphs should appear in the "Outline" menu on the left:
+After [starting IGV](https://www.graalvm.org/jdk25/tools/igv/#get-started),
+you can now open the graph files from the above directory,
+and a bunch of entries should appear in the "Outline" menu on the left:
 
 ![](img/igv-screenshot.png)
