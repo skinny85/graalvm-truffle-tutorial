@@ -14,6 +14,7 @@ import java.util.List;
  */
 public final class ArrayLiteralExprNode extends EasyScriptExprNode {
     private final Shape arrayShape;
+
     @Children
     private final EasyScriptExprNode[] arrayElementExprs;
 
