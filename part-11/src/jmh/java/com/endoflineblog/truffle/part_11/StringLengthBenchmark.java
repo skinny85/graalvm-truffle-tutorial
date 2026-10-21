@@ -2,6 +2,9 @@ package com.endoflineblog.truffle.part_11;
 
 import org.openjdk.jmh.annotations.Benchmark;
 
+/**
+ * A simple benchmark for accessing built-in properties of strings.
+ */
 public class StringLengthBenchmark extends TruffleBenchmark {
     private static final int INPUT = 1_000_000;
 
